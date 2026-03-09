@@ -1,0 +1,73 @@
+# Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
+
+.env
+
+# dependencies
+node_modules/
+
+# Expo
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+
+# Native
+.kotlin/
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+
+# Metro
+.metro-health-check*
+
+# debug
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# macOS
+.DS_Store
+*.pem
+
+# local env files
+.env*.local
+
+# typescript
+*.tsbuildinfo
+
+# iOS
+# Xcode build artifacts
+ios/build/
+ios/DerivedData/
+ios/*.xcworkspace/xcuserdata/
+ios/*.xcodeproj/xcuserdata/
+ios/*.xcodeproj/project.xcworkspace/xcuserdata/
+
+# Pods (if using CocoaPods)
+ios/Pods/
+
+# Specific build files
+ios/**/*.mode1v3
+ios/**/*.mode2v3
+ios/**/*.perspectivev3
+ios/**/*.pbxuser
+ios/**/*.xccheckout
+ios/**/*.moved-aside
+ios/**/*.hmap
+ios/**/*.ipa
+ios/**/*.dSYM.zip
+ios/**/*.dSYM
+
+# Timeline and playground files
+ios/*.playground/timeline.xctimeline
+ios/*.playground/xcuserdata/
+
+# Swift Package Manager
+ios/.swiftpm/
+ios/*.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/
+
+# TODO: Update this to retain android specific config
+/android
