@@ -7,9 +7,12 @@ import {
   useCompleteAction,
   useDeactivateAction,
   useGetActionDetail,
+  useGetAllUserActions,
+  useGetNotificationsEnabled,
   useGetUserAction,
 } from "@/lib/api";
 import { getHexColor } from "@/lib/colors";
+import { env } from "@/lib/env";
 import { ActionTypes } from "@/lib/state/actions.model";
 import tw from "@/lib/tw";
 import Entypo from "@expo/vector-icons/Entypo";
@@ -53,6 +56,18 @@ export default function ActionDetailScreen() {
   const activateAction = useActivateAction();
   const deactivateAction = useDeactivateAction();
   const completeAction = useCompleteAction();
+
+  const { data: notificationsEnabled } = useGetNotificationsEnabled(user?.id);
+  const { data: allUserActions } = useGetAllUserActions(user?.id);
+
+  const totalCompletions = allUserActions?.reduce(
+    (sum, a) => sum + a.completionCount,
+    0,
+  ) ?? 0;
+  const shouldPromptForReminders =
+    env.flags.useReminders &&
+    notificationsEnabled === false &&
+    totalCompletions === 0;
 
   useEffect(() => {
     trackEvent("screen_viewed", { screen_name: "Action Detail" });
@@ -101,7 +116,12 @@ export default function ActionDetailScreen() {
         actionId: isCatalogView ? id : actionData.id,
       });
       trackEvent("action_activated", { action_id: actionData.id });
-      router.replace("/(tabs)/(home)");
+
+      if (shouldPromptForReminders) {
+        router.replace(`/(action)/${id}/reminders` as any);
+      } else {
+        router.replace("/(tabs)/(home)");
+      }
     } catch (error) {
       console.error("Error activating action:", error);
     }

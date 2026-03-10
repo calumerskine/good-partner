@@ -10,6 +10,7 @@ export default function ActionScreenLayout() {
     >
       <Stack.Screen name="[id]" />
       <Stack.Screen name="[id]/success" />
+      <Stack.Screen name="[id]/reminders" />
     </Stack>
   );
 }
