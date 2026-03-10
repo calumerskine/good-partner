@@ -183,7 +183,7 @@ export function useToggleNotificationsEnabled() {
 
       // Snapshot the previous value for rollback
       const previousValue = queryClient.getQueryData<boolean>(
-        queryKeys.notificationsEnabled(userId)
+        queryKeys.notificationsEnabled(userId),
       );
 
       // Optimistically update to the new value
@@ -198,7 +198,7 @@ export function useToggleNotificationsEnabled() {
       if (context) {
         queryClient.setQueryData(
           queryKeys.notificationsEnabled(context.userId),
-          context.previousValue
+          context.previousValue,
         );
       }
     },
@@ -292,7 +292,7 @@ async function getActionsCatalog(): Promise<CatalogAction[]> {
       action_categories (
         name
       )
-    `
+    `,
     )
     .order("title", { ascending: true });
 
@@ -322,7 +322,7 @@ async function getActionsCatalog(): Promise<CatalogAction[]> {
  */
 export function useGetSuggestedActions(
   userId?: string,
-  categories: Category[] = []
+  categories: Category[] = [],
 ) {
   return useQuery({
     queryKey: queryKeys.suggestedActions(),
@@ -334,24 +334,47 @@ export function useGetSuggestedActions(
 
 async function getSuggestedActions(
   userId: string,
-  categories: Category[]
+  categories: Category[],
 ): Promise<CatalogAction[]> {
-  // Get all user_actions for this user (active or with completions)
-  const { data: userActionsData } = await supabase
+  // Get all user_actions for this user to find active or completed action IDs
+  const { data: userActionsData, error: userActionsError } = await supabase
     .from("user_actions")
-    .select("action_id, is_active, completions(id)")
+    .select("action_id, is_active")
     .eq("user_id", userId);
 
-  // Exclude actions that are either:
-  // 1. Currently active, OR
-  // 2. Have been completed (have completions)
-  const excludedIds =
-    userActionsData
-      ?.filter(
-        (ua: any) =>
-          ua.is_active || (ua.completions && ua.completions.length > 0)
-      )
-      .map((ua) => ua.action_id) || [];
+  if (userActionsError) {
+    throw userActionsError;
+  }
+
+  const activeActionIds = new Set(
+    userActionsData?.filter((ua) => ua.is_active).map((ua) => ua.action_id) ||
+      [],
+  );
+
+  // Also exclude actions that have been completed
+  const userActionIds = userActionsData?.map((ua: any) => ua.action_id) || [];
+  const completedActionIds = new Set<string>();
+
+  if (userActionIds.length > 0) {
+    const { data: completionsData, error: completionsError } = await supabase
+      .from("completions")
+      .select("user_action_id, user_actions!inner(action_id)")
+      .in("user_action_id", userActionsData?.map((ua: any) => ua.id) || []);
+
+    // If completions query fails, we still filter active — don't throw
+    if (!completionsError && completionsData) {
+      completionsData.forEach((c: any) => {
+        if (c.user_actions?.action_id) {
+          completedActionIds.add(c.user_actions.action_id);
+        }
+      });
+    }
+  }
+
+  // Exclude actions that are either currently active or have been completed
+  const excludedIds = [
+    ...new Set([...activeActionIds, ...completedActionIds]),
+  ];
 
   // Fetch available actions with tags, ordered by title
   let query = supabase
@@ -370,11 +393,11 @@ async function getSuggestedActions(
           name
         )
       )
-    `
+    `,
     )
     .in(
       "category_id",
-      categories.map((cat) => cat.id)
+      categories.map((cat) => cat.id),
     )
     .order("title", { ascending: true });
 
@@ -396,7 +419,7 @@ async function getSuggestedActions(
       isFeatured:
         action.action_tags?.some((at: any) => at.tags?.name === "featured") ||
         false,
-    })
+    }),
   );
 
   // Sort by featured first, then by title
@@ -426,9 +449,9 @@ async function getSuggestedActions(
       const quota = actionsPerCategory + (index < remainder ? 1 : 0);
       // Actions are already sorted with featured first
       result.push(
-        ...categoryActions.slice(0, Math.min(quota, categoryActions.length))
+        ...categoryActions.slice(0, Math.min(quota, categoryActions.length)),
       );
-    }
+    },
   );
 
   // Fill remaining slots if needed
@@ -437,9 +460,15 @@ async function getSuggestedActions(
     result.push(...remaining.slice(0, 4 - result.length));
   }
 
-  // Remove isFeatured from final result
-  return result.map(({ isFeatured, ...action }: any) => action);
+  // Remove isFeatured from final result and shuffle
+  const final = result.map(({ isFeatured, ...action }: any) => action);
+  for (let i = final.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [final[i], final[j]] = [final[j], final[i]];
+  }
+  return final;
 }
+
 /**
  * Get actions catalog filtered by category
  */
@@ -452,7 +481,7 @@ export function useGetActionsByCategory(category: string) {
 }
 
 async function getActionsByCategory(
-  category: string
+  category: string,
 ): Promise<CatalogAction[]> {
   // First get the category ID by name
   const { data: categoryData, error: categoryError } = await supabase
@@ -480,7 +509,7 @@ async function getActionsByCategory(
       action_categories (
         name
       )
-    `
+    `,
     )
     .eq("category_id", categoryData.id)
     .order("title", { ascending: true });
@@ -523,7 +552,7 @@ async function getActionDetail(actionId: string): Promise<CatalogAction> {
       action_categories (
         name
       )
-    `
+    `,
     )
     .eq("id", actionId)
     .single();
@@ -606,7 +635,7 @@ async function getActiveActions(userId: string): Promise<UserAction[]> {
           name
         )
       )
-    `
+    `,
     )
     .eq("user_id", userId)
     .eq("is_active", true);
@@ -727,7 +756,7 @@ async function getAllUserActions(userId: string): Promise<UserAction[]> {
           name
         )
       )
-    `
+    `,
     )
     .eq("user_id", userId);
   // No filter on is_active - get all actions
@@ -833,7 +862,10 @@ export function useCompleteAction() {
       });
       // Also invalidate all user actions query for progress screen
       queryClient.invalidateQueries({
-        queryKey: [queryKeys.allUserActions(), queryKeys.suggestedActions()],
+        queryKey: queryKeys.allUserActions(),
+      });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.suggestedActions(),
       });
     },
   });
@@ -862,7 +894,7 @@ async function completeAction(userActionId: string) {
   if (deactivateError) {
     console.error(
       "Error deactivating action after completion:",
-      deactivateError
+      deactivateError,
     );
     // Don't throw here - the completion was successful, just log the deactivation error
   }
@@ -884,10 +916,10 @@ export function useActivateAction() {
     onSuccess: (data, { userId }) => {
       // Invalidate active actions for this user
       queryClient.invalidateQueries({
-        queryKey: [
-          queryKeys.activeActions(userId),
-          queryKeys.suggestedActions(),
-        ],
+        queryKey: queryKeys.activeActions(userId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.suggestedActions(),
       });
     },
   });
@@ -958,7 +990,10 @@ export function useDeactivateAction() {
     onSuccess: () => {
       // Invalidate all active actions queries and suggested actions queries
       queryClient.invalidateQueries({
-        queryKey: [queryKeys.allActiveActions(), queryKeys.suggestedActions()],
+        queryKey: queryKeys.allActiveActions(),
+      });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.suggestedActions(),
       });
     },
   });
@@ -1011,7 +1046,7 @@ async function getUserAction(userActionId: string) {
           name
         )
       )
-    `
+    `,
     )
     .eq("id", userActionId)
     .single();
@@ -1131,7 +1166,7 @@ async function getUserProfile(userId: string): Promise<UserProfile | null> {
         name,
         description
       )
-    `
+    `,
     )
     .eq("profile_id", profile.id);
 
@@ -1182,7 +1217,7 @@ export function useCreateUserProfile() {
 async function createUserProfile(
   userId: string,
   categoryIds: string[],
-  hasCompletedOnboarding: boolean
+  hasCompletedOnboarding: boolean,
 ): Promise<UserProfile> {
   // Create the user profile first
   const { data: profile, error: profileError } = await supabase
@@ -1248,7 +1283,7 @@ export function useUpdateUserCategories() {
 
 async function updateUserCategories(
   userId: string,
-  categoryIds: string[]
+  categoryIds: string[],
 ): Promise<UserProfile> {
   // First get the user profile
   const { data: profile, error: profileError } = await supabase

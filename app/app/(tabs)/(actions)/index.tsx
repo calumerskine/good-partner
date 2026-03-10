@@ -1,5 +1,4 @@
 import ActiveActions from "@/components/home/active-actions";
-import SuggestedActions from "@/components/home/suggested-actions";
 import { useAuth } from "@/hooks/use-auth";
 import { trackEvent } from "@/lib/analytics";
 import { useGetActiveActions, useGetUserProfile } from "@/lib/api";
@@ -77,8 +76,6 @@ export default function ActionsScreen() {
           ))}
         </View>
         <ActiveActions isLoading={isLoading} userActions={userActions} />
-
-        <SuggestedActions user={user} profile={profile} isLoading={false} />
       </ScrollView>
     </SafeAreaView>
   );
