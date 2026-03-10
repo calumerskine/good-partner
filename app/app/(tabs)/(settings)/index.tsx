@@ -36,7 +36,8 @@ export default function SettingsScreen() {
     const shouldEnable = !notificationsEnabled;
 
     if (shouldEnable) {
-      await oneSignalService.getPermission();
+      const granted = await oneSignalService.getPermission();
+      if (!granted) return;
     }
 
     await toggleNotifications({ userId: user.id, enabled: shouldEnable });
