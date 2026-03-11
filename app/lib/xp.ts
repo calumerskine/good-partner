@@ -7,13 +7,13 @@ export type Level = {
 };
 
 export const LEVELS: Level[] = [
-  { level: 1, title: "Seed", cumulativeXp: 0 },
-  { level: 2, title: "Sprout", cumulativeXp: 50 },
-  { level: 3, title: "Sapling", cumulativeXp: 150 },
-  { level: 4, title: "Blooming", cumulativeXp: 325 },
-  { level: 5, title: "Flourishing", cumulativeXp: 575 },
-  { level: 6, title: "Thriving", cumulativeXp: 925 },
-  { level: 7, title: "Evergreen", cumulativeXp: 1425 },
+  { level: 1, title: "Spark", cumulativeXp: 0 },
+  { level: 2, title: "Iron", cumulativeXp: 50 },
+  { level: 3, title: "Bronze", cumulativeXp: 150 },
+  { level: 4, title: "Silver", cumulativeXp: 325 },
+  { level: 5, title: "Gold", cumulativeXp: 575 },
+  { level: 6, title: "Platinum", cumulativeXp: 925 },
+  { level: 7, title: "Resolute", cumulativeXp: 1425 },
 ];
 
 export type LevelInfo = {
