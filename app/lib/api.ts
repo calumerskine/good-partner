@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "./supabase";
+import { XP_PER_COMPLETION } from "./xp";
 
 // Query key factory for better type safety and management
 const queryKeys = {
@@ -854,16 +855,19 @@ export function useCompleteAction() {
     mutationKey: mutationKeys.completeAction,
     mutationFn: (userActionId: string) => completeAction(userActionId),
     onSuccess: () => {
-      // Invalidate all active actions queries to refresh completion counts
       queryClient.invalidateQueries({
         queryKey: queryKeys.allActiveActions(),
       });
-      // Also invalidate all user actions query for progress screen
       queryClient.invalidateQueries({
         queryKey: queryKeys.allUserActions(),
       });
       queryClient.invalidateQueries({
         queryKey: queryKeys.suggestedActions(),
+      });
+      // Invalidate all user profile queries to refresh XP on progress screen.
+      // Uses prefix matching: ["userProfile"] matches ["userProfile", userId]
+      queryClient.invalidateQueries({
+        queryKey: ["userProfile"],
       });
     },
   });
@@ -894,10 +898,35 @@ async function completeAction(userActionId: string) {
       "Error deactivating action after completion:",
       deactivateError,
     );
-    // Don't throw here - the completion was successful, just log the deactivation error
   }
 
-  return data;
+  // Get the user_id from the user_action to increment XP
+  let previousXp = 0;
+  let newXp = 0;
+
+  const { data: userAction, error: userActionError } = await supabase
+    .from("user_actions")
+    .select("user_id")
+    .eq("id", userActionId)
+    .single();
+
+  if (userActionError) {
+    console.error("Error fetching user action for XP increment:", userActionError);
+  } else {
+    const { data: xpResult, error: xpError } = await supabase.rpc("increment_xp", {
+      p_user_id: userAction.user_id,
+      p_amount: XP_PER_COMPLETION,
+    });
+
+    if (xpError) {
+      console.error("Error incrementing XP:", xpError);
+    } else {
+      previousXp = xpResult.previous_xp;
+      newXp = xpResult.new_xp;
+    }
+  }
+
+  return { ...data, previousXp, newXp };
 }
 
 /**
@@ -1101,6 +1130,7 @@ export type UserProfile = {
   categories: Category[];
   createdAt: Date;
   hasCompletedOnboarding: boolean;
+  totalXp: number;
 };
 
 /**
@@ -1142,7 +1172,7 @@ async function getUserProfile(userId: string): Promise<UserProfile | null> {
   // First get the user profile
   const { data: profile, error: profileError } = await supabase
     .from("user_profiles")
-    .select("id, user_id, user_tier, created_at, has_completed_onboarding")
+    .select("id, user_id, user_tier, created_at, has_completed_onboarding, total_xp")
     .eq("user_id", userId)
     .single();
 
@@ -1183,6 +1213,7 @@ async function getUserProfile(userId: string): Promise<UserProfile | null> {
     userTier: profile.user_tier,
     createdAt: new Date(profile.created_at),
     hasCompletedOnboarding: profile.has_completed_onboarding,
+    totalXp: profile.total_xp ?? 0,
   };
 }
 

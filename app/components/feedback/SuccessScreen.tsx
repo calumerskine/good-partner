@@ -1,5 +1,6 @@
 import { type ActionType } from "@/lib/state/actions.model";
 import tw from "@/lib/tw";
+import { XP_PER_COMPLETION, getLevelForXp } from "@/lib/xp";
 import { MotiView } from "moti";
 import { useEffect, useState } from "react";
 import { Text, View } from "react-native";
@@ -13,8 +14,6 @@ import Animated, {
 } from "react-native-reanimated";
 import Svg, { Circle } from "react-native-svg";
 import Button from "../ui/button";
-
-const XP_AMOUNT = 25;
 
 const CIRCLE_SIZE = 140;
 const CIRCLE_STROKE = 8;
@@ -256,14 +255,88 @@ function AnimatedXPCounter({
   );
 }
 
+function LevelProgress({
+  previousXp,
+  newXp,
+  color,
+}: {
+  previousXp: number;
+  newXp: number;
+  color: string;
+}) {
+  const prevLevel = getLevelForXp(previousXp);
+  const newLevel = getLevelForXp(newXp);
+  const isLevelUp = prevLevel.level !== newLevel.level;
+
+  if (newLevel.isMaxLevel && prevLevel.isMaxLevel) {
+    return null;
+  }
+
+  // Show progress within the NEW level
+  const displayLevel = newLevel;
+
+  return (
+    <MotiView
+      from={{ opacity: 0, translateY: 10 }}
+      animate={{ opacity: 1, translateY: 0 }}
+      transition={{ delay: ANIMATION.XP_TEXT_DELAY + 200, duration: 300 }}
+      style={tw`w-full px-4`}
+    >
+      <View style={tw`flex-row justify-between items-center mb-1.5`}>
+        <Text style={tw`text-charcoal/60 font-gabarito font-medium text-sm`}>
+          {displayLevel.title}
+        </Text>
+        <Text style={tw`text-charcoal/40 font-gabarito text-sm`}>
+          {displayLevel.isMaxLevel
+            ? "Max Level"
+            : `${displayLevel.currentLevelXp} / ${displayLevel.xpForNextLevel}`}
+        </Text>
+      </View>
+      <View
+        style={[
+          tw`rounded-full overflow-hidden`,
+          { height: 6, backgroundColor: "rgba(0,0,0,0.08)" },
+        ]}
+      >
+        <MotiView
+          from={{ width: isLevelUp ? "0%" : `${Math.round(prevLevel.progress * 100)}%` }}
+          animate={{ width: `${Math.round(displayLevel.progress * 100)}%` }}
+          transition={{ type: "timing", duration: 800, delay: ANIMATION.XP_TEXT_DELAY + 400 }}
+          style={[
+            tw`h-full rounded-full`,
+            { backgroundColor: getHexColor(color) },
+          ]}
+        />
+      </View>
+    </MotiView>
+  );
+}
+
 export default function SuccessScreen({
   category,
+  previousXp,
+  newXp,
   onNext,
 }: {
   category: ActionType;
+  previousXp: number;
+  newXp: number;
   onNext: () => void;
 }) {
   const [showConfetti, setShowConfetti] = useState(true);
+  const prevLevel = getLevelForXp(previousXp);
+  const newLevel = getLevelForXp(newXp);
+  const isLevelUp = prevLevel.level !== newLevel.level;
+  const [showLevelUp, setShowLevelUp] = useState(false);
+
+  useEffect(() => {
+    if (isLevelUp) {
+      const timer = setTimeout(() => {
+        setShowLevelUp(true);
+      }, ANIMATION.XP_TEXT_DELAY + 1200);
+      return () => clearTimeout(timer);
+    }
+  }, [isLevelUp]);
 
   return (
     <View style={tw`flex-1 items-center justify-between px-6`}>
@@ -310,11 +383,40 @@ export default function SuccessScreen({
         </MotiView>
 
         <AnimatedXPCounter
-          amount={XP_AMOUNT}
+          amount={XP_PER_COMPLETION}
           title={category.title}
           color={category.darkColor}
         />
+
+        <LevelProgress previousXp={previousXp} newXp={newXp} color={category.darkColor} />
       </View>
+
+      {showLevelUp && (
+        <>
+          <ConfettiCannon
+            count={120}
+            origin={{ x: 0, y: ANIMATION.CONFETTI_ORIGIN_Y }}
+            autoStart
+            fadeOut
+            fallSpeed={3000}
+            colors={["#8E97FD", "#6FC3DF", "#FFD700", "#F895C2"]}
+          />
+          <MotiView
+            from={{ opacity: 0, scale: 0.5 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{
+              type: "spring",
+              damping: 10,
+              stiffness: 150,
+            }}
+            style={tw`items-center mt-4`}
+          >
+            <Text style={tw`text-2xl font-gabarito font-black text-charcoal text-center`}>
+              🌿 You reached {newLevel.title}!
+            </Text>
+          </MotiView>
+        </>
+      )}
 
       <View style={tw`flex-1`} />
 

@@ -14,12 +14,16 @@ import SuccessScreen from "./SuccessScreen";
 interface FeedbackWizardProps {
   completionId: string;
   category: ActionType;
+  previousXp: number;
+  newXp: number;
   onComplete: () => void;
 }
 
 export default function FeedbackWizard({
   category,
   completionId,
+  previousXp,
+  newXp,
   onComplete,
 }: FeedbackWizardProps) {
   const [step, setStep] = useState<0 | 1 | 2>(0);
@@ -60,7 +64,7 @@ export default function FeedbackWizard({
   };
 
   if (step === 0) {
-    return <SuccessScreen category={category} onNext={handleNext} />;
+    return <SuccessScreen category={category} previousXp={previousXp} newXp={newXp} onNext={handleNext} />;
   }
 
   return (

@@ -17,9 +17,11 @@ function getActionCategory(categoryName: string): ActionType {
 }
 
 export default function ActionSuccessScreen() {
-  const { completionId, categoryId } = useLocalSearchParams<{
+  const { completionId, categoryId, previousXp, newXp } = useLocalSearchParams<{
     completionId: string;
     categoryId: string;
+    previousXp: string;
+    newXp: string;
   }>();
 
   const category = getActionCategory(categoryId);
@@ -38,6 +40,8 @@ export default function ActionSuccessScreen() {
       <FeedbackWizard
         completionId={completionId}
         category={category}
+        previousXp={Number(previousXp) || 0}
+        newXp={Number(newXp) || 0}
         onComplete={handleComplete}
       />
     </SafeAreaView>
