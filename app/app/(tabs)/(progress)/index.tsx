@@ -4,7 +4,7 @@ import { useGetAllUserActions, useGetUserProfile } from "@/lib/api";
 import tw from "@/lib/tw";
 import { useFocusEffect } from "expo-router";
 import { useCallback, useMemo } from "react";
-import { ActivityIndicator, Text, View } from "react-native";
+import { ActivityIndicator, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { FocusRow } from "@/components/progress/FocusRow";
 import { StatusGrid } from "@/components/progress/StatusGrid";
@@ -85,7 +85,7 @@ export default function ProgressScreen() {
 
   return (
     <SafeAreaView edges={["top"]} style={tw`flex-1 bg-background`}>
-      <View style={tw`flex-1 w-full px-4 pb-8`}>
+      <ScrollView contentContainerStyle={tw`w-full px-4 pb-8`} showsVerticalScrollIndicator={false}>
         <View style={tw`py-6 mb-2`}>
           <Text style={tw`text-4xl text-charcoal font-gabarito font-black mb-1`}>
             Progress
@@ -121,7 +121,7 @@ export default function ProgressScreen() {
             </Text>
           </View>
         )}
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
