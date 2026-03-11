@@ -145,7 +145,9 @@ export default function ActionDetailScreen() {
     try {
       const completion = await completeAction.mutateAsync(id);
       trackEvent("action_completed", { action_id: id });
-      router.replace(`/(action)/${id}/success?completionId=${completion.id}` as any);
+      router.replace(
+        `/(action)/${id}/success?completionId=${completion.id}&categoryId=${actionData.category}` as any,
+      );
     } catch (error) {
       console.error("Error completing action:", error);
     }

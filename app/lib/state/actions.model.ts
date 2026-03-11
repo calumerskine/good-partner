@@ -40,3 +40,5 @@ export const ActionTypes = {
     iconName: "wrench",
   },
 } as const;
+
+export type ActionType = (typeof ActionTypes)[keyof typeof ActionTypes];

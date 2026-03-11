@@ -1,23 +1,24 @@
-import Button from "@/components/ui/button";
 import { trackEvent } from "@/lib/analytics";
 import {
   useSubmitFeedback,
   type FeltValue,
   type NoticedValue,
 } from "@/lib/api";
+import { type ActionType } from "@/lib/state/actions.model";
 import tw from "@/lib/tw";
 import { useState } from "react";
 import { Text, View } from "react-native";
 import FeedbackCard from "./FeedbackCard";
+import SuccessScreen from "./SuccessScreen";
 
 interface FeedbackWizardProps {
-  actionId: string;
   completionId: string;
+  category: ActionType;
   onComplete: () => void;
 }
 
 export default function FeedbackWizard({
-  actionId,
+  category,
   completionId,
   onComplete,
 }: FeedbackWizardProps) {
@@ -30,62 +31,36 @@ export default function FeedbackWizard({
   const handleNoticedSelect = (value: NoticedValue) => {
     setWasNoticed(value);
     trackEvent("feedback_noticed_selected", { value });
+    setTimeout(() => setStep(2), 300);
   };
 
-  const handleFeltSelect = (value: FeltValue) => {
+  const handleFeltSelect = async (value: FeltValue) => {
     setFelt(value);
     trackEvent("feedback_felt_selected", { value });
-  };
-
-  const handleNext = async () => {
-    if (step === 0 && wasNoticed) {
-      setStep(1);
-    } else if (step === 1 && felt && wasNoticed) {
-      try {
-        await submitFeedback.mutateAsync({
-          completionId,
-          wasNoticed,
-          felt,
-        });
-        trackEvent("feedback_submitted", {
-          was_noticed: wasNoticed,
-          felt,
-        });
-        setStep(2);
-      } catch (error) {
-        console.error("Error submitting feedback:", error);
-      }
+    try {
+      await submitFeedback.mutateAsync({
+        completionId,
+        wasNoticed: wasNoticed!,
+        felt: value,
+      });
+      trackEvent("feedback_submitted", {
+        was_noticed: wasNoticed,
+        felt: value,
+      });
+      onComplete();
+    } catch (error) {
+      console.error("Error submitting feedback:", error);
     }
   };
 
-  const canProceed = step === 0 ? !!wasNoticed : !!felt;
+  const handleNext = async () => {
+    if (step === 0) {
+      setStep(1);
+    }
+  };
 
-  if (step === 2) {
-    return (
-      <View style={tw`flex-1 items-center justify-between px-6`}>
-        <View style={tw`flex-1`} />
-
-        <View style={tw`items-center gap-6 px-4`}>
-          <View
-            style={tw`w-32 h-32 rounded-full bg-mint/20 items-center justify-center mb-4`}
-          >
-            <Text style={tw`text-7xl`}>✨</Text>
-          </View>
-          <Text
-            style={tw`text-charcoal font-gabarito font-black text-5xl text-center mb-4`}
-          >
-            Great job!
-          </Text>
-          <Text
-            style={tw`text-charcoal/70 font-gabarito text-xl text-center mb-8 px-4`}
-          >
-            Every action counts. You're building something meaningful.
-          </Text>
-        </View>
-        <View style={tw`flex-1`} />
-        <Button onPress={onComplete}>Continue</Button>
-      </View>
-    );
+  if (step === 0) {
+    return <SuccessScreen category={category} onNext={handleNext} />;
   }
 
   return (
@@ -100,7 +75,7 @@ export default function FeedbackWizard({
           </Text>
         </View>
 
-        {step === 0 && (
+        {step === 1 && (
           <View style={tw`gap-3`}>
             <Text
               style={tw`text-charcoal/70 font-gabarito text-lg text-center mb-2`}
@@ -125,7 +100,7 @@ export default function FeedbackWizard({
           </View>
         )}
 
-        {step === 1 && (
+        {step === 2 && (
           <View style={tw`gap-3`}>
             <Text
               style={tw`text-charcoal/70 font-gabarito text-lg text-center mb-2`}
@@ -149,20 +124,6 @@ export default function FeedbackWizard({
             />
           </View>
         )}
-      </View>
-
-      <View style={tw`pb-6`}>
-        <Button
-          onPress={handleNext}
-          disabled={!canProceed || submitFeedback.isPending}
-          color="mint"
-        >
-          {submitFeedback.isPending
-            ? "Submitting..."
-            : step === 1
-            ? "Submit"
-            : "Next"}
-        </Button>
       </View>
     </View>
   );

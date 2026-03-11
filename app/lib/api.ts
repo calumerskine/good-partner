@@ -339,7 +339,7 @@ async function getSuggestedActions(
   // Get all user_actions for this user to find active or completed action IDs
   const { data: userActionsData, error: userActionsError } = await supabase
     .from("user_actions")
-    .select("action_id, is_active")
+    .select("id, action_id, is_active")
     .eq("user_id", userId);
 
   if (userActionsError) {
@@ -372,9 +372,7 @@ async function getSuggestedActions(
   }
 
   // Exclude actions that are either currently active or have been completed
-  const excludedIds = [
-    ...new Set([...activeActionIds, ...completedActionIds]),
-  ];
+  const excludedIds = [...new Set([...activeActionIds, ...completedActionIds])];
 
   // Fetch available actions with tags, ordered by title
   let query = supabase

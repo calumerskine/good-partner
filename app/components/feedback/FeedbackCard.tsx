@@ -12,10 +12,12 @@ export default function FeedbackCard({ label, selected, onPress }: FeedbackCardP
   return (
     <TouchableOpacity
       onPress={onPress}
+      activeOpacity={0.8}
       style={tw`w-full py-4 px-5 rounded-2xl border-2 ${
-        selected ? "bg-mint border-mint" : "bg-white border-grape/20"
+        selected 
+          ? "bg-mint border-mint shadow-md shadow-charcoal/30" 
+          : "bg-white border-grape/20 shadow-md shadow-charcoal/10"
       }`}
-      activeOpacity={0.7}
     >
       <View style={tw`flex-row items-center justify-between`}>
         <Text
