@@ -33,6 +33,11 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView edges={["top"]} style={tw`bg-background flex-1`}>
+      {/* <BauhausBackground
+        seed={"progress"}
+        color={getHexColor("darkBackground")}
+        opacity={1}
+      /> */}
       <ScrollView
         contentContainerStyle={tw`px-6`}
         showsVerticalScrollIndicator={false}

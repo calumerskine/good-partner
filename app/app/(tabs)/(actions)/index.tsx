@@ -1,12 +1,10 @@
-import ActiveActions from "@/components/home/active-actions";
 import { useAuth } from "@/hooks/use-auth";
 import { trackEvent } from "@/lib/analytics";
 import { useGetActiveActions, useGetUserProfile } from "@/lib/api";
-import { getHexColor } from "@/lib/colors";
+import { getCategoryColors } from "@/lib/colors";
 import { ActionTypes } from "@/lib/state/actions.model";
 import tw from "@/lib/tw";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { LinearGradient } from "expo-linear-gradient";
 import { Link, useFocusEffect } from "expo-router";
 import { useCallback } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
@@ -25,6 +23,11 @@ export default function ActionsScreen() {
 
   return (
     <SafeAreaView edges={["top"]} style={tw`flex-1 bg-background`}>
+      {/* <BauhausBackground
+        seed={"progress"}
+        color={getHexColor("darkBackground")}
+        opacity={1}
+      /> */}
       <ScrollView
         style={tw`flex-1 w-full`}
         contentContainerStyle={tw`px-6 pb-8`}
@@ -36,18 +39,21 @@ export default function ActionsScreen() {
           </Text>
         </View>
 
-        <Text style={tw`text-lg text-charcoal font-gabarito font mb-4`}>
+        <Text style={tw`text-lg text-charcoal/70 font-gabarito font mb-4`}>
           Browse by area of focus
         </Text>
         <View style={tw`gap-4 mb-4`}>
           {Object.entries(ActionTypes).map(([key, action]) => (
             <Link href={`/(tabs)/(actions)/${key}`} key={key} asChild>
-              <Pressable style={tw`shadow-md`}>
-                <LinearGradient
+              <Pressable style={tw``}>
+                {/* <LinearGradient
                   colors={[getHexColor("grape"), getHexColor(action.color)]}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 0.85, y: 0.85 }}
                   style={tw`rounded-2xl p-6 pt-5`}
+                > */}
+                <View
+                  style={tw`rounded p-6 border pt-5 bg-${action.title.toLowerCase()}-surface border-b-4 border-${action.title.toLowerCase()}-main`}
                 >
                   <View
                     style={tw`absolute flex items-center justify-center right-2 top-2 w-8 h-8`}
@@ -55,12 +61,12 @@ export default function ActionsScreen() {
                     <FontAwesome
                       name={action.iconName}
                       size={20}
-                      color={getHexColor(action.darkerColor)}
+                      color={getCategoryColors(action.darkColor)}
                     />
                   </View>
                   <View style={tw`gap-2`}>
                     <Text
-                      style={tw`text-2xl font-gabarito font-black text-charcoal tracking-wide`}
+                      style={tw`text-xl font-gabarito font-black text-${action.title.toLowerCase()}-ink tracking-wider uppercase`}
                     >
                       {action.title}
                     </Text>
@@ -70,12 +76,12 @@ export default function ActionsScreen() {
                       {action.description}
                     </Text>
                   </View>
-                </LinearGradient>
+                </View>
+                {/* </LinearGradient> */}
               </Pressable>
             </Link>
           ))}
         </View>
-        <ActiveActions isLoading={isLoading} userActions={userActions} />
       </ScrollView>
     </SafeAreaView>
   );

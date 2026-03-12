@@ -1,11 +1,12 @@
+import BauhausBackground from "@/components/shapes/bauhaus";
 import { trackEvent } from "@/lib/analytics";
 import { CatalogAction, useGetActionsByCategory } from "@/lib/api";
 import { getHexColor } from "@/lib/colors";
 import { ActionTypes } from "@/lib/state/actions.model";
 import tw from "@/lib/tw";
-import Entypo from "@expo/vector-icons/Entypo";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Link, useLocalSearchParams } from "expo-router";
+import { ArrowLeft, ArrowRight } from "lucide-react-native";
 import { useEffect } from "react";
 import { FlatList, Pressable, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -22,10 +23,17 @@ export default function ActionTypeScreen() {
 
   return (
     <SafeAreaView edges={["top"]} style={tw`flex-1 bg-background`}>
+      {/* <BauhausBackground
+        seed={"progress"}
+        color={getHexColor(category.lightColor)}
+        opacity={0.6}
+      /> */}
       <View style={tw`w-full px-5 py-4 flex-row items-center justify-between`}>
         <Link href=".." asChild>
-          <Pressable style={tw`p-3 pl-0`}>
-            <Entypo name="chevron-left" size={30} color="charcoal" />
+          <Pressable>
+            <View style={tw`bg-charcoal rounded-full p-2 inline-flex`}>
+              <ArrowLeft size={20} style={tw`text-white`} />
+            </View>
           </Pressable>
         </Link>
         <View style={tw`flex-row items-center gap-2`}>
@@ -34,6 +42,7 @@ export default function ActionTypeScreen() {
           >
             {category.title}
           </Text>
+
           <FontAwesome
             name={category.iconName}
             size={30}
@@ -57,7 +66,7 @@ export default function ActionTypeScreen() {
 
             {!isLoading && actions.length > 0 && (
               <Text
-                style={tw`text-charcoal/60 font-gabarito text-base self-end mb-2`}
+                style={tw`text-charcoal/60 font-gabarito text-base mb-3 mt-2`}
               >
                 {actions.length} {actions.length === 1 ? "action" : "actions"}{" "}
                 available
@@ -92,30 +101,33 @@ export default function ActionTypeScreen() {
         renderItem={({ item }: { item: CatalogAction }) => (
           <Link href={`/(action)/${item.id}?catalog=true`} asChild>
             <Pressable
-              style={tw`bg-mediumGrey rounded-2xl p-6 border-[3px] border-${category.darkColor} shadow-md`}
+              style={tw`bg-darkBackground rounded-xl p-4 overflow-hidden relative`}
             >
-              <View>
-                <View style={tw`flex-row items-center justify-between mb-2`}>
-                  <Text
-                    style={tw`text-lg font-gabarito font-bold text-black mr-4 leading-1.2`}
-                  >
-                    {item.title}
-                  </Text>
-                  <FontAwesome
-                    name="chevron-right"
-                    size={16}
-                    color={getHexColor(category.darkColor)}
-                  />
-                </View>
+              <BauhausBackground
+                seed={item.id}
+                color={getHexColor("darkerBackground")}
+                opacity={1}
+              />
+              <View style={tw`flex`}>
+                <Text
+                  style={tw`text-lg font-gabarito font-bold text-charcoal mr-4 leading-loose`}
+                >
+                  {item.title}
+                </Text>
 
                 {item.description ? (
                   <Text
-                    style={tw`text-base text-charcoal font-gabarito leading`}
+                    style={tw`text-base text-charcoal/80 font-gabarito leading`}
                     numberOfLines={3}
                   >
                     {item.description}
                   </Text>
                 ) : null}
+                <View
+                  style={tw`bg-${category.color} rounded-full p-2 inline-flex mt-6`}
+                >
+                  <ArrowRight size={20} />
+                </View>
               </View>
             </Pressable>
           </Link>

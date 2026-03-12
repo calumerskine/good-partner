@@ -1,3 +1,4 @@
+import BauhausBackground from "@/components/shapes/bauhaus";
 import Button from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
 import { trackEvent } from "@/lib/analytics";
@@ -60,10 +61,8 @@ export default function ActionDetailScreen() {
   const { data: notificationsEnabled } = useGetNotificationsEnabled(user?.id);
   const { data: allUserActions } = useGetAllUserActions(user?.id);
 
-  const totalCompletions = allUserActions?.reduce(
-    (sum, a) => sum + a.completionCount,
-    0,
-  ) ?? 0;
+  const totalCompletions =
+    allUserActions?.reduce((sum, a) => sum + a.completionCount, 0) ?? 0;
   const shouldPromptForReminders =
     env.flags.useReminders &&
     notificationsEnabled === false &&
@@ -155,6 +154,11 @@ export default function ActionDetailScreen() {
 
   return (
     <SafeAreaView style={tw`flex-1 bg-background`}>
+      <BauhausBackground
+        seed={actionData.id}
+        color={getHexColor("darkBackground")}
+        opacity={1}
+      />
       <View style={tw`w-full px-6 py-4 flex-row items-center justify-between`}>
         <BackButton />
 
@@ -162,7 +166,7 @@ export default function ActionDetailScreen() {
           style={tw`flex-row gap-2 pl-4 pr-2 py-2 rounded-lg bg-${categoryInfo.color || "white"}`}
         >
           <Text
-            style={tw`text-${categoryInfo.darkerColor} font-gabarito font-bold text-sm uppercase tracking-wide`}
+            style={tw`text-${categoryInfo.title.toLowerCase()}-ink font-gabarito font-bold text-sm uppercase tracking-wide`}
           >
             {categoryInfo.title || actionData.category}
           </Text>
@@ -170,7 +174,7 @@ export default function ActionDetailScreen() {
           <FontAwesome
             name={categoryInfo.iconName}
             size={20}
-            color={getHexColor(categoryInfo.darkerColor)}
+            style={tw`text-${categoryInfo.title.toLowerCase()}-ink`}
           />
         </View>
       </View>
@@ -230,8 +234,7 @@ export default function ActionDetailScreen() {
               </Text>
             </View>
           </ScrollView>
-
-          <View style={tw`w-full px-6 pb-6 pt-4 bg-background`}>
+          <View style={tw`w-full px-6 pb-6 pt-4 `}>
             {isCatalogView ? (
               <Button
                 onPress={handleActivate}

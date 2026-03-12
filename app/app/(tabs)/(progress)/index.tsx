@@ -18,8 +18,11 @@ type CategoryCompletion = {
 
 export default function ProgressScreen() {
   const { user } = useAuth();
-  const { data: profile, isLoading: profileLoading } = useGetUserProfile(user?.id);
-  const { data: userActions = [], isLoading: actionsLoading } = useGetAllUserActions(user?.id);
+  const { data: profile, isLoading: profileLoading } = useGetUserProfile(
+    user?.id,
+  );
+  const { data: userActions = [], isLoading: actionsLoading } =
+    useGetAllUserActions(user?.id);
 
   const isLoading = profileLoading || actionsLoading;
 
@@ -85,13 +88,24 @@ export default function ProgressScreen() {
 
   return (
     <SafeAreaView edges={["top"]} style={tw`flex-1 bg-background`}>
-      <ScrollView contentContainerStyle={tw`w-full px-4 pb-8`} showsVerticalScrollIndicator={false}>
-        <View style={tw`py-6 mb-2`}>
-          <Text style={tw`text-4xl text-charcoal font-gabarito font-black mb-1`}>
+      {/* <BauhausBackground
+        seed={"progress"}
+        color={getHexColor("darkBackground")}
+        opacity={1}
+      /> */}
+      <ScrollView
+        style={tw`flex-1 w-full`}
+        contentContainerStyle={tw`px-6 pb-8`}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={tw`py-6 mb-3`}>
+          <Text
+            style={tw`text-4xl text-charcoal font-gabarito font-black mb-1`}
+          >
             Progress
           </Text>
-          <Text style={tw`text-base text-charcoal/70 font-gabarito`}>
-            Your command center
+          <Text style={tw`text-lg text-charcoal/70 font-gabarito`}>
+            Review your progress
           </Text>
         </View>
 
@@ -99,10 +113,14 @@ export default function ProgressScreen() {
 
         {focusCategoryNames.length === 0 ? (
           <View style={tw`flex-1 items-center justify-center px-6`}>
-            <Text style={tw`text-2xl text-charcoal font-gabarito font-bold mb-3 text-center`}>
+            <Text
+              style={tw`text-2xl text-charcoal font-gabarito font-bold mb-3 text-center`}
+            >
               Select Focus Areas
             </Text>
-            <Text style={tw`text-base text-charcoal/70 font-gabarito text-center mb-6`}>
+            <Text
+              style={tw`text-base text-charcoal/70 font-gabarito text-center mb-6`}
+            >
               Go to Settings to choose your priority areas.
             </Text>
           </View>
@@ -113,10 +131,14 @@ export default function ProgressScreen() {
           </>
         ) : (
           <View style={tw`flex-1 items-center justify-center px-6`}>
-            <Text style={tw`text-2xl text-charcoal font-gabarito font-bold mb-3 text-center`}>
+            <Text
+              style={tw`text-2xl text-charcoal font-gabarito font-bold mb-3 text-center`}
+            >
               Start Your Command Center
             </Text>
-            <Text style={tw`text-base text-charcoal/70 font-gabarito text-center`}>
+            <Text
+              style={tw`text-base text-charcoal/70 font-gabarito text-center`}
+            >
               Complete actions to see your progress here.
             </Text>
           </View>

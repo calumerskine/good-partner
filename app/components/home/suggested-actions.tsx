@@ -12,6 +12,7 @@ import {
   View,
 } from "react-native";
 import Button from "../ui/button";
+import { ArrowRight } from "lucide-react-native";
 
 export default function SuggestedActions({
   user,
@@ -163,7 +164,7 @@ export default function SuggestedActions({
           <Link href="/(tabs)/(actions)" asChild>
             <Pressable
               style={tw.style(
-                `bg-grape rounded-2xl items-center justify-center gap-8 shadow-md`,
+                `bg-charcoal rounded-2xl items-center justify-center gap-8 shadow-md`,
                 { width: cardWidth },
               )}
             >
@@ -172,7 +173,8 @@ export default function SuggestedActions({
               >
                 Or browse some more actions
               </Text>
-              <FontAwesome name="chevron-right" size={40} color="white" />
+              <ArrowRight size={40} color="white" />
+              {/* <FontAwesome name="chevron-right" size={40} color="white" /> */}
             </Pressable>
           </Link>
         </ScrollView>

@@ -44,39 +44,38 @@ export default function SettingsScreen() {
     trackEvent("settings_notifications_toggled", { enabled: shouldEnable });
   }, 500);
 
-  // const handleNukeUser = async () => {
-  //   await nukeUser(user.id);
-  // };
-
   return (
     <SafeAreaView edges={["top"]} style={tw`flex-1 bg-background`}>
+      {/* <BauhausBackground
+        seed={"progress"}
+        color={getHexColor("raspberry")}
+        opacity={0.3}
+      /> */}
       <ScrollView
         style={tw`flex-1 w-full`}
         contentContainerStyle={tw`px-6 pb-8`}
         showsVerticalScrollIndicator={false}
       >
-        <View style={tw`py-6 mb-4`}>
+        <View style={tw`py-6 mb-3`}>
           <Text style={tw`text-4xl text-black font-gabarito font-black mb-2`}>
             Settings
           </Text>
-          <Text style={tw`text-lg text-charcoal font-gabarito`}>
+          <Text style={tw`text-lg text-charcoal/70 font-gabarito`}>
             Manage your preferences
           </Text>
         </View>
 
         <View style={tw`mb-6`}>
-          <View
-            style={tw`bg-mediumGrey border border-white/10 rounded-2xl p-5 mb-3`}
-          >
+          <View style={tw`bg-darkBackground rounded-xl p-5 mb-3`}>
             <View style={tw`flex-row items-baseline justify-between mb-4`}>
-              <Text style={tw`text-charcoal font-gabarito text-sm`}>
+              <Text style={tw`text-charcoal font-gabarito font-bold text-lg`}>
                 Your focus areas
               </Text>
               <Pressable
                 onPress={() =>
                   router.push("/(tabs)/(settings)/edit-focus-areas")
                 }
-                style={tw`px-3 py-1.5 bg-grape border border-grape/40 rounded-lg`}
+                style={tw`px-3 py-1.5 bg-charcoal rounded-lg`}
               >
                 <Text style={tw`text-white font-gabarito font-bold text-sm`}>
                   Edit
@@ -89,12 +88,15 @@ export default function SettingsScreen() {
                   const categoryKey = cat.name as keyof typeof ActionTypes;
                   const categoryData = ActionTypes[categoryKey];
                   const color = categoryData?.color || "white";
+                  const border = categoryData?.darkColor;
 
                   return (
                     <View key={cat.id} style={tw`flex-row items-center gap-3`}>
-                      <View style={tw`w-3 h-3 rounded-full bg-${color}`} />
+                      <View
+                        style={tw`w-3 h-3 rounded-full bg-${color} border border-${border}`}
+                      />
                       <Text
-                        style={tw`text-charcoal font-gabarito font-bold text-base`}
+                        style={tw`text-charcoal/80 font-gabarito font-medium text-base`}
                       >
                         {categoryData?.title || cat.name}
                       </Text>
@@ -117,7 +119,7 @@ export default function SettingsScreen() {
             >
               Notifications
             </Text>
-            <View style={tw`bg-mediumGrey rounded-2xl p-5`}>
+            <View style={tw`bg-darkBackground rounded-xl p-5`}>
               <View style={tw`flex-row items-center justify-between mb-3`}>
                 <Text style={tw`text-charcoal font-gabarito font-bold text-lg`}>
                   Daily reminders
@@ -142,13 +144,15 @@ export default function SettingsScreen() {
             Account
           </Text>
 
-          <View
-            style={tw`bg-mediumGrey border border-white/10 rounded-2xl p-5 mb-3`}
-          >
-            <Text style={tw`text-charcoal font-gabarito text-sm mb-2`}>
+          <View style={tw`bg-darkBackground rounded-xl p-5 mb-3`}>
+            <Text
+              style={tw`text-charcoal font-gabarito font-bold text-lg mb-4`}
+            >
               Logged in as
             </Text>
-            <Text style={tw`text-charcoal font-gabarito font-bold text-lg`}>
+            <Text
+              style={tw`text-charcoal/80 font-gabarito font-medium text-base`}
+            >
               {user.email}
             </Text>
           </View>
@@ -174,9 +178,7 @@ export default function SettingsScreen() {
               Debug Info
             </Text>
 
-            <View
-              style={tw`bg-charcoal/30 border border-white/5 rounded-2xl p-4 mb-3`}
-            >
+            <View style={tw`bg-darkBackground rounded-2xl p-4 mb-3`}>
               <Text
                 style={tw`text-charcoal font-gabarito font-bold text-sm mb-2`}
               >
@@ -189,9 +191,7 @@ export default function SettingsScreen() {
               </Text>
             </View>
 
-            <View
-              style={tw`bg-charcoal/30 border border-white/5 rounded-2xl p-4 mb-3`}
-            >
+            <View style={tw`bg-darkBackground rounded-2xl p-4 mb-3`}>
               <Text
                 style={tw`text-charcoal font-gabarito font-bold text-sm mb-2`}
               >
@@ -203,9 +203,7 @@ export default function SettingsScreen() {
               </Text>
             </View>
 
-            <View
-              style={tw`bg-charcoal/30 border border-white/5 rounded-2xl p-4 mb-3`}
-            >
+            <View style={tw`bg-darkBackground rounded-2xl p-4 mb-3`}>
               <Text
                 style={tw`text-charcoal font-gabarito font-bold text-sm mb-2`}
               >
@@ -216,9 +214,7 @@ export default function SettingsScreen() {
               </Text>
             </View>
 
-            <View
-              style={tw`bg-charcoal/30 border border-white/5 rounded-2xl p-4`}
-            >
+            <View style={tw`bg-darkBackground rounded-2xl p-4`}>
               <Text
                 style={tw`text-charcoal font-gabarito font-bold text-sm mb-2`}
               >

@@ -28,6 +28,7 @@ const colors = {
   yellow: "bg-yellow",
   muted: "bg-white/50",
   ghost: "bg-transparent",
+  charcoal: "bg-charcoal",
 };
 
 const sizes = {
@@ -48,7 +49,7 @@ const sizes = {
 export default forwardRef(function Button(
   {
     children,
-    color = "grape",
+    color = "charcoal",
     size = "md",
     disabled,
     buttonStyle,
@@ -67,7 +68,7 @@ export default forwardRef(function Button(
       disabled={disabled}
       style={({ pressed }) => [
         tw.style(
-          `rounded-xl w-full ${sizes[size].padding}`,
+          `rounded-full w-full ${sizes[size].padding}`,
           colors[color],
           isDisabled && tw`opacity-50`,
           pressed && !isDisabled && tw`opacity-80`,

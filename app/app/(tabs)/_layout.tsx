@@ -1,5 +1,6 @@
 import { useAuth } from "@/hooks/use-auth";
 import { trackEvent } from "@/lib/analytics";
+import { getHexColor } from "@/lib/colors";
 import { resetRootTabListener } from "@/lib/helpers";
 import Feather from "@expo/vector-icons/Feather";
 import { Redirect, Tabs } from "expo-router";
@@ -28,24 +29,26 @@ export default function TabLayout() {
         },
       }}
       screenOptions={{
-        tabBarActiveTintColor: "#2E3130",
-        tabBarInactiveTintColor: "#2E3130",
+        tabBarActiveTintColor: getHexColor("charcoal"),
+        tabBarInactiveTintColor: getHexColor("charcoal"),
         headerShown: false,
         // tabBarButton: HapticTab,
         tabBarStyle:
           Platform.OS === "web"
             ? { display: "none" }
             : {
-                backgroundColor: "#D4D1C3",
-                height: 100,
-                paddingTop: 10,
-                shadowOffset: {
-                  width: 0,
-                  height: 12,
-                },
-                shadowOpacity: 0.58,
-                shadowRadius: 10.0,
-                elevation: 24,
+                backgroundColor: getHexColor("background"),
+                height: 90,
+                paddingTop: 18,
+                // paddingBottom: 10,
+                // shadowOffset: {
+                //   width: 0,
+                //   height: 12,
+                // },
+                // shadowOpacity: 0.0,
+                // shadowOpacity: 0.58,
+                // shadowRadius: 10.0,
+                // elevation: 24,
               },
         tabBarLabelStyle: { fontSize: 14, paddingTop: 10 },
       }}
@@ -54,13 +57,13 @@ export default function TabLayout() {
         name="(home)"
         listeners={resetRootTabListener}
         options={{
-          title: "Home",
+          tabBarShowLabel: false,
           tabBarIcon: ({ focused }) => (
             <TabButton focused={focused}>
               <Feather
                 name="home"
                 size={24}
-                color={focused ? "white" : "#2E3130"}
+                color={focused ? "white" : getHexColor("charcoal")}
               />
             </TabButton>
           ),
@@ -70,10 +73,10 @@ export default function TabLayout() {
         name="(actions)"
         listeners={resetRootTabListener}
         options={{
-          title: "Actions",
+          tabBarShowLabel: false,
           tabBarIcon: ({ focused }) => (
             <TabButton focused={focused}>
-              <ListTodo color={focused ? "white" : "#2E3130"} />
+              <ListTodo color={focused ? "white" : getHexColor("charcoal")} />
             </TabButton>
           ),
         }}
@@ -82,10 +85,10 @@ export default function TabLayout() {
         name="(progress)"
         listeners={resetRootTabListener}
         options={{
-          title: "Progress",
+          tabBarShowLabel: false,
           tabBarIcon: ({ focused }) => (
             <TabButton focused={focused}>
-              <ChartBar color={focused ? "white" : "#2E3130"} />
+              <ChartBar color={focused ? "white" : getHexColor("charcoal")} />
             </TabButton>
           ),
         }}
@@ -94,13 +97,13 @@ export default function TabLayout() {
         name="(settings)"
         listeners={resetRootTabListener}
         options={{
-          title: "Settings",
+          tabBarShowLabel: false,
           tabBarIcon: ({ focused }) => (
             <TabButton focused={focused}>
               <Feather
                 name="settings"
                 size={24}
-                color={focused ? "white" : "#2E3130"}
+                color={focused ? "white" : getHexColor("charcoal")}
               />
             </TabButton>
           ),
@@ -120,12 +123,12 @@ const TabButton = ({
   return (
     <View
       style={{
-        borderRadius: 10,
+        borderRadius: 16,
         alignItems: "center",
         justifyContent: "center",
         width: 40,
         height: 40,
-        backgroundColor: focused ? "#8E97FD" : "transparent",
+        backgroundColor: focused ? getHexColor("charcoal") : "transparent",
       }}
     >
       {children}

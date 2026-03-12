@@ -25,8 +25,39 @@ module.exports = {
         darkerYellow: "#C98908",
         charcoal: "#2E3130",
         orange: "#FF9E23",
+        lightBackground: "#FDFCF9",
         background: "#F6F3E6",
+        darkBackground: '#EFEAD3',
+        darkerBackground: '#E9E1C1',
         mediumGrey: "#D4D1C3",
+        // updated palette
+        // Global Neutrals
+        base: "#F5F2E7",      // Cream Background
+        ink: "#1A1816",       // Near-Black for Bauhaus contrast
+        muted: "#8C887E",     // Warm Grey
+        divider: "#E9E5D6",   // Geometric line color
+
+        // Category Scales
+        attention: {
+          surface: "#E3F3F9", // Soft Sky Wash
+          main: "#6FC3DF",    // Your Cyan/Blue
+          ink: "#235B6D",     // High-contrast Navy
+        },
+        affection: {
+          surface: "#FEEAF4", // Soft Rose Wash
+          main: "#F895C2",    // Your Pink/Raspberry
+          ink: "#7D2E53",     // Deep Plum
+        },
+        initiative: {
+          surface: "#FEF4E2", // Soft Amber Wash
+          main: "#F6C86B",    // Your Yellow/Gold
+          ink: "#7A5712",     // Deep Bronze
+        },
+        repair: {
+          surface: "#EAF9F3", // Soft Mint Wash
+          main: "#7FD9B8",    // Your Green/Mint
+          ink: "#2D634F",     // Deep Forest
+        },
       },
       fontFamily: {
         archivo: ["ArchivoBlack", "sans-serif"],
