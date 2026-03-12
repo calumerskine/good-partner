@@ -1673,6 +1673,30 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
+  - react-native-skia (2.5.1):
+    - hermes-engine
+    - RCTRequired
+    - RCTTypeSafety
+    - React
+    - React-callinvoker
+    - React-Core
+    - React-Core-prebuilt
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - ReactNativeDependencies
+    - Yoga
   - React-NativeModulesApple (0.81.5):
     - hermes-engine
     - React-callinvoker
@@ -2345,6 +2369,7 @@ DEPENDENCIES:
   - "React-microtasksnativemodule (from `../node_modules/.pnpm/react-native@0.81.5_@babel+core@7.28.6_@types+react@19.1.17_react@19.1.0/node_modules/react-native/ReactCommon/react/nativemodule/microtasks`)"
   - "react-native-onesignal (from `../node_modules/.pnpm/react-native-onesignal@5.2.16/node_modules/react-native-onesignal`)"
   - "react-native-safe-area-context (from `../node_modules/.pnpm/react-native-safe-area-context@5.6.2_react-native@0.81.5_@babel+core@7.28.6_@types+reac_14122a3aa345cfabcc022a0f638ef16d/node_modules/react-native-safe-area-context`)"
+  - "react-native-skia (from `../node_modules/.pnpm/@shopify+react-native-skia@2.5.1_react-native-reanimated@4.1.6_@babel+core@7.28.6_react_de795625e7782bfadc2111dfc89b3f88/node_modules/@shopify/react-native-skia`)"
   - "React-NativeModulesApple (from `../node_modules/.pnpm/react-native@0.81.5_@babel+core@7.28.6_@types+react@19.1.17_react@19.1.0/node_modules/react-native/ReactCommon/react/nativemodule/core/platform/ios`)"
   - "React-oscompat (from `../node_modules/.pnpm/react-native@0.81.5_@babel+core@7.28.6_@types+react@19.1.17_react@19.1.0/node_modules/react-native/ReactCommon/oscompat`)"
   - "React-perflogger (from `../node_modules/.pnpm/react-native@0.81.5_@babel+core@7.28.6_@types+react@19.1.17_react@19.1.0/node_modules/react-native/ReactCommon/reactperflogger`)"
@@ -2507,6 +2532,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/.pnpm/react-native-onesignal@5.2.16/node_modules/react-native-onesignal"
   react-native-safe-area-context:
     :path: "../node_modules/.pnpm/react-native-safe-area-context@5.6.2_react-native@0.81.5_@babel+core@7.28.6_@types+reac_14122a3aa345cfabcc022a0f638ef16d/node_modules/react-native-safe-area-context"
+  react-native-skia:
+    :path: "../node_modules/.pnpm/@shopify+react-native-skia@2.5.1_react-native-reanimated@4.1.6_@babel+core@7.28.6_react_de795625e7782bfadc2111dfc89b3f88/node_modules/@shopify/react-native-skia"
   React-NativeModulesApple:
     :path: "../node_modules/.pnpm/react-native@0.81.5_@babel+core@7.28.6_@types+react@19.1.17_react@19.1.0/node_modules/react-native/ReactCommon/react/nativemodule/core/platform/ios"
   React-oscompat:
@@ -2644,6 +2671,7 @@ SPEC CHECKSUMS:
   React-microtasksnativemodule: d77e0c426fce34c23227394c96ca1033b30c813c
   react-native-onesignal: 1634e96223d6a666b76f38f4a20fec6c87bbb0c4
   react-native-safe-area-context: 53f796cb6c814661bbe99fbdfd0585d07b996cdd
+  react-native-skia: c19a8d1a926b64f159a7dcb678da336137fbe5d9
   React-NativeModulesApple: 1664340b8750d64e0ef3907c5e53d9481f74bcbd
   React-oscompat: ce47230ed20185e91de62d8c6d139ae61763d09c
   React-perflogger: b1af3cfb3f095f819b2814910000392a8e17ba9f

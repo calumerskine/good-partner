@@ -1,4 +1,4 @@
-import BauhausBackground from "@/components/shapes/bauhaus";
+import BauhausSkiaShape from "@/components/shapes/bauhaus-skia-shape";
 import Button from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
 import { trackEvent } from "@/lib/analytics";
@@ -16,9 +16,9 @@ import { getHexColor } from "@/lib/colors";
 import { env } from "@/lib/env";
 import { ActionTypes } from "@/lib/state/actions.model";
 import tw from "@/lib/tw";
-import Entypo from "@expo/vector-icons/Entypo";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Link, router, useLocalSearchParams } from "expo-router";
+import { ArrowLeft } from "lucide-react-native";
 import { useEffect } from "react";
 import {
   ActivityIndicator,
@@ -32,7 +32,9 @@ import { SafeAreaView } from "react-native-safe-area-context";
 const BackButton = () => (
   <Link href=".." asChild>
     <Pressable style={tw`p-3 pl-0`}>
-      <Entypo name="chevron-left" size={30} color="charcoal" />
+      <View style={tw`bg-charcoal rounded-full p-2 inline-flex`}>
+        <ArrowLeft size={20} style={tw`text-white`} />
+      </View>
     </Pressable>
   </Link>
 );
@@ -154,10 +156,40 @@ export default function ActionDetailScreen() {
 
   return (
     <SafeAreaView style={tw`flex-1 bg-background`}>
-      <BauhausBackground
+      <BauhausSkiaShape
         seed={actionData.id}
-        color={getHexColor("darkBackground")}
-        opacity={1}
+        type="hexagon"
+        anchor="top-right"
+        distance={0.7}
+        size={600}
+        shapeScale={0.8}
+        nudge={[50, -20]}
+        color={getHexColor(categoryInfo.color)}
+        animation="float"
+        opacity={0.1}
+      />
+      <BauhausSkiaShape
+        seed={actionData.id}
+        type="trapezoid"
+        anchor="top-left"
+        strokeOnly
+        distance={0.4}
+        size={800}
+        shapeScale={1.2}
+        color={getHexColor(categoryInfo.color)}
+        animation="float"
+        opacity={0.5}
+      />
+      <BauhausSkiaShape
+        seed={actionData.id}
+        type="hexagon"
+        anchor="bottom-left"
+        distance={0.8}
+        size={500}
+        shapeScale={1.6}
+        color={getHexColor(categoryInfo.color)}
+        animation="float"
+        opacity={0.4}
       />
       <View style={tw`w-full px-6 py-4 flex-row items-center justify-between`}>
         <BackButton />
@@ -212,7 +244,7 @@ export default function ActionDetailScreen() {
             )}
 
             <View
-              style={tw`rounded-2xl p-7 bg-${categoryInfo.color}/20 mb-6 border-[3px] border-${categoryInfo.color}`}
+              style={tw`rounded-2xl p-7 bg-${categoryInfo.lightColor} mb-6 border-[3px] border-${categoryInfo.color}`}
             >
               <View style={tw`absolute right-4 top-4`}>
                 <FontAwesome

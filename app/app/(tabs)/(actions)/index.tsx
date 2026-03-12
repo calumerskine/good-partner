@@ -1,7 +1,8 @@
+import BauhausSkiaShape from "@/components/shapes/bauhaus-skia-shape";
 import { useAuth } from "@/hooks/use-auth";
 import { trackEvent } from "@/lib/analytics";
 import { useGetActiveActions, useGetUserProfile } from "@/lib/api";
-import { getCategoryColors } from "@/lib/colors";
+import { getCategoryColors, getHexColor } from "@/lib/colors";
 import { ActionTypes } from "@/lib/state/actions.model";
 import tw from "@/lib/tw";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
@@ -23,11 +24,41 @@ export default function ActionsScreen() {
 
   return (
     <SafeAreaView edges={["top"]} style={tw`flex-1 bg-background`}>
-      {/* <BauhausBackground
-        seed={"progress"}
-        color={getHexColor("darkBackground")}
-        opacity={1}
-      /> */}
+      <BauhausSkiaShape
+        type="triangle"
+        anchor="top-right"
+        distance={0.6}
+        size={500}
+        strokeWidth={6}
+        shapeScale={1.2}
+        color={getHexColor("peach")}
+        opacity={0.2}
+        animation="float"
+        strokeOnly
+      />
+      <BauhausSkiaShape
+        type="pill"
+        anchor="bottom-left"
+        distance={0.2}
+        size={400}
+        strokeWidth={7}
+        shapeScale={1.6}
+        color={getHexColor("blue")}
+        opacity={0.2}
+        strokeOnly
+      />
+      <BauhausSkiaShape
+        type="circle"
+        anchor="bottom-left"
+        distance={1}
+        size={600}
+        nudge={[-50, -50]}
+        strokeWidth={6}
+        shapeScale={1.2}
+        color={getHexColor("mint")}
+        opacity={0.6}
+        strokeOnly
+      />
       <ScrollView
         style={tw`flex-1 w-full`}
         contentContainerStyle={tw`px-6 pb-8`}

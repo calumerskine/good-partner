@@ -8,6 +8,8 @@ import { useFocusEffect } from "expo-router";
 import { useCallback } from "react";
 import { ActivityIndicator, ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import BauhausSkiaShape from "@/components/shapes/bauhaus-skia-shape";
+import { getHexColor } from "@/lib/colors";
 
 export default function HomeScreen() {
   const { user } = useAuth();
@@ -33,11 +35,41 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView edges={["top"]} style={tw`bg-background flex-1`}>
-      {/* <BauhausBackground
-        seed={"progress"}
-        color={getHexColor("darkBackground")}
-        opacity={1}
-      /> */}
+      <BauhausSkiaShape
+        type="triangle"
+        anchor="top-right"
+        distance={0.6}
+        size={500}
+        strokeWidth={6}
+        shapeScale={1.2}
+        color={getHexColor("peach")}
+        opacity={0.2}
+        animation="float"
+        strokeOnly
+      />
+      <BauhausSkiaShape
+        type="pill"
+        anchor="bottom-left"
+        distance={0.2}
+        size={400}
+        strokeWidth={7}
+        shapeScale={1.6}
+        color={getHexColor("blue")}
+        opacity={0.2}
+        strokeOnly
+      />
+      <BauhausSkiaShape
+        type="circle"
+        anchor="bottom-left"
+        distance={1}
+        size={600}
+        nudge={[-50, -50]}
+        strokeWidth={6}
+        shapeScale={1.2}
+        color={getHexColor("mint")}
+        opacity={0.6}
+        strokeOnly
+      />
       <ScrollView
         contentContainerStyle={tw`px-6`}
         showsVerticalScrollIndicator={false}

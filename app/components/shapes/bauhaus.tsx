@@ -35,7 +35,7 @@ const BauhausBackground = ({
         right: "-20%",
         bottom: "-20%",
         opacity,
-        transform: [{ scale: 1.4 }], // Extra zoom to keep shapes chunky
+        transform: [{ scale: 2 }], // Extra zoom to keep shapes chunky
       }}
       pointerEvents="none"
     >

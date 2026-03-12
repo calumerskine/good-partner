@@ -1,4 +1,4 @@
-import BauhausBackground from "@/components/shapes/bauhaus";
+import BauhausSkiaShape from "@/components/shapes/bauhaus-skia-shape";
 import { trackEvent } from "@/lib/analytics";
 import { CatalogAction, useGetActionsByCategory } from "@/lib/api";
 import { getHexColor } from "@/lib/colors";
@@ -6,7 +6,7 @@ import { ActionTypes } from "@/lib/state/actions.model";
 import tw from "@/lib/tw";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Link, useLocalSearchParams } from "expo-router";
-import { ArrowLeft, ArrowRight } from "lucide-react-native";
+import { ArrowLeft } from "lucide-react-native";
 import { useEffect } from "react";
 import { FlatList, Pressable, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -101,12 +101,24 @@ export default function ActionTypeScreen() {
         renderItem={({ item }: { item: CatalogAction }) => (
           <Link href={`/(action)/${item.id}?catalog=true`} asChild>
             <Pressable
-              style={tw`bg-darkBackground rounded-xl p-4 overflow-hidden relative`}
+              style={tw`bg-${category.lightColor}/40 rounded-xl p-4 overflow-hidden relative`}
             >
-              <BauhausBackground
+              <BauhausSkiaShape
                 seed={item.id}
-                color={getHexColor("darkerBackground")}
-                opacity={1}
+                type="hexagon"
+                color={getHexColor(category.color)}
+                distance={0.7}
+                opacity={0.3}
+                shapeScale={0.7}
+              />
+              <BauhausSkiaShape
+                seed={item.id}
+                type="pill"
+                color={getHexColor(category.color)}
+                anchor="bottom-left"
+                distance={1}
+                opacity={0.2}
+                shapeScale={0.7}
               />
               <View style={tw`flex`}>
                 <Text
@@ -123,11 +135,11 @@ export default function ActionTypeScreen() {
                     {item.description}
                   </Text>
                 ) : null}
-                <View
+                {/* <View
                   style={tw`bg-${category.color} rounded-full p-2 inline-flex mt-6`}
                 >
                   <ArrowRight size={20} />
-                </View>
+                </View> */}
               </View>
             </Pressable>
           </Link>
