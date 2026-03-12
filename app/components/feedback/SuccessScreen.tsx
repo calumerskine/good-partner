@@ -284,7 +284,7 @@ function LevelProgress({
     >
       <View style={tw`flex-row justify-between items-center mb-1.5`}>
         <Text style={tw`text-charcoal/60 font-gabarito font-medium text-sm`}>
-          {displayLevel.title}
+          {displayLevel.title}{" "}
         </Text>
         <Text style={tw`text-charcoal/40 font-gabarito text-sm`}>
           {displayLevel.isMaxLevel
@@ -299,9 +299,17 @@ function LevelProgress({
         ]}
       >
         <MotiView
-          from={{ width: isLevelUp ? "0%" : `${Math.round(prevLevel.progress * 100)}%` }}
+          from={{
+            width: isLevelUp
+              ? "0%"
+              : `${Math.round(prevLevel.progress * 100)}%`,
+          }}
           animate={{ width: `${Math.round(displayLevel.progress * 100)}%` }}
-          transition={{ type: "timing", duration: 800, delay: ANIMATION.XP_TEXT_DELAY + 400 }}
+          transition={{
+            type: "timing",
+            duration: 800,
+            delay: ANIMATION.XP_TEXT_DELAY + 400,
+          }}
           style={[
             tw`h-full rounded-full`,
             { backgroundColor: getHexColor(color) },
@@ -388,7 +396,11 @@ export default function SuccessScreen({
           color={category.darkColor}
         />
 
-        <LevelProgress previousXp={previousXp} newXp={newXp} color={category.darkColor} />
+        <LevelProgress
+          previousXp={previousXp}
+          newXp={newXp}
+          color={category.darkColor}
+        />
       </View>
 
       {showLevelUp && (
@@ -411,7 +423,9 @@ export default function SuccessScreen({
             }}
             style={tw`items-center mt-4`}
           >
-            <Text style={tw`text-2xl font-gabarito font-black text-charcoal text-center`}>
+            <Text
+              style={tw`text-2xl font-gabarito font-black text-charcoal text-center`}
+            >
               🌿 You reached {newLevel.title}!
             </Text>
           </MotiView>
@@ -435,7 +449,7 @@ export default function SuccessScreen({
             onNext();
           }}
         >
-          Claim XP
+          Continue
         </Button>
       </MotiView>
     </View>

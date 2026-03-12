@@ -8,6 +8,7 @@ export const ActionTypes = {
     darkerColor: "darkerBlue",
     icon: "🌱",
     iconName: "leaf",
+    buttonColor: "blue",
   },
   AFFECTION: {
     title: "Affection",
@@ -18,6 +19,7 @@ export const ActionTypes = {
     darkerColor: "darkerRaspberry",
     icon: "❤️",
     iconName: "heart",
+    buttonColor: "raspberry",
   },
   INITIATIVE: {
     title: "Initiative",
@@ -28,6 +30,7 @@ export const ActionTypes = {
     darkerColor: "darkerYellow",
     icon: "⚡️",
     iconName: "bolt",
+    buttonColor: "yellow",
   },
   REPAIR: {
     title: "Repair",
@@ -38,6 +41,7 @@ export const ActionTypes = {
     darkerColor: "darkerMint",
     icon: "🔧",
     iconName: "wrench",
+    buttonColor: "mint",
   },
 } as const;
 

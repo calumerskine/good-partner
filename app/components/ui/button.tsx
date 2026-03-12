@@ -24,6 +24,8 @@ const colors = {
   mint: "bg-mint",
   raspberry: "bg-raspberry",
   orange: "bg-orange",
+  blue: "bg-blue",
+  yellow: "bg-yellow",
   muted: "bg-white/50",
   ghost: "bg-transparent",
 };
