@@ -23,11 +23,6 @@ export default function ActionTypeScreen() {
 
   return (
     <SafeAreaView edges={["top"]} style={tw`flex-1 bg-background`}>
-      {/* <BauhausBackground
-        seed={"progress"}
-        color={getHexColor(category.lightColor)}
-        opacity={0.6}
-      /> */}
       <View style={tw`w-full px-5 py-4 flex-row items-center justify-between`}>
         <Link href=".." asChild>
           <Pressable>

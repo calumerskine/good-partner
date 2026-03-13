@@ -1,4 +1,3 @@
-import BauhausSkiaShape from "@/components/shapes/bauhaus-skia-shape";
 import Button from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
 import { useThrottle } from "@/hooks/use-throttle";
@@ -8,13 +7,11 @@ import {
   useGetUserProfile,
   useToggleNotificationsEnabled,
 } from "@/lib/api";
-import { getHexColor } from "@/lib/colors";
 import { env } from "@/lib/env";
 import { oneSignalService } from "@/lib/onesignal";
 import { ActionTypes } from "@/lib/state/actions.model";
 import tw from "@/lib/tw";
-import { useRouter } from "expo-router";
-import { useFocusEffect } from "expo-router";
+import { useFocusEffect, useRouter } from "expo-router";
 import { useCallback } from "react";
 import { Pressable, ScrollView, Switch, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -48,28 +45,6 @@ export default function SettingsScreen() {
 
   return (
     <SafeAreaView edges={["top"]} style={tw`flex-1 bg-background`}>
-      <BauhausSkiaShape
-        type="hexagon"
-        anchor="top-right"
-        distance={0.7}
-        size={600}
-        shapeScale={0.8}
-        nudge={[50, -20]}
-        color={getHexColor("grape")}
-        animation="float"
-        opacity={0.1}
-      />
-      <BauhausSkiaShape
-        type="hexagon"
-        anchor="bottom-left"
-        distance={0.8}
-        size={500}
-        shapeScale={1.6}
-        color={getHexColor("grape")}
-        animation="float"
-        opacity={0.4}
-      />
-
       <ScrollView
         style={tw`flex-1 w-full`}
         contentContainerStyle={tw`px-6 pb-8`}
