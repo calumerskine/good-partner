@@ -99,18 +99,8 @@ export default function TabLayout() {
       />
       <Tabs.Screen
         name="(settings)"
-        listeners={resetRootTabListener}
         options={{
-          tabBarShowLabel: false,
-          tabBarIcon: ({ focused }) => (
-            <TabButton focused={focused}>
-              <Feather
-                name="settings"
-                size={24}
-                color={focused ? activeText : charcoal}
-              />
-            </TabButton>
-          ),
+          href: null,
         }}
       />
     </Tabs>
