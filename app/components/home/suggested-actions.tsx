@@ -75,27 +75,10 @@ export default function SuggestedActions({
   const allExhausted = currentIndex >= suggestedActions.length;
 
   return (
-    <View style={tw`flex-1 pt-12`}>
+    <View style={tw`flex-1`}>
       <Text style={tw`text-2xl text-black font-gabarito font-bold mb-6`}>
         Your move for today:
       </Text>
-
-      {/* Progress dots */}
-      {/* <View style={tw`flex-row justify-center gap-2 mb-6`}>
-        {suggestedActions.map((action: CatalogAction, i: number) => (
-          <View
-            key={action.id}
-            style={tw.style(
-              `w-2 h-2 rounded-full`,
-              i < currentIndex
-                ? `bg-charcoal/30`
-                : i === currentIndex
-                  ? `bg-grape`
-                  : `bg-charcoal/20`,
-            )}
-          />
-        ))}
-      </View> */}
 
       {allExhausted ? (
         /* Browse Library state */

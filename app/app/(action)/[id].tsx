@@ -11,11 +11,10 @@ import {
   useGetActionDetail,
   useGetUserAction,
 } from "@/lib/api";
-import { getHexColor } from "@/lib/colors";
 import { ActionTypes } from "@/lib/state/actions.model";
 import tw from "@/lib/tw";
-import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { router, useLocalSearchParams } from "expo-router";
+import { Lightbulb } from "lucide-react-native";
 import { useEffect } from "react";
 import { ActivityIndicator, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -66,7 +65,7 @@ export default function ActionDetailScreen() {
 
   if (!actionData) {
     return (
-      <SafeAreaView style={tw`flex-1 bg-background`}>
+      <SafeAreaView style={tw`flex-1 bg-white`}>
         <View
           style={tw`w-full px-6 py-4 flex-row items-center justify-between`}
         >
@@ -129,62 +128,20 @@ export default function ActionDetailScreen() {
   };
 
   return (
-    <SafeAreaView style={tw`flex-1 bg-background`}>
-      {/* <BauhausSkiaShape
-        seed={actionData.id}
-        type="hexagon"
-        anchor="top-right"
-        distance={0.7}
-        size={600}
-        shapeScale={0.8}
-        nudge={[50, -20]}
-        color={getHexColor(categoryInfo.color)}
-        animation="float"
-        opacity={0.1}
-      />
-      <BauhausSkiaShape
-        seed={actionData.id}
-        type="trapezoid"
-        anchor="top-left"
-        strokeOnly
-        distance={0.4}
-        size={800}
-        shapeScale={1.2}
-        color={getHexColor(categoryInfo.color)}
-        animation="float"
-        opacity={0.5}
-      />
-      <BauhausSkiaShape
-        seed={actionData.id}
-        type="hexagon"
-        anchor="bottom-left"
-        distance={0.8}
-        size={500}
-        shapeScale={1.6}
-        color={getHexColor(categoryInfo.color)}
-        animation="float"
-        opacity={0.4}
-      /> */}
+    <SafeAreaView style={tw`flex-1 bg-white`}>
       <View style={tw`w-full px-6 py-4 flex-row items-center justify-between`}>
         <BackButton />
 
         <View style={tw`flex-row items-center gap-2`}>
-          <Text
-            style={tw`text-4xl text-${categoryInfo.darkColor} font-gabarito font-black`}
-          >
+          <Text style={tw`text-4xl text-gray-400 font-gabarito font-black`}>
             {categoryInfo.title}
           </Text>
-
-          <FontAwesome
-            name={categoryInfo.iconName}
-            size={30}
-            color={getHexColor(categoryInfo.darkColor)}
-          />
+          {categoryInfo.icon({ size: 30, color: "grey" })}
         </View>
       </View>
 
       {isLoading ? (
-        <View style={tw`flex-1 items-center justify-center bg-background`}>
+        <View style={tw`flex-1 items-center justify-center bg-white`}>
           <ActivityIndicator size="large" color="#2E3130" />
         </View>
       ) : (
@@ -217,12 +174,7 @@ export default function ActionDetailScreen() {
 
             <View style={tw`rounded-2xl p-7 bg-white mb-6 border-2 `}>
               <View style={tw`absolute right-4 top-4`}>
-                <FontAwesome
-                  name="lightbulb-o"
-                  size={30}
-                  color={getHexColor("yellow")}
-                  // color={getHexColor(categoryInfo.darkColor)}
-                />
+                <Lightbulb />
               </View>
 
               <Text
@@ -242,14 +194,13 @@ export default function ActionDetailScreen() {
               <Button
                 onPress={handleActivate}
                 disabled={activateAction.isPending}
+                color={categoryInfo.color}
               >
-                <Text>
-                  {activateAction.isPending
-                    ? "Activating..."
-                    : completionCount > 0
-                      ? "Activate Again"
-                      : "Activate This Action"}
-                </Text>
+                {activateAction.isPending
+                  ? "Activating..."
+                  : completionCount > 0
+                    ? "Activate Again"
+                    : "Activate This Action"}
               </Button>
             ) : isActive ? (
               <View style={tw`gap-3`}>

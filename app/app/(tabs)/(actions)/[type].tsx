@@ -1,13 +1,12 @@
 import BackButton from "@/components/ui/back-button";
+import PressableCard from "@/components/ui/pressable-card";
 import { trackEvent } from "@/lib/analytics";
 import { CatalogAction, useGetActionsByCategory } from "@/lib/api";
-import { getHexColor } from "@/lib/colors";
 import { ActionTypes } from "@/lib/state/actions.model";
 import tw from "@/lib/tw";
-import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { Link, useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams } from "expo-router";
 import { useEffect } from "react";
-import { FlatList, Pressable, Text, View } from "react-native";
+import { FlatList, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function ActionTypeScreen() {
@@ -21,7 +20,7 @@ export default function ActionTypeScreen() {
   }, [type]);
 
   return (
-    <SafeAreaView edges={["top"]} style={tw`flex-1 bg-background`}>
+    <SafeAreaView edges={["top"]} style={tw`flex-1 bg-white`}>
       <View style={tw`w-full px-5 py-4 flex-row items-center justify-between`}>
         <BackButton />
         <View style={tw`flex-row items-center gap-2`}>
@@ -31,11 +30,7 @@ export default function ActionTypeScreen() {
             {category.title}
           </Text>
 
-          <FontAwesome
-            name={category.iconName}
-            size={30}
-            color={getHexColor(category.darkColor)}
-          />
+          {category.icon({ size: 30 })}
         </View>
       </View>
 
@@ -87,45 +82,28 @@ export default function ActionTypeScreen() {
         }
         ItemSeparatorComponent={() => <View style={tw`h-4`} />}
         renderItem={({ item }: { item: CatalogAction }) => (
-          <Link href={`/(action)/${item.id}?catalog=true`} asChild>
-            <Pressable
-              style={tw`border-4 border-${category.darkColor} rounded-xl p-4 bg-darkBackground`}
-            >
-              {/* <BauhausSkiaShape
-                seed={item.id}
-                type="hexagon"
-                color={getHexColor(category.color)}
-                distance={0.7}
-                opacity={0.3}
-                shapeScale={0.7}
-              />
-              <BauhausSkiaShape
-                seed={item.id}
-                type="pill"
-                color={getHexColor(category.color)}
-                anchor="bottom-left"
-                distance={1}
-                opacity={0.2}
-                shapeScale={0.7}
-              /> */}
-              <View style={tw`flex`}>
-                <Text
-                  style={tw`text-lg font-gabarito font-bold text-charcoal mr-4 leading-loose`}
-                >
-                  {item.title}
-                </Text>
+          <PressableCard
+            href={`/(action)/${item.id}?catalog=true`}
+            color={category.color}
+            shade={200}
+          >
+            <View style={tw`p-5`}>
+              <Text
+                style={tw`text-lg font-gabarito font-bold text-ink mr-4 leading-loose`}
+              >
+                {item.title}
+              </Text>
 
-                {item.description ? (
-                  <Text
-                    style={tw`text-base text-charcoal/80 font-gabarito leading`}
-                    numberOfLines={3}
-                  >
-                    {item.description}
-                  </Text>
-                ) : null}
-              </View>
-            </Pressable>
-          </Link>
+              {item.description ? (
+                <Text
+                  style={tw`text-base text-ink/80 font-gabarito leading mt-1`}
+                  numberOfLines={3}
+                >
+                  {item.description}
+                </Text>
+              ) : null}
+            </View>
+          </PressableCard>
         )}
       />
     </SafeAreaView>

@@ -40,11 +40,11 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView edges={["top"]} style={tw`bg-white flex-1 px-6`}>
-      <HomeHeader dayNumber={dayNumber ?? 1} />
       <ScrollView
         contentContainerStyle={tw`flex-grow`}
         showsVerticalScrollIndicator={false}
       >
+        <HomeHeader dayNumber={dayNumber ?? 1} />
         {/* Daily message */}
         <Text
           style={tw`flex-1 text-xl font-gabarito text-charcoal mt-3`}
@@ -52,12 +52,15 @@ export default function HomeScreen() {
         >
           {dailyContent?.headlineMessage ?? "Everyone starts here"}
         </Text>
-
         {userActions.length > 0 ? (
           <ActiveActions isLoading={isLoading} userActions={userActions} />
-        ) : null}
-
-        <SuggestedActions user={user} profile={profile} isLoading={isLoading} />
+        ) : (
+          <SuggestedActions
+            user={user}
+            profile={profile}
+            isLoading={isLoading}
+          />
+        )}
       </ScrollView>
     </SafeAreaView>
   );

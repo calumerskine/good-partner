@@ -1,10 +1,10 @@
 import { getHexColor } from "@/lib/colors";
 import { ActionTypes } from "@/lib/state/actions.model";
 import tw from "@/lib/tw";
-import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { MotiView } from "moti";
 import { useEffect, useState } from "react";
 import { ScrollView, Text, View } from "react-native";
+import PressableCard from "../ui/pressable-card";
 
 type CategoryCompletion = {
   categoryKey: string;
@@ -48,6 +48,8 @@ export function FocusRow({ categories, vertical = false }: FocusRowProps) {
     const darkColorHex = getHexColor(actionType.darkColor);
     const colorHex = getHexColor(actionType.color);
 
+    const category = ActionTypes[CATEGORY_MAP[cat.categoryKey]];
+
     return (
       <MotiView
         key={cat.categoryKey}
@@ -57,64 +59,42 @@ export function FocusRow({ categories, vertical = false }: FocusRowProps) {
           scale: animated ? 1 : 0.95,
         }}
         transition={{ delay: index * 100, duration: 300 }}
-        style={[
-          vertical ? tw`w-full rounded-2xl p-5 border-2` : tw`w-64 rounded-2xl p-5 border-2`,
-          {
-            backgroundColor: hexToRgba(lightColorHex, 0.15),
-            borderColor: colorHex,
-            shadowColor: colorHex,
-            shadowOffset: { width: 0, height: 4 },
-            shadowOpacity: 0.1,
-            shadowRadius: 8,
-            elevation: 3,
-          },
-        ]}
       >
-        <View
-          style={tw`flex flex-row-reverse justify-between items-baseline`}
-        >
-          <View style={[tw``]}>
-            <FontAwesome
-              name={ActionTypes[CATEGORY_MAP[cat.categoryKey]].iconName}
-              size={24}
-              color={getHexColor(
-                ActionTypes[CATEGORY_MAP[cat.categoryKey]].darkColor,
-              )}
-            />
-          </View>
-          <Text
-            style={tw`text-xl text-charcoal font-gabarito font-bold mb-3`}
-          >
-            {actionType.title}
-          </Text>
-        </View>
+        <PressableCard color="indigo">
+          <View style={tw`p-4`}>
+            <View
+              style={tw`flex flex-row-reverse justify-between items-baseline`}
+            >
+              <View style={[tw``]}>{category.icon()}</View>
+              <Text style={tw`text-xl text-ink font-gabarito font-bold mb-3`}>
+                {actionType.title}
+              </Text>
+            </View>
 
-        <Text
-          style={[
-            tw`text-5xl font-gabarito font-black mb-2`,
-            { color: darkColorHex },
-          ]}
-        >
-          {cat.totalCompletions}
-        </Text>
-        <Text style={tw`text-sm text-charcoal/60 font-gabarito mb-1`}>
-          Actions Completed
-        </Text>
+            <Text
+              style={[
+                tw`text-5xl font-gabarito font-black mb-2`,
+                { color: darkColorHex },
+              ]}
+            >
+              {cat.totalCompletions}
+            </Text>
+            <Text style={tw`text-sm text-ink/60 font-gabarito mb-1`}>
+              Actions Completed
+            </Text>
+          </View>
+        </PressableCard>
       </MotiView>
     );
   });
 
   if (vertical) {
-    return (
-      <View style={tw`gap-3`}>
-        {cards}
-      </View>
-    );
+    return <View style={tw`gap-3`}>{cards}</View>;
   }
 
   return (
     <View style={tw`mb-6`}>
-      <Text style={tw`text-lg text-charcoal font-gabarito font-bold mb-3 px-1`}>
+      <Text style={tw`text-lg text-ink font-gabarito font-bold mb-3 px-1`}>
         Focus Areas
       </Text>
       <ScrollView

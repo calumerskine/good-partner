@@ -4,15 +4,9 @@ import { useHaptics } from "@/hooks/use-haptics";
 import tw from "@/lib/tw";
 import { Href, Link } from "expo-router";
 import React from "react";
-import {
-  Animated,
-  Pressable,
-  StyleProp,
-  View,
-  ViewStyle,
-} from "react-native";
+import { Animated, Pressable, StyleProp, View, ViewStyle } from "react-native";
 
-const PRESS_DEPTH = 5;
+const PRESS_DEPTH = 10;
 
 type PressableCardProps = {
   children: React.ReactNode;
@@ -21,6 +15,7 @@ type PressableCardProps = {
   onPress?: () => void;
   href?: Href;
   pressDepth?: number;
+  showShadow?: boolean;
   style?: StyleProp<ViewStyle>;
   disabled?: boolean;
   accessibilityLabel?: string;
@@ -39,7 +34,11 @@ function getColorClasses(color: string, shade: number) {
     return { faceClass: "bg-white/50", shadowClass: null, isSpecial: true };
   }
   if (color === "white") {
-    return { faceClass: "bg-white", shadowClass: "bg-gray-100", isSpecial: false };
+    return {
+      faceClass: "bg-white",
+      shadowClass: "bg-gray-100",
+      isSpecial: false,
+    };
   }
   const s = clampShade(shade);
   const shadowShade = Math.min(s + 100, 900);
@@ -57,6 +56,7 @@ export default function PressableCard({
   onPress,
   href,
   pressDepth = PRESS_DEPTH,
+  showShadow = false,
   style,
   disabled = false,
   accessibilityLabel,
@@ -82,9 +82,32 @@ export default function PressableCard({
   const role = accessibilityRole ?? defaultRole;
 
   if (!isInteractive) {
+    const shadow =
+      showShadow && shadowClass ? (
+        <View
+          style={[
+            tw.style(shadowClass, `rounded-2xl absolute inset-0`),
+            { top: pressDepth },
+          ]}
+        />
+      ) : null;
     return (
-      <View style={[tw.style(`rounded-2xl overflow-hidden`, faceClass), style]}>
-        {children}
+      <View
+        style={[
+          tw`relative`,
+          showShadow && shadowClass ? { paddingBottom: pressDepth } : undefined,
+          style,
+        ]}
+      >
+        {shadow}
+        <View
+          style={[
+            tw.style(`rounded-2xl overflow-hidden`, faceClass),
+            { flex: 1 },
+          ]}
+        >
+          {children}
+        </View>
       </View>
     );
   }

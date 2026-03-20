@@ -71,7 +71,7 @@ export default forwardRef(function Button(
   };
 
   return (
-    <View style={[tw`relative`, { paddingBottom: PRESS_DEPTH }]}>
+    <View style={[tw`relative min-w-full`, { paddingBottom: PRESS_DEPTH }]}>
       {shadowClass && (
         <View
           style={[
@@ -89,10 +89,7 @@ export default forwardRef(function Button(
           onPressIn={onPressIn}
           onPressOut={onPressOut}
           style={[
-            tw.style(
-              `rounded-3xl w-full ${sizes[size].padding}`,
-              faceClass,
-            ),
+            tw.style(`rounded-3xl w-full ${sizes[size].padding}`, faceClass),
             buttonStyle,
           ]}
         >

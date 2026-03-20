@@ -16,8 +16,7 @@ type CategoryCompletion = {
 
 export default function ProgressScreen() {
   const { user } = useAuth();
-  const { data: userActions = [], isLoading } =
-    useGetAllUserActions(user?.id);
+  const { data: userActions = [], isLoading } = useGetAllUserActions(user?.id);
 
   useFocusEffect(
     useCallback(() => {
@@ -55,7 +54,7 @@ export default function ProgressScreen() {
 
   if (isLoading) {
     return (
-      <SafeAreaView edges={["top"]} style={tw`flex-1 bg-background`}>
+      <SafeAreaView edges={["top"]} style={tw`flex-1 bg-white`}>
         <View style={tw`flex-1 items-center justify-center`}>
           <ActivityIndicator size="large" color="#2E3130" />
         </View>
@@ -64,25 +63,15 @@ export default function ProgressScreen() {
   }
 
   return (
-    <SafeAreaView edges={["top"]} style={tw`flex-1 bg-background`}>
-      {/* <BauhausBackground
-        seed={"progress"}
-        color={getHexColor("darkBackground")}
-        opacity={1}
-      /> */}
+    <SafeAreaView edges={["top"]} style={tw`flex-1 bg-white`}>
       <ScrollView
         style={tw`flex-1 w-full`}
         contentContainerStyle={tw`px-6 pb-8`}
         showsVerticalScrollIndicator={false}
       >
-        <View style={tw`py-6 mb-3`}>
-          <Text
-            style={tw`text-4xl text-charcoal font-gabarito font-black mb-1`}
-          >
+        <View style={tw`py-6`}>
+          <Text style={tw`text-4xl text-ink font-gabarito font-black mb-1`}>
             Progress
-          </Text>
-          <Text style={tw`text-lg text-charcoal/70 font-gabarito`}>
-            Review your progress
           </Text>
         </View>
 
@@ -92,14 +81,7 @@ export default function ProgressScreen() {
           <FocusRow categories={categoryProgress} vertical />
         ) : (
           <View style={tw`flex-1 items-center justify-center px-6`}>
-            <Text
-              style={tw`text-2xl text-charcoal font-gabarito font-bold mb-3 text-center`}
-            >
-              Start Your Command Center
-            </Text>
-            <Text
-              style={tw`text-base text-charcoal/70 font-gabarito text-center`}
-            >
+            <Text style={tw`text-base text-ink/70 font-gabarito text-center`}>
               Complete actions to see your progress here.
             </Text>
           </View>

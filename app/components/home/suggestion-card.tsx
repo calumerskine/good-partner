@@ -1,9 +1,9 @@
 import { CatalogAction } from "@/lib/api";
 import { ActionTypes } from "@/lib/state/actions.model";
 import tw from "@/lib/tw";
-import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Text, View } from "react-native";
 import Button from "../ui/button";
+import PressableCard from "../ui/pressable-card";
 
 type Props = {
   action: CatalogAction;
@@ -31,59 +31,46 @@ export default function SuggestionCard({
     : "";
 
   return (
-    <View>
-      <Button style={tw`flex-1`} textStyle={tw`text-white`}>
-        {/* Card (tappable → detail screen) */}
-        {/* <Link href={`/(action)/${id}?catalog=true`} asChild> */}
-        {/* <Pressable style={tw`flex-1 rounded-2xl p-7 pt-10 border-2 bg-white`}> */}
-        {/* Category icon */}
+    <PressableCard color={categoryInfo.color} shade={100} showShadow>
+      <View style={tw`p-6 items-start`}>
         <View
-          style={tw`absolute top-4 right-4 bg-gray-200 rounded-lg flex flex-row items-center px-3 py-1`}
+          style={tw`bg-white rounded-lg flex flex-row items-center px-3 py-1`}
         >
           <Text style={tw`uppercase font-gabarito font-medium mr-2 text-sm`}>
             {categoryInfo.title}
           </Text>
-          <FontAwesome
-            name={categoryInfo.iconName}
-            size={22}
-            style={tw`text-${categoryInfo.color}-500`}
-          />
+          {categoryInfo.icon()}
         </View>
         {/* Content */}
-        <View style={tw`flex-1 justify-center items-center gap-4 mt-2`}>
+        <View style={tw`flex-1 mt-3`}>
           <Text
-            style={tw`text-2xl font-gabarito font-bold text-black leading-1.3 text-center`}
+            style={tw`text-2xl font-gabarito font-bold text-black leading-1.3 mt-4`}
           >
             {title}
           </Text>
           {firstSentence ? (
-            <Text
-              style={tw`text-lg text-black font-gabarito leading-1.6 text-center`}
-            >
+            <Text style={tw`text-lg text-black font-gabarito leading-1.6 mt-3`}>
               {firstSentence}
             </Text>
           ) : null}
         </View>
-        {/* </Pressable> */}
-        {/* </Link> */}
-        {/* Actions */}
-      </Button>
-      <View style={tw`gap-3 mt-5`}>
-        <Button
-          color={categoryInfo.buttonColor as any}
-          onPress={() => onActivate(id)}
-          disabled={isActivating || isSkipping}
-        >
-          I'm on it
-        </Button>
-        <Button
-          color="ghost"
-          onPress={() => onSkip(id)}
-          disabled={isActivating || isSkipping}
-        >
-          Not the right moment
-        </Button>
+        <View style={tw`gap-3 mt-5`}>
+          <Button
+            color={categoryInfo.buttonColor as any}
+            onPress={() => onActivate(id)}
+            disabled={isActivating || isSkipping}
+          >
+            I'm on it
+          </Button>
+          <Button
+            color="muted"
+            onPress={() => onSkip(id)}
+            disabled={isActivating || isSkipping}
+          >
+            Not the right time
+          </Button>
+        </View>
       </View>
-    </View>
+    </PressableCard>
   );
 }

@@ -46,7 +46,7 @@ export default function SettingsScreen() {
   }, 500);
 
   return (
-    <SafeAreaView edges={["top"]} style={tw`flex-1 bg-background`}>
+    <SafeAreaView edges={["top"]} style={tw`flex-1 bg-amber-400`}>
       <ScrollView
         style={tw`flex-1 w-full`}
         contentContainerStyle={tw`px-6 pb-8`}
@@ -55,9 +55,6 @@ export default function SettingsScreen() {
         <View style={tw`py-6 mb-3`}>
           <Text style={tw`text-4xl text-black font-gabarito font-black mb-2`}>
             Settings
-          </Text>
-          <Text style={tw`text-lg text-charcoal/70 font-gabarito`}>
-            Manage your preferences
           </Text>
         </View>
 
@@ -117,10 +114,7 @@ export default function SettingsScreen() {
                 Haptics
               </Text>
               {hapticsLoaded && (
-                <Switch
-                  value={hapticsEnabled}
-                  onValueChange={toggleHaptics}
-                />
+                <Switch value={hapticsEnabled} onValueChange={toggleHaptics} />
               )}
             </View>
             <Text

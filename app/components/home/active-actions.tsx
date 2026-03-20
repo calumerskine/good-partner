@@ -2,12 +2,12 @@ import { UserAction, useCompleteAction } from "@/lib/api";
 import { getHexColor } from "@/lib/colors";
 import { ActionTypes } from "@/lib/state/actions.model";
 import tw from "@/lib/tw";
-import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Link, router } from "expo-router";
 import { MotiView } from "moti";
 import { useCallback, useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import Button from "../ui/button";
+import PressableCard from "../ui/pressable-card";
 
 function ActionCard({
   item,
@@ -42,24 +42,8 @@ function ActionCard({
   const iconBg = accentLight + "4D"; // 30% opacity
 
   return (
-    <Pressable onPress={onToggle} style={tw``}>
-      <View
-        style={tw`bg-darkBackground border-4 border-${categoryInfo.darkColor} rounded-2xl p-5 overflow-hidden`}
-      >
-        {/* Top accent bar */}
-        {/* <LinearGradient
-          colors={[accentLight, accentDark]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 0 }}
-          style={{
-            position: "absolute",
-            left: 0,
-            right: 0,
-            top: 0,
-            height: 4,
-          }}
-        /> */}
-
+    <PressableCard color={categoryInfo.color} showShadow>
+      <View style={tw`p-5`}>
         {/* Header row */}
         <View style={tw`flex-row items-center justify-between`}>
           <Text
@@ -73,11 +57,7 @@ function ActionCard({
               // { backgroundColor: iconBg },
             ]}
           >
-            <FontAwesome
-              name={categoryInfo.iconName}
-              size={22}
-              color={getHexColor(categoryInfo.darkColor)}
-            />
+            {categoryInfo.icon()}
             {/* <Text style={{ fontSize: 16 }}>{categoryInfo.icon}</Text> */}
           </View>
         </View>
@@ -133,7 +113,7 @@ function ActionCard({
           </MotiView>
         )}
       </View>
-    </Pressable>
+    </PressableCard>
   );
 }
 
@@ -152,8 +132,8 @@ export default function ActiveActions({
   return (
     <View style={tw`mb-2`}>
       <View style={tw`py-4`}>
-        <Text style={tw`text-2xl text-black font-gabarito font-black mb-2`}>
-          Your active actions
+        <Text style={tw`text-2xl text-black font-gabarito font-bold mb-6`}>
+          Your move for today:
         </Text>
       </View>
 
@@ -167,7 +147,7 @@ export default function ActiveActions({
             <ActionCard
               key={item.id}
               item={item}
-              isExpanded={expandedId === item.id}
+              isExpanded
               onToggle={() => handleToggle(item.id)}
             />
           ))}

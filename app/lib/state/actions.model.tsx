@@ -1,3 +1,5 @@
+import { Wrench, Heart, Zap, Leaf } from "lucide-react-native";
+
 export const ActionTypes = {
   ATTENTION: {
     title: "Attention",
@@ -6,7 +8,7 @@ export const ActionTypes = {
     color: "blue",
     darkColor: "darkBlue",
     darkerColor: "darkerBlue",
-    icon: "🌱",
+    icon: (props?: any) => <Leaf {...props} />,
     iconName: "leaf",
     buttonColor: "blue",
   },
@@ -17,7 +19,7 @@ export const ActionTypes = {
     color: "pink",
     darkColor: "darkRaspberry",
     darkerColor: "darkerRaspberry",
-    icon: "❤️",
+    icon: (props?: any) => <Heart {...props} />,
     iconName: "heart",
     buttonColor: "pink",
   },
@@ -28,7 +30,7 @@ export const ActionTypes = {
     color: "yellow",
     darkColor: "darkYellow",
     darkerColor: "darkerYellow",
-    icon: "⚡️",
+    icon: (props?: any) => <Zap {...props} />,
     iconName: "bolt",
     buttonColor: "yellow",
   },
@@ -39,7 +41,7 @@ export const ActionTypes = {
     color: "green",
     darkColor: "darkMint",
     darkerColor: "darkerMint",
-    icon: "🔧",
+    icon: (props?: any) => <Wrench {...props} />,
     iconName: "wrench",
     buttonColor: "green",
   },
