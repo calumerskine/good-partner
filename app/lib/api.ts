@@ -20,6 +20,7 @@ const queryKeys = {
   userProfile: (userId: string) => ["userProfile", userId] as const,
   categories: () => ["categories"] as const,
   suggestedActions: () => ["suggestedActions"] as const,
+  dailyContent: (dayNumber: number) => ["dailyContent", dayNumber] as const,
 };
 
 const mutationKeys = {
@@ -1395,4 +1396,46 @@ async function submitFeedback(input: FeedbackInput) {
   if (error) {
     throw error;
   }
+}
+
+// ============================================================
+// Daily Content API
+// ============================================================
+
+export type DailyContent = {
+  id: string;
+  dayNumber: number;
+  headlineMessage: string;
+  subtext: string | null;
+};
+
+export function useGetDailyContent(dayNumber: number) {
+  return useQuery({
+    queryKey: queryKeys.dailyContent(dayNumber),
+    queryFn: () => getDailyContent(dayNumber),
+    staleTime: Infinity,
+  });
+}
+
+async function getDailyContent(dayNumber: number): Promise<DailyContent | null> {
+  // Try to get content for the exact day number, fall back to day 1
+  const { data, error } = await supabase
+    .from("daily_content")
+    .select("id, day_number, headline_message, subtext")
+    .lte("day_number", dayNumber)
+    .order("day_number", { ascending: false })
+    .limit(1)
+    .single();
+
+  if (error) {
+    if (error.code === "PGRST116") return null;
+    throw error;
+  }
+
+  return {
+    id: data.id,
+    dayNumber: data.day_number,
+    headlineMessage: data.headline_message,
+    subtext: data.subtext,
+  };
 }
