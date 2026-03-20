@@ -19,7 +19,7 @@ export const ActionTypes = {
     darkerColor: "darkerRaspberry",
     icon: "❤️",
     iconName: "heart",
-    buttonColor: "pink",
+    buttonColor: "raspberry",
   },
   INITIATIVE: {
     title: "Initiative",
@@ -41,7 +41,7 @@ export const ActionTypes = {
     darkerColor: "darkerMint",
     icon: "🔧",
     iconName: "wrench",
-    buttonColor: "green",
+    buttonColor: "mint",
   },
 } as const;
 

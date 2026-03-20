@@ -12,7 +12,6 @@ import { Link, router } from "expo-router";
 import { ArrowRight } from "lucide-react-native";
 import { useState } from "react";
 import { Pressable, Text, View } from "react-native";
-import Button from "../ui/button";
 import SuggestionCard from "./suggestion-card";
 
 export default function SuggestedActions({
@@ -83,9 +82,9 @@ export default function SuggestedActions({
 
       {/* Progress dots */}
       <View style={tw`flex-row justify-center gap-2 mb-6`}>
-        {suggestedActions.map((_: CatalogAction, i: number) => (
+        {suggestedActions.map((action: CatalogAction, i: number) => (
           <View
-            key={i}
+            key={action.id}
             style={tw.style(
               `w-2 h-2 rounded-full`,
               i < currentIndex

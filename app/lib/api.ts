@@ -1061,16 +1061,10 @@ async function deactivateAction(userActionId: string) {
  * Creates a user_skips record with today's date
  */
 export function useSkipAction() {
-  const queryClient = useQueryClient();
-
   return useMutation({
     mutationKey: mutationKeys.skipAction,
     mutationFn: ({ userId, actionId }: { userId: string; actionId: string }) =>
       skipAction(userId, actionId),
-    onSuccess: () => {
-      // Invalidate suggested actions so re-fetch excludes today's skips
-      queryClient.invalidateQueries({ queryKey: queryKeys.suggestedActions() });
-    },
   });
 }
 
