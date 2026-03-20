@@ -65,7 +65,7 @@ export default function RemindersPromptScreen() {
         <View style={tw`flex-1`} />
 
         <View style={tw`w-full pb-6 gap-3`}>
-          <Button onPress={handleEnable} color="mint">
+          <Button onPress={handleEnable} color="green">
             Enable Reminders
           </Button>
           <Button onPress={handleDismiss} color="ghost" size="sm">

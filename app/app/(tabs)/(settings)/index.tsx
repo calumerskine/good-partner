@@ -69,7 +69,7 @@ export default function SettingsScreen() {
               </Text>
               <Button
                 size="sm"
-                color="grape"
+                color="indigo"
                 onPress={() =>
                   router.push("/(tabs)/(settings)/edit-focus-areas")
                 }
@@ -172,7 +172,7 @@ export default function SettingsScreen() {
               </Text>
               <Button
                 size="sm"
-                color="raspberry"
+                color="pink"
                 onPress={() => {
                   trackEvent("auth_signout");
                   signOut();
