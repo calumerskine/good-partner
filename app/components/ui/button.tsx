@@ -1,6 +1,7 @@
+import { usePressAnimation } from "@/hooks/animations";
 import { useHaptics } from "@/hooks/use-haptics";
 import tw from "@/lib/tw";
-import React, { forwardRef, useRef } from "react";
+import React, { forwardRef } from "react";
 import {
   Animated,
   Pressable,
@@ -12,39 +13,7 @@ import {
   ViewStyle,
 } from "react-native";
 
-type Props = PressableProps & {
-  children: React.ReactNode;
-  color?: keyof typeof colors;
-  size?: keyof typeof sizes;
-  buttonStyle?: StyleProp<ViewStyle>;
-  textStyle?: StyleProp<TextStyle>;
-};
-
-const colors = {
-  grape: "bg-indigo-500",
-  peach: "bg-peach",
-  mint: "bg-green-500",
-  raspberry: "bg-pink-500",
-  orange: "bg-orange",
-  blue: "bg-blue-500",
-  yellow: "bg-yellow-500",
-  muted: "bg-white/50",
-  ghost: "bg-transparent",
-  charcoal: "bg-charcoal",
-};
-
-const shadows = {
-  grape: "bg-indigo-600",
-  peach: "bg-darkPeach",
-  mint: "bg-green-600",
-  raspberry: "bg-pink-600",
-  orange: "bg-darkOrange",
-  blue: "bg-blue-600",
-  yellow: "bg-yellow-600",
-  charcoal: "bg-black",
-  muted: "bg-transparent",
-  ghost: "bg-transparent",
-};
+const PRESS_DEPTH = 5;
 
 const sizes = {
   sm: { padding: "py-2 px-6", text: "text-base" },
@@ -52,10 +21,18 @@ const sizes = {
   lg: { padding: "py-5 px-10", text: "text-xl" },
 };
 
+type Props = PressableProps & {
+  children: React.ReactNode;
+  color?: string;
+  size?: keyof typeof sizes;
+  buttonStyle?: StyleProp<ViewStyle>;
+  textStyle?: StyleProp<TextStyle>;
+};
+
 export default forwardRef(function Button(
   {
     children,
-    color = "grape",
+    color = "indigo",
     size = "md",
     disabled,
     buttonStyle,
@@ -65,38 +42,41 @@ export default forwardRef(function Button(
   ref: React.Ref<View>,
 ) {
   const { trigger } = useHaptics();
-  const translateY = useRef(new Animated.Value(0)).current;
   const isSpecial = color === "ghost" || color === "muted";
   const isDisabled = disabled || false;
 
-  const handlePressIn = (event: any) => {
-    if (!isDisabled && !isSpecial) {
-      Animated.spring(translateY, {
-        toValue: 5,
-        useNativeDriver: true,
-        bounciness: 0,
-      }).start();
-    }
+  const { translateY, handlePressIn, handlePressOut } = usePressAnimation({
+    pressDepth: PRESS_DEPTH,
+    disabled: isDisabled,
+    skipAnimation: isSpecial,
+  });
+
+  const faceClass = isSpecial
+    ? color === "muted"
+      ? "bg-white/50"
+      : "bg-transparent"
+    : `bg-${color}-400`;
+
+  const shadowClass = `bg-${color}-500`;
+
+  const onPressIn = (event: any) => {
+    handlePressIn(event);
     props.onPressIn?.(event);
-    trigger("impactLight");
+    if (!isDisabled) trigger("impactLight");
   };
 
-  const handlePressOut = (event: any) => {
-    Animated.spring(translateY, {
-      toValue: 0,
-      useNativeDriver: true,
-      bounciness: 12,
-    }).start();
+  const onPressOut = (event: any) => {
+    handlePressOut(event);
     props.onPressOut?.(event);
   };
 
   return (
-    <View style={[tw`relative`, { paddingBottom: 5 }]}>
+    <View style={[tw`relative`, { paddingBottom: PRESS_DEPTH }]}>
       {!isSpecial && (
         <View
           style={[
-            tw.style(shadows[color], `rounded-3xl absolute inset-0`),
-            { top: 5 },
+            tw.style(shadowClass, `rounded-3xl absolute inset-0`),
+            { top: PRESS_DEPTH },
           ]}
         />
       )}
@@ -104,15 +84,14 @@ export default forwardRef(function Button(
       <Animated.View style={{ transform: [{ translateY }] }}>
         <Pressable
           {...props}
+          ref={ref}
           disabled={isDisabled}
-          onPressIn={handlePressIn}
-          onPressOut={handlePressOut}
-          style={({ pressed }) => [
+          onPressIn={onPressIn}
+          onPressOut={onPressOut}
+          style={[
             tw.style(
               `rounded-3xl w-full ${sizes[size].padding}`,
-              colors[color],
-              isDisabled && ``,
-              pressed && isSpecial && ``,
+              faceClass,
             ),
             buttonStyle,
           ]}
