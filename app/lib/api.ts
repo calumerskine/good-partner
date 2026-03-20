@@ -1129,6 +1129,8 @@ export type UserProfile = {
   createdAt: Date;
   hasCompletedOnboarding: boolean;
   totalXp: number;
+  currentStreakDays: number;
+  totalDaysActive: number;
 };
 
 /**
@@ -1170,7 +1172,7 @@ async function getUserProfile(userId: string): Promise<UserProfile | null> {
   // First get the user profile
   const { data: profile, error: profileError } = await supabase
     .from("user_profiles")
-    .select("id, user_id, user_tier, created_at, has_completed_onboarding, total_xp")
+    .select("id, user_id, user_tier, created_at, has_completed_onboarding, total_xp, current_streak_days, total_days_active")
     .eq("user_id", userId)
     .single();
 
@@ -1212,6 +1214,8 @@ async function getUserProfile(userId: string): Promise<UserProfile | null> {
     createdAt: new Date(profile.created_at),
     hasCompletedOnboarding: profile.has_completed_onboarding,
     totalXp: profile.total_xp ?? 0,
+    currentStreakDays: profile.current_streak_days ?? 0,
+    totalDaysActive: profile.total_days_active ?? 0,
   };
 }
 
