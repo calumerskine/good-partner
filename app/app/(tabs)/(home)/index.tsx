@@ -25,14 +25,14 @@ export default function HomeScreen() {
 
   if (isLoading || isProfileLoading) {
     return (
-      <View style={tw`flex-1 items-center justify-center bg-background`}>
+      <View style={tw`flex-1 items-center justify-center bg-white`}>
         <ActivityIndicator size="large" color="#2E3130" />
       </View>
     );
   }
 
   return (
-    <SafeAreaView edges={["top"]} style={tw`bg-background flex-1`}>
+    <SafeAreaView edges={["top"]} style={tw`bg-white flex-1`}>
       <ScrollView
         contentContainerStyle={tw`px-6`}
         showsVerticalScrollIndicator={false}

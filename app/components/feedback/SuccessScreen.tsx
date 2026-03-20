@@ -1,6 +1,7 @@
 import { type ActionType } from "@/lib/state/actions.model";
 import tw from "@/lib/tw";
 import { XP_PER_COMPLETION, getLevelForXp } from "@/lib/xp";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { MotiView } from "moti";
 import { useEffect, useState } from "react";
 import { Text, View } from "react-native";
@@ -190,7 +191,8 @@ function AnimatedProgressIcon({
           },
         ]}
       >
-        <Text style={tw`text-5xl`}>{icon}</Text>
+        <FontAwesome name={icon as any} size={42} color={lightColor} />
+        {/* <Text style={tw`text-5xl`}>{icon}</Text> */}
       </MotiView>
     </View>
   );
@@ -370,7 +372,7 @@ export default function SuccessScreen({
 
       <View style={tw`items-center gap-6 px-4 mt-36`}>
         <AnimatedProgressIcon
-          icon={category.icon}
+          icon={category.iconName}
           lightColor={category.lightColor}
         />
 

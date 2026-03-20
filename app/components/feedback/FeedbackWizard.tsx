@@ -8,8 +8,8 @@ import { type ActionType } from "@/lib/state/actions.model";
 import tw from "@/lib/tw";
 import { useState } from "react";
 import { Text, View } from "react-native";
-import FeedbackCard from "./FeedbackCard";
 import SuccessScreen from "./SuccessScreen";
+import Button from "../ui/button";
 
 interface FeedbackWizardProps {
   completionId: string;
@@ -64,7 +64,14 @@ export default function FeedbackWizard({
   };
 
   if (step === 0) {
-    return <SuccessScreen category={category} previousXp={previousXp} newXp={newXp} onNext={handleNext} />;
+    return (
+      <SuccessScreen
+        category={category}
+        previousXp={previousXp}
+        newXp={newXp}
+        onNext={handleNext}
+      />
+    );
   }
 
   return (
@@ -86,21 +93,21 @@ export default function FeedbackWizard({
             >
               Was the action noticed?
             </Text>
-            <FeedbackCard
-              label="Not yet"
-              selected={wasNoticed === "not_yet"}
-              onPress={() => handleNoticedSelect("not_yet")}
-            />
-            <FeedbackCard
-              label="A little"
-              selected={wasNoticed === "a_little"}
+            <Button color="blue" onPress={() => handleNoticedSelect("not_yet")}>
+              Not yet
+            </Button>
+            <Button
+              color="blue"
               onPress={() => handleNoticedSelect("a_little")}
-            />
-            <FeedbackCard
-              label="Yes, definitely"
-              selected={wasNoticed === "yes_definitely"}
+            >
+              A little
+            </Button>
+            <Button
+              color="blue"
               onPress={() => handleNoticedSelect("yes_definitely")}
-            />
+            >
+              Yes, definitely
+            </Button>
           </View>
         )}
 
@@ -111,21 +118,15 @@ export default function FeedbackWizard({
             >
               How did it feel for you?
             </Text>
-            <FeedbackCard
-              label="Neutral"
-              selected={felt === "neutral"}
-              onPress={() => handleFeltSelect("neutral")}
-            />
-            <FeedbackCard
-              label="Good"
-              selected={felt === "good"}
-              onPress={() => handleFeltSelect("good")}
-            />
-            <FeedbackCard
-              label="Great"
-              selected={felt === "great"}
-              onPress={() => handleFeltSelect("great")}
-            />
+            <Button color="blue" onPress={() => handleFeltSelect("neutral")}>
+              Neutral
+            </Button>
+            <Button color="blue" onPress={() => handleFeltSelect("good")}>
+              Good
+            </Button>
+            <Button color="blue" onPress={() => handleFeltSelect("great")}>
+              Great
+            </Button>
           </View>
         )}
       </View>

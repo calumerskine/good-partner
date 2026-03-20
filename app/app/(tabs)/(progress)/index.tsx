@@ -1,14 +1,12 @@
+import { FocusRow } from "@/components/progress/FocusRow";
 import { useAuth } from "@/hooks/use-auth";
 import { trackEvent } from "@/lib/analytics";
-import { useGetAllUserActions, useGetUserProfile } from "@/lib/api";
+import { useGetAllUserActions } from "@/lib/api";
 import tw from "@/lib/tw";
 import { useFocusEffect } from "expo-router";
 import { useCallback, useMemo } from "react";
 import { ActivityIndicator, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { FocusRow } from "@/components/progress/FocusRow";
-import { StatusGrid } from "@/components/progress/StatusGrid";
-import XPHeroCard from "@/components/progress/XPHeroCard";
 
 type CategoryCompletion = {
   categoryKey: string;
@@ -18,23 +16,14 @@ type CategoryCompletion = {
 
 export default function ProgressScreen() {
   const { user } = useAuth();
-  const { data: profile, isLoading: profileLoading } = useGetUserProfile(
-    user?.id,
-  );
-  const { data: userActions = [], isLoading: actionsLoading } =
+  const { data: userActions = [], isLoading } =
     useGetAllUserActions(user?.id);
-
-  const isLoading = profileLoading || actionsLoading;
 
   useFocusEffect(
     useCallback(() => {
       trackEvent("screen_viewed", { screen_name: "Progress" });
     }, []),
   );
-
-  const focusCategoryNames = useMemo(() => {
-    return profile?.categories?.map((cat) => cat.name) || [];
-  }, [profile]);
 
   const categoryProgress = useMemo((): CategoryCompletion[] => {
     const categoryMap: Record<string, { total: number; hasToday: boolean }> = {
@@ -61,18 +50,6 @@ export default function ProgressScreen() {
 
     return result;
   }, [userActions]);
-
-  const focusAreas = useMemo(() => {
-    return categoryProgress.filter((cat) =>
-      focusCategoryNames.includes(cat.categoryKey),
-    );
-  }, [categoryProgress, focusCategoryNames]);
-
-  const nonFocusAreas = useMemo(() => {
-    return categoryProgress.filter(
-      (cat) => !focusCategoryNames.includes(cat.categoryKey),
-    );
-  }, [categoryProgress, focusCategoryNames]);
 
   const hasAnyActions = userActions.some((ua) => ua.completionCount > 0);
 
@@ -109,26 +86,10 @@ export default function ProgressScreen() {
           </Text>
         </View>
 
-        <XPHeroCard totalXp={profile?.totalXp ?? 0} />
+        {/* <XPHeroCard totalXp={profile?.totalXp ?? 0} /> */}
 
-        {focusCategoryNames.length === 0 ? (
-          <View style={tw`flex-1 items-center justify-center px-6`}>
-            <Text
-              style={tw`text-2xl text-charcoal font-gabarito font-bold mb-3 text-center`}
-            >
-              Select Focus Areas
-            </Text>
-            <Text
-              style={tw`text-base text-charcoal/70 font-gabarito text-center mb-6`}
-            >
-              Go to Settings to choose your priority areas.
-            </Text>
-          </View>
-        ) : hasAnyActions ? (
-          <>
-            <FocusRow categories={focusAreas} />
-            <StatusGrid categories={nonFocusAreas} />
-          </>
+        {hasAnyActions ? (
+          <FocusRow categories={categoryProgress} vertical />
         ) : (
           <View style={tw`flex-1 items-center justify-center px-6`}>
             <Text

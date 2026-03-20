@@ -1,9 +1,16 @@
-import { CatalogAction, useGetSuggestedActions, UserProfile } from "@/lib/api";
+import { useReminderPrompt } from "@/hooks/use-reminder-prompt";
+import {
+  CatalogAction,
+  useActivateAction,
+  useGetSuggestedActions,
+  UserProfile,
+} from "@/lib/api";
 import { ActionTypes } from "@/lib/state/actions.model";
 import tw from "@/lib/tw";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { User } from "@supabase/supabase-js";
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
+import { ArrowRight } from "lucide-react-native";
 import {
   Pressable,
   ScrollView,
@@ -12,7 +19,19 @@ import {
   View,
 } from "react-native";
 import Button from "../ui/button";
-import { ArrowRight } from "lucide-react-native";
+
+const getColorName = (category: string) => {
+  switch (category) {
+    case "Attention":
+      return "blue";
+    case "Affection":
+      return "raspberry";
+    case "Initiative":
+      return "yellow";
+    case "Repair":
+      return "mint";
+  }
+};
 
 export default function SuggestedActions({
   user,
@@ -29,6 +48,22 @@ export default function SuggestedActions({
     user?.id,
     profile?.categories,
   );
+
+  const activateAction = useActivateAction();
+  const { shouldPrompt, markShown } = useReminderPrompt(user?.id);
+
+  const handleActivate = async (actionId: string) => {
+    if (!user) return;
+    try {
+      await activateAction.mutateAsync({ userId: user.id, actionId });
+      if (shouldPrompt) {
+        markShown();
+        router.replace(`/(action)/${actionId}/reminders` as any);
+      }
+    } catch (error) {
+      console.error("Error activating action:", error);
+    }
+  };
 
   if (!suggestedActions.length) {
     return null;
@@ -59,18 +94,19 @@ export default function SuggestedActions({
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
+          style={tw`h-[520px]`}
           contentContainerStyle={tw`mb-8 p-2 flex-row`}
           snapToOffsets={snapOffsets}
           decelerationRate="fast"
         >
           {suggestedActions.map((item: CatalogAction) => {
-            const { id, title, description, category, reasoning } = item;
+            const { id, title, description, category } = item;
             const categoryInfo =
               ActionTypes[category as keyof typeof ActionTypes];
             return (
               <Link href={`/(action)/${id}?catalog=true`} key={id} asChild>
                 <Pressable
-                  style={tw.style(`rounded-2xl mr-4 `, {
+                  style={tw.style(`rounded-2xl mr-4`, {
                     width: cardWidth,
                     // boxShadow: `0px 0px 10px ${getHexColor(categoryInfo.darkerColor)}90`,
                   })}
@@ -89,18 +125,18 @@ export default function SuggestedActions({
                     ]}
                   > */}
                   <View
-                    style={tw`flex-1 rounded-2xl p-7 pt-10 border-2 border-${categoryInfo.color}/90 bg-${categoryInfo.lightColor}/60`}
+                    style={tw`flex-1 rounded-2xl p-7 pt-10 border-2 bg-${categoryInfo.color}-200 shadow-black/50`}
                   >
                     <View
-                      style={tw`absolute flex items-center justify-center rounded-tr-lg rounded-bl-lg right-0 w-8 h-8 bg-${categoryInfo.color}/90`}
+                      style={tw`absolute flex items-center justify-center rounded-tr-lg rounded-bl-lg right-0 w-12 h-12 `}
                     >
                       <FontAwesome
                         name={categoryInfo.iconName}
-                        size={20}
-                        color={"white"}
+                        size={26}
+                        style={tw`text-${categoryInfo.color}-500`}
                       />
                     </View>
-                    <View style={tw`justify-between flex-1 gap-2`}>
+                    <View style={tw`justify-between flex-1 gap-2 items-center`}>
                       <Text
                         style={tw`text-2xl font-gabarito font-bold text-black mb-4 leading-1.3 text-center`}
                       >
@@ -120,24 +156,17 @@ export default function SuggestedActions({
                       ) : null}
 
                       <View style={tw`flex-row gap-3 mt-6`}>
-                        <Link
-                          href={`/(action)/${id}?catalog=true`}
-                          key={id}
-                          asChild
+                        <Button
+                          size="sm"
+                          color={getColorName(categoryInfo.title)}
+                          onPress={() => handleActivate(id)}
+                          disabled={activateAction.isPending}
                         >
-                          <Button
-                            size="sm"
-                            buttonStyle={[
-                              tw.style(`bg-${"white"}`),
-                              // {
-                              //   boxShadow: `0px 0px 5px 5px rgba(255,255,255,0.5)`,
-                              // },
-                            ]}
-                            textStyle={tw`text-charcoal`}
-                          >
-                            I'll do it today!
-                          </Button>
-                        </Link>
+                          {/* {activateAction.isPending
+                            ? "Activating..."
+                            : "I'll do it today!"} */}
+                          I'll do it today!
+                        </Button>
                       </View>
                       {/* // Restore these when we build those actions. */}
                       {/* <View
@@ -164,7 +193,7 @@ export default function SuggestedActions({
           <Link href="/(tabs)/(actions)" asChild>
             <Pressable
               style={tw.style(
-                `bg-charcoal rounded-2xl items-center justify-center gap-8 shadow-md`,
+                `bg-grape rounded-2xl items-center justify-center gap-8`,
                 { width: cardWidth },
               )}
             >

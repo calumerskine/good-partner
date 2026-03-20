@@ -431,7 +431,7 @@ async function getSuggestedActions(
   // Distribute actions evenly across categories
   if (actions.length === 0) return [];
 
-  const actionsByCategory = new Map<string, CatalogAction[]>();
+  const actionsByCategory = new Map<string, typeof actions>();
   actions.forEach((action) => {
     if (!actionsByCategory.has(action.category)) {
       actionsByCategory.set(action.category, []);
@@ -439,24 +439,22 @@ async function getSuggestedActions(
     actionsByCategory.get(action.category)!.push(action);
   });
 
-  const result: CatalogAction[] = [];
-  const actionsPerCategory = Math.floor(4 / categories.length);
-  const remainder = 4 % categories.length;
+  // Round-robin across categories to fill 4 slots, picking featured-first within each
+  const result: typeof actions = [];
+  const categoryList = Array.from(actionsByCategory.values());
+  let round = 0;
 
-  Array.from(actionsByCategory.entries()).forEach(
-    ([category, categoryActions], index) => {
-      const quota = actionsPerCategory + (index < remainder ? 1 : 0);
-      // Actions are already sorted with featured first
-      result.push(
-        ...categoryActions.slice(0, Math.min(quota, categoryActions.length)),
-      );
-    },
-  );
-
-  // Fill remaining slots if needed
-  if (result.length < 4) {
-    const remaining = actions.filter((a) => !result.includes(a));
-    result.push(...remaining.slice(0, 4 - result.length));
+  while (result.length < 4) {
+    let addedInRound = false;
+    for (const catActions of categoryList) {
+      if (result.length >= 4) break;
+      if (round < catActions.length) {
+        result.push(catActions[round]);
+        addedInRound = true;
+      }
+    }
+    if (!addedInRound) break;
+    round++;
   }
 
   // Remove isFeatured from final result and shuffle

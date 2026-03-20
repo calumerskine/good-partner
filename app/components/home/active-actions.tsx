@@ -3,16 +3,10 @@ import { getHexColor } from "@/lib/colors";
 import { ActionTypes } from "@/lib/state/actions.model";
 import tw from "@/lib/tw";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { LinearGradient } from "expo-linear-gradient";
 import { Link, router } from "expo-router";
 import { MotiView } from "moti";
 import { useCallback, useState } from "react";
-import {
-  LayoutAnimation,
-  Pressable,
-  Text,
-  View,
-} from "react-native";
+import { Pressable, Text, View } from "react-native";
 import Button from "../ui/button";
 
 function ActionCard({
@@ -48,10 +42,12 @@ function ActionCard({
   const iconBg = accentLight + "4D"; // 30% opacity
 
   return (
-    <Pressable onPress={onToggle} style={tw`shadow-md`}>
-      <View style={tw`bg-mediumGrey rounded-2xl p-5 overflow-hidden`}>
+    <Pressable onPress={onToggle} style={tw``}>
+      <View
+        style={tw`bg-darkBackground border-4 border-${categoryInfo.darkColor} rounded-2xl p-5 overflow-hidden`}
+      >
         {/* Top accent bar */}
-        <LinearGradient
+        {/* <LinearGradient
           colors={[accentLight, accentDark]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 0 }}
@@ -62,28 +58,33 @@ function ActionCard({
             top: 0,
             height: 4,
           }}
-        />
+        /> */}
 
         {/* Header row */}
         <View style={tw`flex-row items-center justify-between`}>
           <Text
-            style={tw`text-lg font-gabarito font-bold text-charcoal flex-1 mr-3`}
+            style={tw`text-lg font-gabarito font-bold text-ink flex-1 mr-3`}
           >
             {item.action.title}
           </Text>
           <View
             style={[
               tw`w-8 h-8 rounded-full items-center justify-center`,
-              { backgroundColor: iconBg },
+              // { backgroundColor: iconBg },
             ]}
           >
-            <Text style={{ fontSize: 16 }}>{categoryInfo.icon}</Text>
+            <FontAwesome
+              name={categoryInfo.iconName}
+              size={22}
+              color={getHexColor(categoryInfo.darkColor)}
+            />
+            {/* <Text style={{ fontSize: 16 }}>{categoryInfo.icon}</Text> */}
           </View>
         </View>
 
         {/* Footer row */}
         <View style={tw`flex-row items-center justify-end mt-3`}>
-          <MotiView
+          {/* <MotiView
             from={{ rotateZ: "0deg" }}
             animate={{ rotateZ: isExpanded ? "180deg" : "0deg" }}
             transition={{ type: "timing", duration: 200 }}
@@ -91,10 +92,10 @@ function ActionCard({
             <FontAwesome
               name="chevron-down"
               size={14}
-              color={getHexColor("charcoal")}
+              color={getHexColor("ink")}
               style={tw`opacity-60`}
             />
-          </MotiView>
+          </MotiView> */}
         </View>
 
         {/* Expanded content */}
@@ -103,10 +104,9 @@ function ActionCard({
             from={{ opacity: 0, translateY: 8 }}
             animate={{ opacity: 1, translateY: 0 }}
             transition={{ type: "timing", duration: 180 }}
-            style={tw`mt-4 pt-4 border-t border-black/10`}
           >
             <Text
-              style={tw`text-base text-charcoal/80 font-gabarito leading-relaxed mb-4`}
+              style={tw`text-base text-ink/80 font-gabarito leading-relaxed mb-4`}
               numberOfLines={4}
             >
               {item.action.description || "No description available"}
@@ -121,13 +121,14 @@ function ActionCard({
               >
                 {completeAction.isPending ? "Loading..." : "✓ I've done it!"}
               </Button>
-              <Pressable onPress={handleViewMore} style={tw`self-center`}>
-                <Text
-                  style={tw`text-charcoal/60 font-gabarito text-sm underline`}
-                >
-                  View more →
-                </Text>
-              </Pressable>
+              <Button
+                color="ghost"
+                size="sm"
+                onPress={handleViewMore}
+                style={tw`self-center`}
+              >
+                View more →
+              </Button>
             </View>
           </MotiView>
         )}
@@ -146,7 +147,6 @@ export default function ActiveActions({
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const handleToggle = useCallback((id: string) => {
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setExpandedId((prev) => (prev === id ? null : id));
   }, []);
   return (
@@ -159,9 +159,7 @@ export default function ActiveActions({
 
       {isLoading ? (
         <View style={tw`py-12 items-center`}>
-          <Text style={tw`text-charcoal font-gabarito text-lg`}>
-            Loading...
-          </Text>
+          <Text style={tw`text-ink font-gabarito text-lg`}>Loading...</Text>
         </View>
       ) : userActions.length > 0 ? (
         <View style={tw`gap-4 mb-4`}>
@@ -176,7 +174,7 @@ export default function ActiveActions({
         </View>
       ) : (
         <View style={tw`rounded-2xl p-8 bg-mediumGrey`}>
-          <Text style={tw`text-base text-charcoal font-gabarito mb-6`}>
+          <Text style={tw`text-base text-ink font-gabarito mb-6`}>
             Choose an action to focus on today and start building meaningful
             habits
           </Text>

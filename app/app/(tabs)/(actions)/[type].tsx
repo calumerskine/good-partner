@@ -1,4 +1,4 @@
-import BauhausSkiaShape from "@/components/shapes/bauhaus-skia-shape";
+import BackButton from "@/components/ui/back-button";
 import { trackEvent } from "@/lib/analytics";
 import { CatalogAction, useGetActionsByCategory } from "@/lib/api";
 import { getHexColor } from "@/lib/colors";
@@ -6,7 +6,6 @@ import { ActionTypes } from "@/lib/state/actions.model";
 import tw from "@/lib/tw";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Link, useLocalSearchParams } from "expo-router";
-import { ArrowLeft } from "lucide-react-native";
 import { useEffect } from "react";
 import { FlatList, Pressable, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -24,13 +23,7 @@ export default function ActionTypeScreen() {
   return (
     <SafeAreaView edges={["top"]} style={tw`flex-1 bg-background`}>
       <View style={tw`w-full px-5 py-4 flex-row items-center justify-between`}>
-        <Link href=".." asChild>
-          <Pressable>
-            <View style={tw`bg-charcoal rounded-full p-2 inline-flex`}>
-              <ArrowLeft size={20} style={tw`text-white`} />
-            </View>
-          </Pressable>
-        </Link>
+        <BackButton />
         <View style={tw`flex-row items-center gap-2`}>
           <Text
             style={tw`text-4xl text-${category.darkColor} font-gabarito font-black`}
@@ -96,9 +89,9 @@ export default function ActionTypeScreen() {
         renderItem={({ item }: { item: CatalogAction }) => (
           <Link href={`/(action)/${item.id}?catalog=true`} asChild>
             <Pressable
-              style={tw`bg-${category.lightColor}/40 rounded-xl p-4 overflow-hidden relative`}
+              style={tw`border-4 border-${category.darkColor} rounded-xl p-4 bg-darkBackground`}
             >
-              <BauhausSkiaShape
+              {/* <BauhausSkiaShape
                 seed={item.id}
                 type="hexagon"
                 color={getHexColor(category.color)}
@@ -114,7 +107,7 @@ export default function ActionTypeScreen() {
                 distance={1}
                 opacity={0.2}
                 shapeScale={0.7}
-              />
+              /> */}
               <View style={tw`flex`}>
                 <Text
                   style={tw`text-lg font-gabarito font-bold text-charcoal mr-4 leading-loose`}
@@ -130,11 +123,6 @@ export default function ActionTypeScreen() {
                     {item.description}
                   </Text>
                 ) : null}
-                {/* <View
-                  style={tw`bg-${category.color} rounded-full p-2 inline-flex mt-6`}
-                >
-                  <ArrowRight size={20} />
-                </View> */}
               </View>
             </Pressable>
           </Link>

@@ -1,5 +1,5 @@
-import { ActionTypes } from "@/lib/state/actions.model";
 import { getHexColor } from "@/lib/colors";
+import { ActionTypes } from "@/lib/state/actions.model";
 import tw from "@/lib/tw";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { MotiView } from "moti";
@@ -13,6 +13,7 @@ type CategoryCompletion = {
 
 type FocusRowProps = {
   categories: CategoryCompletion[];
+  vertical?: boolean;
 };
 
 const CATEGORY_MAP: Record<string, keyof typeof ActionTypes> = {
@@ -29,7 +30,7 @@ function hexToRgba(hex: string, alpha: number): string {
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
-export function FocusRow({ categories }: FocusRowProps) {
+export function FocusRow({ categories, vertical = false }: FocusRowProps) {
   const [animated, setAnimated] = useState(false);
 
   useEffect(() => {
@@ -39,6 +40,76 @@ export function FocusRow({ categories }: FocusRowProps) {
 
   if (categories.length === 0) {
     return null;
+  }
+
+  const cards = categories.map((cat, index) => {
+    const actionType = ActionTypes[CATEGORY_MAP[cat.categoryKey]];
+    const lightColorHex = getHexColor(actionType.lightColor);
+    const darkColorHex = getHexColor(actionType.darkColor);
+    const colorHex = getHexColor(actionType.color);
+
+    return (
+      <MotiView
+        key={cat.categoryKey}
+        from={{ opacity: 0, scale: 0.95 }}
+        animate={{
+          opacity: animated ? 1 : 0,
+          scale: animated ? 1 : 0.95,
+        }}
+        transition={{ delay: index * 100, duration: 300 }}
+        style={[
+          vertical ? tw`w-full rounded-2xl p-5 border-2` : tw`w-64 rounded-2xl p-5 border-2`,
+          {
+            backgroundColor: hexToRgba(lightColorHex, 0.15),
+            borderColor: colorHex,
+            shadowColor: colorHex,
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.1,
+            shadowRadius: 8,
+            elevation: 3,
+          },
+        ]}
+      >
+        <View
+          style={tw`flex flex-row-reverse justify-between items-baseline`}
+        >
+          <View style={[tw``]}>
+            <FontAwesome
+              name={ActionTypes[CATEGORY_MAP[cat.categoryKey]].iconName}
+              size={24}
+              color={getHexColor(
+                ActionTypes[CATEGORY_MAP[cat.categoryKey]].darkColor,
+              )}
+            />
+          </View>
+          <Text
+            style={tw`text-xl text-charcoal font-gabarito font-bold mb-3`}
+          >
+            {actionType.title}
+          </Text>
+        </View>
+
+        <Text
+          style={[
+            tw`text-5xl font-gabarito font-black mb-2`,
+            { color: darkColorHex },
+          ]}
+        >
+          {cat.totalCompletions}
+        </Text>
+        <Text style={tw`text-sm text-charcoal/60 font-gabarito mb-1`}>
+          Actions Completed
+        </Text>
+      </MotiView>
+    );
+  });
+
+  if (vertical) {
+    return (
+      <View style={tw`gap-3`}>
+        {cards}
+      </View>
+    );
   }
 
   return (
@@ -53,71 +124,7 @@ export function FocusRow({ categories }: FocusRowProps) {
         snapToInterval={280}
         decelerationRate="fast"
       >
-        {categories.map((cat, index) => {
-          const actionType = ActionTypes[CATEGORY_MAP[cat.categoryKey]];
-          const lightColorHex = getHexColor(actionType.lightColor);
-          const darkColorHex = getHexColor(actionType.darkColor);
-          const colorHex = getHexColor(actionType.color);
-
-          return (
-            <MotiView
-              key={cat.categoryKey}
-              from={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: animated ? 1 : 0, scale: animated ? 1 : 0.95 }}
-              transition={{ delay: index * 100, duration: 300 }}
-              style={[
-                tw`w-64 rounded-2xl p-5 border-2`,
-                {
-                  backgroundColor: hexToRgba(lightColorHex, 0.15),
-                  borderColor: colorHex,
-                  shadowColor: colorHex,
-                  shadowOffset: { width: 0, height: 4 },
-                  shadowOpacity: 0.1,
-                  shadowRadius: 8,
-                  elevation: 3,
-                },
-              ]}
-            >
-              <View
-                style={[
-                  tw`absolute top-3 right-3 w-6 h-6 rounded-full items-center justify-center`,
-                  { backgroundColor: darkColorHex },
-                ]}
-              >
-                <FontAwesome name="bullseye" size={11} color="white" />
-              </View>
-
-              <View style={tw`mb-3`}>
-                <Text style={tw`text-4xl`}>{actionType.icon}</Text>
-              </View>
-
-              <Text style={tw`text-xl text-charcoal font-gabarito font-bold mb-1`}>
-                {actionType.title}
-              </Text>
-
-              <Text
-                style={[
-                  tw`text-5xl font-gabarito font-black mb-1`,
-                  { color: darkColorHex },
-                ]}
-              >
-                {cat.totalCompletions}
-              </Text>
-              <Text style={tw`text-sm text-charcoal/60 font-gabarito mb-3`}>
-                Total Actions
-              </Text>
-
-              <View style={tw`flex-row items-center gap-1`}>
-                <View
-                  style={[tw`w-2 h-2 rounded-full`, { backgroundColor: colorHex }]}
-                />
-                <Text style={tw`text-xs text-charcoal/70 font-gabarito font-medium`}>
-                  Main Focus
-                </Text>
-              </View>
-            </MotiView>
-          );
-        })}
+        {cards}
       </ScrollView>
     </View>
   );

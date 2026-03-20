@@ -1,12 +1,16 @@
 import { useAuth } from "@/hooks/use-auth";
 import { trackEvent } from "@/lib/analytics";
-import { getHexColor } from "@/lib/colors";
 import { resetRootTabListener } from "@/lib/helpers";
+import tw from "@/lib/tw";
 import Feather from "@expo/vector-icons/Feather";
 import { Redirect, Tabs } from "expo-router";
 import { ChartBar, ListTodo } from "lucide-react-native";
 import React from "react";
 import { Platform, View } from "react-native";
+
+const themeColor = tw`bg-indigo-500`["backgroundColor"] as string;
+const charcoal = tw`bg-indigo-900`["backgroundColor"] as string;
+const activeText = tw`bg-indigo-50`["backgroundColor"] as string;
 
 export default function TabLayout() {
   const { user, isLoading } = useAuth();
@@ -29,15 +33,15 @@ export default function TabLayout() {
         },
       }}
       screenOptions={{
-        tabBarActiveTintColor: getHexColor("charcoal"),
-        tabBarInactiveTintColor: getHexColor("charcoal"),
+        tabBarActiveTintColor: charcoal,
+        tabBarInactiveTintColor: charcoal,
         headerShown: false,
         // tabBarButton: HapticTab,
         tabBarStyle:
           Platform.OS === "web"
             ? { display: "none" }
             : {
-                backgroundColor: getHexColor("background"),
+                backgroundColor: "#fff",
                 height: 90,
                 paddingTop: 18,
                 // paddingBottom: 10,
@@ -63,7 +67,7 @@ export default function TabLayout() {
               <Feather
                 name="home"
                 size={24}
-                color={focused ? "white" : getHexColor("charcoal")}
+                color={focused ? activeText : charcoal}
               />
             </TabButton>
           ),
@@ -76,7 +80,7 @@ export default function TabLayout() {
           tabBarShowLabel: false,
           tabBarIcon: ({ focused }) => (
             <TabButton focused={focused}>
-              <ListTodo color={focused ? "white" : getHexColor("charcoal")} />
+              <ListTodo color={focused ? activeText : charcoal} />
             </TabButton>
           ),
         }}
@@ -88,7 +92,7 @@ export default function TabLayout() {
           tabBarShowLabel: false,
           tabBarIcon: ({ focused }) => (
             <TabButton focused={focused}>
-              <ChartBar color={focused ? "white" : getHexColor("charcoal")} />
+              <ChartBar color={focused ? activeText : charcoal} />
             </TabButton>
           ),
         }}
@@ -103,7 +107,7 @@ export default function TabLayout() {
               <Feather
                 name="settings"
                 size={24}
-                color={focused ? "white" : getHexColor("charcoal")}
+                color={focused ? activeText : charcoal}
               />
             </TabButton>
           ),
@@ -122,14 +126,12 @@ const TabButton = ({
 }) => {
   return (
     <View
-      style={{
-        borderRadius: 16,
-        alignItems: "center",
-        justifyContent: "center",
-        width: 40,
-        height: 40,
-        backgroundColor: focused ? getHexColor("charcoal") : "transparent",
-      }}
+      style={[
+        tw`rounded-2xl w-12 h-12 items-center justify-center`,
+        {
+          backgroundColor: focused ? themeColor : "transparent",
+        },
+      ]}
     >
       {children}
     </View>

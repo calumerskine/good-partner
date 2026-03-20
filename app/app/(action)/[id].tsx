@@ -1,6 +1,7 @@
-import BauhausSkiaShape from "@/components/shapes/bauhaus-skia-shape";
+import BackButton from "@/components/ui/back-button";
 import Button from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
+import { useReminderPrompt } from "@/hooks/use-reminder-prompt";
 import { trackEvent } from "@/lib/analytics";
 import {
   CatalogAction,
@@ -8,36 +9,16 @@ import {
   useCompleteAction,
   useDeactivateAction,
   useGetActionDetail,
-  useGetAllUserActions,
-  useGetNotificationsEnabled,
   useGetUserAction,
 } from "@/lib/api";
 import { getHexColor } from "@/lib/colors";
-import { env } from "@/lib/env";
 import { ActionTypes } from "@/lib/state/actions.model";
 import tw from "@/lib/tw";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { Link, router, useLocalSearchParams } from "expo-router";
-import { ArrowLeft } from "lucide-react-native";
+import { router, useLocalSearchParams } from "expo-router";
 import { useEffect } from "react";
-import {
-  ActivityIndicator,
-  Pressable,
-  ScrollView,
-  Text,
-  View,
-} from "react-native";
+import { ActivityIndicator, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-
-const BackButton = () => (
-  <Link href=".." asChild>
-    <Pressable style={tw`p-3 pl-0`}>
-      <View style={tw`bg-charcoal rounded-full p-2 inline-flex`}>
-        <ArrowLeft size={20} style={tw`text-white`} />
-      </View>
-    </Pressable>
-  </Link>
-);
 
 export default function ActionDetailScreen() {
   const { id, catalog } = useLocalSearchParams<{
@@ -60,15 +41,7 @@ export default function ActionDetailScreen() {
   const deactivateAction = useDeactivateAction();
   const completeAction = useCompleteAction();
 
-  const { data: notificationsEnabled } = useGetNotificationsEnabled(user?.id);
-  const { data: allUserActions } = useGetAllUserActions(user?.id);
-
-  const totalCompletions =
-    allUserActions?.reduce((sum, a) => sum + a.completionCount, 0) ?? 0;
-  const shouldPromptForReminders =
-    env.flags.useReminders &&
-    notificationsEnabled === false &&
-    totalCompletions === 0;
+  const { shouldPrompt, markShown } = useReminderPrompt(user?.id);
 
   useEffect(() => {
     trackEvent("screen_viewed", { screen_name: "Action Detail" });
@@ -118,7 +91,8 @@ export default function ActionDetailScreen() {
       });
       trackEvent("action_activated", { action_id: actionData.id });
 
-      if (shouldPromptForReminders) {
+      if (shouldPrompt) {
+        markShown();
         router.replace(`/(action)/${id}/reminders` as any);
       } else {
         router.replace("/(tabs)/(home)");
@@ -156,7 +130,7 @@ export default function ActionDetailScreen() {
 
   return (
     <SafeAreaView style={tw`flex-1 bg-background`}>
-      <BauhausSkiaShape
+      {/* <BauhausSkiaShape
         seed={actionData.id}
         type="hexagon"
         anchor="top-right"
@@ -190,23 +164,21 @@ export default function ActionDetailScreen() {
         color={getHexColor(categoryInfo.color)}
         animation="float"
         opacity={0.4}
-      />
+      /> */}
       <View style={tw`w-full px-6 py-4 flex-row items-center justify-between`}>
         <BackButton />
 
-        <View
-          style={tw`flex-row gap-2 pl-4 pr-2 py-2 rounded-lg bg-${categoryInfo.color || "white"}`}
-        >
+        <View style={tw`flex-row items-center gap-2`}>
           <Text
-            style={tw`text-${categoryInfo.title.toLowerCase()}-ink font-gabarito font-bold text-sm uppercase tracking-wide`}
+            style={tw`text-4xl text-${categoryInfo.darkColor} font-gabarito font-black`}
           >
-            {categoryInfo.title || actionData.category}
+            {categoryInfo.title}
           </Text>
 
           <FontAwesome
             name={categoryInfo.iconName}
-            size={20}
-            style={tw`text-${categoryInfo.title.toLowerCase()}-ink`}
+            size={30}
+            color={getHexColor(categoryInfo.darkColor)}
           />
         </View>
       </View>
@@ -243,14 +215,13 @@ export default function ActionDetailScreen() {
               </View>
             )}
 
-            <View
-              style={tw`rounded-2xl p-7 bg-${categoryInfo.lightColor} mb-6 border-[3px] border-${categoryInfo.color}`}
-            >
+            <View style={tw`rounded-2xl p-7 bg-white mb-6 border-2 `}>
               <View style={tw`absolute right-4 top-4`}>
                 <FontAwesome
                   name="lightbulb-o"
                   size={30}
-                  color={getHexColor(categoryInfo.darkColor)}
+                  color={getHexColor("yellow")}
+                  // color={getHexColor(categoryInfo.darkColor)}
                 />
               </View>
 
@@ -266,7 +237,7 @@ export default function ActionDetailScreen() {
               </Text>
             </View>
           </ScrollView>
-          <View style={tw`w-full px-6 pb-6 pt-4 `}>
+          <View style={tw`w-full px-6 pb-0 pt-4`}>
             {isCatalogView ? (
               <Button
                 onPress={handleActivate}

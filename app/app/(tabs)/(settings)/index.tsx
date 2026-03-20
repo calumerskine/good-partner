@@ -1,5 +1,6 @@
 import Button from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
+import { useHaptics } from "@/hooks/use-haptics";
 import { useThrottle } from "@/hooks/use-throttle";
 import { trackEvent } from "@/lib/analytics";
 import {
@@ -13,7 +14,7 @@ import { ActionTypes } from "@/lib/state/actions.model";
 import tw from "@/lib/tw";
 import { useFocusEffect, useRouter } from "expo-router";
 import { useCallback } from "react";
-import { Pressable, ScrollView, Switch, Text, View } from "react-native";
+import { ScrollView, Switch, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function SettingsScreen() {
@@ -22,6 +23,7 @@ export default function SettingsScreen() {
   const { data: profile } = useGetUserProfile(user?.id);
   const { data: notificationsEnabled } = useGetNotificationsEnabled(user?.id);
   const { mutateAsync: toggleNotifications } = useToggleNotificationsEnabled();
+  const { hapticsEnabled, loaded: hapticsLoaded, toggleHaptics } = useHaptics();
 
   useFocusEffect(
     useCallback(() => {
@@ -60,21 +62,20 @@ export default function SettingsScreen() {
         </View>
 
         <View style={tw`mb-6`}>
-          <View style={tw`bg-darkBackground rounded-xl p-5 mb-3`}>
-            <View style={tw`flex-row items-baseline justify-between mb-4`}>
+          <View style={tw`bg-white border-2 rounded-xl p-5 mb-3`}>
+            <View style={tw`flex-row items-baseline justify-between mb-3`}>
               <Text style={tw`text-charcoal font-gabarito font-bold text-lg`}>
                 Your focus areas
               </Text>
-              <Pressable
+              <Button
+                size="sm"
+                color="grape"
                 onPress={() =>
                   router.push("/(tabs)/(settings)/edit-focus-areas")
                 }
-                style={tw`px-3 py-1.5 bg-charcoal rounded-lg`}
               >
-                <Text style={tw`text-white font-gabarito font-bold text-sm`}>
-                  Edit
-                </Text>
-              </Pressable>
+                Edit
+              </Button>
             </View>
             {profile?.categories && profile.categories.length > 0 ? (
               <View style={tw`gap-3`}>
@@ -106,6 +107,30 @@ export default function SettingsScreen() {
           </View>
         </View>
 
+        <View style={tw`mb-6`}>
+          <Text style={tw`text-lg font-gabarito font-bold text-charcoal mb-3`}>
+            Preferences
+          </Text>
+          <View style={tw`bg-white border-2 rounded-xl p-5`}>
+            <View style={tw`flex-row items-center justify-between mb-3`}>
+              <Text style={tw`text-charcoal font-gabarito font-bold text-lg`}>
+                Haptics
+              </Text>
+              {hapticsLoaded && (
+                <Switch
+                  value={hapticsEnabled}
+                  onValueChange={toggleHaptics}
+                />
+              )}
+            </View>
+            <Text
+              style={tw`font-gabarito text-sm text-charcoal/80 leading-relaxed`}
+            >
+              Vibration feedback on interactions.
+            </Text>
+          </View>
+        </View>
+
         {env.flags.useReminders && (
           <View style={tw`mb-6`}>
             <Text
@@ -113,7 +138,7 @@ export default function SettingsScreen() {
             >
               Notifications
             </Text>
-            <View style={tw`bg-darkBackground rounded-xl p-5`}>
+            <View style={tw`bg-white border-2 rounded-xl p-5`}>
               <View style={tw`flex-row items-center justify-between mb-3`}>
                 <Text style={tw`text-charcoal font-gabarito font-bold text-lg`}>
                   Daily reminders
@@ -138,29 +163,29 @@ export default function SettingsScreen() {
             Account
           </Text>
 
-          <View style={tw`bg-darkBackground rounded-xl p-5 mb-3`}>
-            <Text
-              style={tw`text-charcoal font-gabarito font-bold text-lg mb-4`}
-            >
-              Logged in as
-            </Text>
+          <View style={tw`bg-white border-2 rounded-xl p-5 mb-3`}>
+            <View style={tw`flex-row items-baseline justify-between mb-1`}>
+              <Text
+                style={tw`text-charcoal font-gabarito font-bold text-lg mb-3`}
+              >
+                User
+              </Text>
+              <Button
+                size="sm"
+                color="raspberry"
+                onPress={() => {
+                  trackEvent("auth_signout");
+                  signOut();
+                }}
+              >
+                Sign Out
+              </Button>
+            </View>
             <Text
               style={tw`text-charcoal/80 font-gabarito font-medium text-base`}
             >
               {user.email}
             </Text>
-          </View>
-
-          <View style={tw`w-full`}>
-            <Button
-              color="ghost"
-              onPress={() => {
-                trackEvent("auth_signout");
-                signOut();
-              }}
-            >
-              <Text style={tw`text-charcoal`}>Sign Out</Text>
-            </Button>
           </View>
         </View>
 
@@ -172,7 +197,7 @@ export default function SettingsScreen() {
               Debug Info
             </Text>
 
-            <View style={tw`bg-darkBackground rounded-2xl p-4 mb-3`}>
+            <View style={tw`bg-white border-2 rounded-2xl p-4 mb-3`}>
               <Text
                 style={tw`text-charcoal font-gabarito font-bold text-sm mb-2`}
               >
@@ -185,7 +210,7 @@ export default function SettingsScreen() {
               </Text>
             </View>
 
-            <View style={tw`bg-darkBackground rounded-2xl p-4 mb-3`}>
+            <View style={tw`bg-white border-2 rounded-2xl p-4 mb-3`}>
               <Text
                 style={tw`text-charcoal font-gabarito font-bold text-sm mb-2`}
               >
@@ -197,7 +222,7 @@ export default function SettingsScreen() {
               </Text>
             </View>
 
-            <View style={tw`bg-darkBackground rounded-2xl p-4 mb-3`}>
+            <View style={tw`bg-white border-2 rounded-2xl p-4 mb-3`}>
               <Text
                 style={tw`text-charcoal font-gabarito font-bold text-sm mb-2`}
               >
@@ -208,7 +233,7 @@ export default function SettingsScreen() {
               </Text>
             </View>
 
-            <View style={tw`bg-darkBackground rounded-2xl p-4`}>
+            <View style={tw`bg-white border-2 rounded-2xl p-4`}>
               <Text
                 style={tw`text-charcoal font-gabarito font-bold text-sm mb-2`}
               >
