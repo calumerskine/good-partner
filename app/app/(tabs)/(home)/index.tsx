@@ -1,8 +1,13 @@
 import ActiveActions from "@/components/home/active-actions";
+import HomeHeader from "@/components/home/home-header";
 import SuggestedActions from "@/components/home/suggested-actions";
 import { useAuth } from "@/hooks/use-auth";
 import { trackEvent } from "@/lib/analytics";
-import { useGetActiveActions, useGetUserProfile } from "@/lib/api";
+import {
+  useGetActiveActions,
+  useGetDailyContent,
+  useGetUserProfile,
+} from "@/lib/api";
 import tw from "@/lib/tw";
 import { useFocusEffect } from "expo-router";
 import { useCallback } from "react";
@@ -16,7 +21,9 @@ export default function HomeScreen() {
     user?.id,
   );
 
-  // useFocusEffect when the screen is focused as screens stay mounted
+  const dayNumber = profile ? (profile.totalDaysActive ?? 0) + 1 : undefined;
+  const { data: dailyContent } = useGetDailyContent(dayNumber);
+
   useFocusEffect(
     useCallback(() => {
       trackEvent("screen_viewed", { screen_name: "Home" });
@@ -34,12 +41,18 @@ export default function HomeScreen() {
   return (
     <SafeAreaView edges={["top"]} style={tw`bg-white flex-1`}>
       <ScrollView
-        contentContainerStyle={tw`px-6`}
+        contentContainerStyle={tw`px-6 flex-grow`}
         showsVerticalScrollIndicator={false}
       >
-        {userActions.length > 0 && !isLoading ? (
+        <HomeHeader
+          dayNumber={dayNumber ?? 1}
+          headlineMessage={dailyContent?.headlineMessage ?? "Everyone starts here"}
+        />
+
+        {userActions.length > 0 ? (
           <ActiveActions isLoading={isLoading} userActions={userActions} />
         ) : null}
+
         <SuggestedActions user={user} profile={profile} isLoading={isLoading} />
       </ScrollView>
     </SafeAreaView>
