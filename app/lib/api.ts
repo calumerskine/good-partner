@@ -32,6 +32,7 @@ const mutationKeys = {
   createProfile: ["createProfile"] as const,
   updateCategories: ["updateCategories"] as const,
   submitFeedback: ["submitFeedback"] as const,
+  skipAction: ["skipAction"] as const,
 };
 
 type OnboardForm = {
@@ -376,13 +377,23 @@ async function getSuggestedActions(
   // Exclude actions that are either currently active or have been completed
   const excludedIds = [...new Set([...activeActionIds, ...completedActionIds])];
 
+  // Fetch today's skips for this user
+  const { data: skipsData } = await supabase
+    .from("user_skips")
+    .select("action_id")
+    .eq("user_id", userId)
+    .eq("skipped_at", new Date().toISOString().split("T")[0]);
+
+  const skippedActionIds = skipsData?.map((s: any) => s.action_id) || [];
+  const allExcludedIds = [...new Set([...excludedIds, ...skippedActionIds])];
+
   // Fetch available actions with tags, ordered by title
   let query = supabase
     .from("actions")
     .select(
       `
       id,
-      title,  
+      title,
       description,
       reasoning,
       action_categories (
@@ -401,8 +412,8 @@ async function getSuggestedActions(
     )
     .order("title", { ascending: true });
 
-  if (excludedIds.length > 0) {
-    query = query.not("id", "in", `(${excludedIds.join(",")})`);
+  if (allExcludedIds.length > 0) {
+    query = query.not("id", "in", `(${allExcludedIds.join(",")})`);
   }
 
   const { data, error } = await query;
@@ -440,15 +451,15 @@ async function getSuggestedActions(
     actionsByCategory.get(action.category)!.push(action);
   });
 
-  // Round-robin across categories to fill 4 slots, picking featured-first within each
+  // Round-robin across categories to fill 5 slots, picking featured-first within each
   const result: typeof actions = [];
   const categoryList = Array.from(actionsByCategory.values());
   let round = 0;
 
-  while (result.length < 4) {
+  while (result.length < 5) {
     let addedInRound = false;
     for (const catActions of categoryList) {
-      if (result.length >= 4) break;
+      if (result.length >= 5) break;
       if (round < catActions.length) {
         result.push(catActions[round]);
         addedInRound = true;
@@ -1038,6 +1049,36 @@ async function deactivateAction(userActionId: string) {
   }
 
   return data;
+}
+
+/**
+ * Skip an action for today
+ * Creates a user_skips record with today's date
+ */
+export function useSkipAction() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationKey: mutationKeys.skipAction,
+    mutationFn: ({ userId, actionId }: { userId: string; actionId: string }) =>
+      skipAction(userId, actionId),
+    onSuccess: () => {
+      // Invalidate suggested actions so re-fetch excludes today's skips
+      queryClient.invalidateQueries({ queryKey: queryKeys.suggestedActions() });
+    },
+  });
+}
+
+async function skipAction(userId: string, actionId: string): Promise<void> {
+  const today = new Date().toISOString().split("T")[0];
+  const { error } = await supabase
+    .from("user_skips")
+    .upsert(
+      { user_id: userId, action_id: actionId, skipped_at: today },
+      { onConflict: "user_id,action_id,skipped_at", ignoreDuplicates: true },
+    );
+
+  if (error) throw error;
 }
 
 /**
