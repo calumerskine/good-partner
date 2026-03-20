@@ -1409,16 +1409,17 @@ export type DailyContent = {
   subtext: string | null;
 };
 
-export function useGetDailyContent(dayNumber: number) {
+export function useGetDailyContent(dayNumber: number | undefined) {
   return useQuery({
-    queryKey: queryKeys.dailyContent(dayNumber),
-    queryFn: () => getDailyContent(dayNumber),
+    queryKey: queryKeys.dailyContent(dayNumber ?? 0),
+    queryFn: () => getDailyContent(dayNumber!),
     staleTime: Infinity,
+    enabled: dayNumber !== undefined,
   });
 }
 
 async function getDailyContent(dayNumber: number): Promise<DailyContent | null> {
-  // Try to get content for the exact day number, fall back to day 1
+  // Fetch the closest content entry with day_number <= dayNumber, returning null if none exists
   const { data, error } = await supabase
     .from("daily_content")
     .select("id, day_number, headline_message, subtext")
