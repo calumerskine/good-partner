@@ -57,7 +57,7 @@ export default forwardRef(function Button(
       : "bg-transparent"
     : `bg-${color}-400`;
 
-  const shadowClass = `bg-${color}-500`;
+  const shadowClass = isSpecial ? null : `bg-${color}-500`;
 
   const onPressIn = (event: any) => {
     handlePressIn(event);
@@ -72,7 +72,7 @@ export default forwardRef(function Button(
 
   return (
     <View style={[tw`relative`, { paddingBottom: PRESS_DEPTH }]}>
-      {!isSpecial && (
+      {shadowClass && (
         <View
           style={[
             tw.style(shadowClass, `rounded-3xl absolute inset-0`),
