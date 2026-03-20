@@ -28,11 +28,13 @@ export function usePressAnimation({
   };
 
   const handlePressOut = (_event: GestureResponderEvent) => {
-    Animated.spring(translateY, {
-      toValue: 0,
-      useNativeDriver: true,
-      bounciness,
-    }).start();
+    if (shouldAnimate) {
+      Animated.spring(translateY, {
+        toValue: 0,
+        useNativeDriver: true,
+        bounciness,
+      }).start();
+    }
   };
 
   return { translateY, handlePressIn, handlePressOut };
