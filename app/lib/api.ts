@@ -378,11 +378,16 @@ async function getSuggestedActions(
   const excludedIds = [...new Set([...activeActionIds, ...completedActionIds])];
 
   // Fetch today's skips for this user
-  const { data: skipsData } = await supabase
+  const { data: skipsData, error: skipsError } = await supabase
     .from("user_skips")
     .select("action_id")
     .eq("user_id", userId)
     .eq("skipped_at", new Date().toISOString().split("T")[0]);
+
+  // If skips query fails, fall back to empty — skipped cards may re-appear but won't break the flow
+  if (skipsError) {
+    console.warn("Failed to fetch skips:", skipsError);
+  }
 
   const skippedActionIds = skipsData?.map((s: any) => s.action_id) || [];
   const allExcludedIds = [...new Set([...excludedIds, ...skippedActionIds])];
