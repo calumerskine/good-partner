@@ -102,14 +102,14 @@ export default function PressableCard({
       disabled={disabled}
       accessibilityLabel={accessibilityLabel}
       accessibilityRole={role === "none" ? undefined : role}
-      style={[tw.style(`rounded-2xl overflow-hidden`, faceClass), style]}
+      style={tw.style(`rounded-2xl overflow-hidden`, faceClass)}
     >
       {children}
     </Pressable>
   );
 
   return (
-    <View style={[tw`relative`, { paddingBottom: pressDepth }]}>
+    <View style={[tw`relative`, { paddingBottom: pressDepth }, style]}>
       {shadowClass && (
         <View
           style={[
@@ -119,7 +119,7 @@ export default function PressableCard({
         />
       )}
       <Animated.View style={{ transform: [{ translateY }] }}>
-        {href ? (
+        {href && !disabled ? (
           <Link href={href} asChild>
             {pressableEl}
           </Link>
