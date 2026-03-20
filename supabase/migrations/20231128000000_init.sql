@@ -15,7 +15,7 @@ CREATE TABLE user_profiles (
   user_tier TEXT NOT NULL DEFAULT 'free',
   created_at TIMESTAMPTZ DEFAULT NOW(),
   has_completed_onboarding BOOLEAN DEFAULT FALSE,
-  notifications_enabled BOOLEAN DEFAULT FALSE
+  notifications_enabled BOOLEAN DEFAULT FALSE,
   current_streak_days INTEGER DEFAULT 0,
   last_completion_date DATE,
   total_days_active INTEGER DEFAULT 0
@@ -28,14 +28,6 @@ CREATE TABLE user_categories (
   category_id UUID NOT NULL REFERENCES action_categories(id) ON DELETE CASCADE,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   UNIQUE(profile_id, category_id)
-);
-
-CREATE TABLE user_skips (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-  action_id UUID NOT NULL REFERENCES actions(id) ON DELETE CASCADE,
-  skipped_at DATE DEFAULT CURRENT_DATE,
-  UNIQUE(user_id, action_id, skipped_at)
 );
 
 -- actions table: the master list of all possible actions
@@ -55,13 +47,21 @@ CREATE TABLE user_actions (
   action_id UUID NOT NULL REFERENCES actions(id) ON DELETE CASCADE,
   activated_at TIMESTAMPTZ DEFAULT NOW(),
   is_active BOOLEAN DEFAULT TRUE,
-  created_at TIMESTAMPTZ DEFAULT NOW()
+  created_at TIMESTAMPTZ DEFAULT NOW(),
   -- For the "Remind me" bottom sheet
   reminder_at TIMESTAMPTZ, 
   -- To track if a card was dismissed/skipped for the day
   last_dismissed_at TIMESTAMPTZ,
   -- To handle the "Not today after all" logic (how many times it was skipped)
   skip_count INTEGER DEFAULT 0
+);
+
+CREATE TABLE user_skips (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  action_id UUID NOT NULL REFERENCES user_actions(id) ON DELETE CASCADE,
+  skipped_at DATE DEFAULT CURRENT_DATE,
+  UNIQUE(user_id, action_id, skipped_at)
 );
 
 -- completions table: tracks each time a user completes an action
@@ -239,4 +239,4 @@ INSERT INTO action_tags (id, action_id, tag_id) VALUES
   ('00000000-0000-0000-0000-000000000008', '00000000-0000-0000-0000-000000000042', '00000000-0000-0000-0000-000000000001');
 
 INSERT INTO daily_content (id, day_number, headline_message, subtext) VALUES
-  ('00000000-0000-0000-0000-000000000001', 1, "Everyone starts here", "")
+  ('00000000-0000-0000-0000-000000000001', 1, 'Everyone starts here', '')

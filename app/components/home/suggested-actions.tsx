@@ -75,13 +75,13 @@ export default function SuggestedActions({
   const allExhausted = currentIndex >= suggestedActions.length;
 
   return (
-    <View style={tw`flex-1 pt-4`}>
-      <Text style={tw`text-3xl text-black font-gabarito font-bold mb-6`}>
-        Pick your action
+    <View style={tw`flex-1 pt-12`}>
+      <Text style={tw`text-2xl text-black font-gabarito font-bold mb-6`}>
+        Your move for today:
       </Text>
 
       {/* Progress dots */}
-      <View style={tw`flex-row justify-center gap-2 mb-6`}>
+      {/* <View style={tw`flex-row justify-center gap-2 mb-6`}>
         {suggestedActions.map((action: CatalogAction, i: number) => (
           <View
             key={action.id}
@@ -95,7 +95,7 @@ export default function SuggestedActions({
             )}
           />
         ))}
-      </View>
+      </View> */}
 
       {allExhausted ? (
         /* Browse Library state */

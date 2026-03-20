@@ -4,10 +4,9 @@ import { Pressable, Text, View } from "react-native";
 
 type Props = {
   dayNumber: number;
-  headlineMessage: string;
 };
 
-export default function HomeHeader({ dayNumber, headlineMessage }: Props) {
+export default function HomeHeader({ dayNumber }: Props) {
   return (
     <View style={tw`flex-row items-center justify-between pt-4 pb-2`}>
       {/* Day badge */}
@@ -16,14 +15,6 @@ export default function HomeHeader({ dayNumber, headlineMessage }: Props) {
           Day {dayNumber}
         </Text>
       </View>
-
-      {/* Daily message */}
-      <Text
-        style={tw`flex-1 text-center text-base font-gabarito text-charcoal px-3`}
-        numberOfLines={1}
-      >
-        {headlineMessage}
-      </Text>
 
       {/* Avatar → settings.
           Note: components/ui/avatar.tsx exists but is sized w-50 h-50 (large profile card use).

@@ -11,7 +11,7 @@ import {
 import tw from "@/lib/tw";
 import { useFocusEffect } from "expo-router";
 import { useCallback } from "react";
-import { ActivityIndicator, ScrollView, View } from "react-native";
+import { Text, ActivityIndicator, ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function HomeScreen() {
@@ -39,15 +39,19 @@ export default function HomeScreen() {
   }
 
   return (
-    <SafeAreaView edges={["top"]} style={tw`bg-white flex-1`}>
+    <SafeAreaView edges={["top"]} style={tw`bg-white flex-1 px-6`}>
+      <HomeHeader dayNumber={dayNumber ?? 1} />
       <ScrollView
-        contentContainerStyle={tw`px-6 flex-grow`}
+        contentContainerStyle={tw`flex-grow`}
         showsVerticalScrollIndicator={false}
       >
-        <HomeHeader
-          dayNumber={dayNumber ?? 1}
-          headlineMessage={dailyContent?.headlineMessage ?? "Everyone starts here"}
-        />
+        {/* Daily message */}
+        <Text
+          style={tw`flex-1 text-xl font-gabarito text-charcoal mt-3`}
+          numberOfLines={1}
+        >
+          {dailyContent?.headlineMessage ?? "Everyone starts here"}
+        </Text>
 
         {userActions.length > 0 ? (
           <ActiveActions isLoading={isLoading} userActions={userActions} />
