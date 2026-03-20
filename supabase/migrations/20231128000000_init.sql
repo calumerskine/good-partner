@@ -16,6 +16,9 @@ CREATE TABLE user_profiles (
   created_at TIMESTAMPTZ DEFAULT NOW(),
   has_completed_onboarding BOOLEAN DEFAULT FALSE,
   notifications_enabled BOOLEAN DEFAULT FALSE
+  current_streak_days INTEGER DEFAULT 0,
+  last_completion_date DATE,
+  total_days_active INTEGER DEFAULT 0
 );
 
 -- user_categories table: many-to-many relationship between users and action categories
@@ -25,6 +28,14 @@ CREATE TABLE user_categories (
   category_id UUID NOT NULL REFERENCES action_categories(id) ON DELETE CASCADE,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   UNIQUE(profile_id, category_id)
+);
+
+CREATE TABLE user_skips (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  action_id UUID NOT NULL REFERENCES actions(id) ON DELETE CASCADE,
+  skipped_at DATE DEFAULT CURRENT_DATE,
+  UNIQUE(user_id, action_id, skipped_at)
 );
 
 -- actions table: the master list of all possible actions
@@ -45,6 +56,12 @@ CREATE TABLE user_actions (
   activated_at TIMESTAMPTZ DEFAULT NOW(),
   is_active BOOLEAN DEFAULT TRUE,
   created_at TIMESTAMPTZ DEFAULT NOW()
+  -- For the "Remind me" bottom sheet
+  reminder_at TIMESTAMPTZ, 
+  -- To track if a card was dismissed/skipped for the day
+  last_dismissed_at TIMESTAMPTZ,
+  -- To handle the "Not today after all" logic (how many times it was skipped)
+  skip_count INTEGER DEFAULT 0
 );
 
 -- completions table: tracks each time a user completes an action
@@ -71,6 +88,14 @@ CREATE TABLE action_tags (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+CREATE TABLE daily_content (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  day_number INTEGER UNIQUE NOT NULL, -- e.g., Day 1, Day 2
+  headline_message TEXT NOT NULL,      -- "Everyone starts here"
+  subtext TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
 -- Useful indexes
 CREATE INDEX idx_user_categories_profile_id ON user_categories(profile_id);
 CREATE INDEX idx_user_categories_category_id ON user_categories(category_id);
@@ -80,6 +105,61 @@ CREATE INDEX idx_user_actions_action_id ON user_actions(action_id);
 CREATE INDEX idx_user_actions_active ON user_actions(user_id, is_active);
 CREATE INDEX idx_completions_user_action ON completions(user_action_id);
 CREATE INDEX idx_user_profiles_user_tier ON user_profiles(user_tier);
+
+CREATE OR REPLACE FUNCTION update_user_streak()
+RETURNS TRIGGER AS $$
+DECLARE
+    last_date DATE;
+    current_streak INTEGER;
+BEGIN
+    -- 1. Get the last completion date and current streak from user_profiles
+    -- We join through user_actions to find the correct profile
+    SELECT last_completion_date, current_streak_days 
+    INTO last_date, current_streak
+    FROM user_profiles
+    JOIN user_actions ON user_actions.user_id = user_profiles.user_id
+    WHERE user_actions.id = NEW.user_action_id;
+
+    -- 2. Determine the new streak value
+    IF last_date IS NULL THEN
+        -- First time ever completing an action
+        current_streak := 1;
+    ELSIF last_date = CURRENT_DATE THEN
+        -- Already completed something today, don't increment streak
+        current_streak := current_streak; 
+    ELSIF last_date = CURRENT_DATE - INTERVAL '1 day' THEN
+        -- Completed yesterday, increment streak
+        current_streak := current_streak + 1;
+    ELSE
+        -- Streak broken (last completion was > 1 day ago)
+        current_streak := 1;
+    END IF;
+
+    -- 3. Update the profile
+    UPDATE user_profiles
+    SET 
+        current_streak_days = current_streak,
+        last_completion_date = CURRENT_DATE,
+        total_days_active = total_days_active + (CASE WHEN last_date = CURRENT_DATE THEN 0 ELSE 1 END)
+    FROM user_actions
+    WHERE user_profiles.user_id = user_actions.user_id
+    AND user_actions.id = NEW.user_action_id;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_update_streak
+AFTER INSERT ON completions
+FOR EACH ROW
+EXECUTE FUNCTION update_user_streak();
+
+CREATE VIEW user_daily_status AS
+SELECT 
+  p.user_id,
+  p.current_streak_days,
+  (p.last_completion_date = CURRENT_DATE) AS is_completed_today
+FROM user_profiles p;
 
 -- Seed data for action categories
 INSERT INTO action_categories (id, name, description) VALUES
@@ -157,3 +237,6 @@ INSERT INTO action_tags (id, action_id, tag_id) VALUES
   ('00000000-0000-0000-0000-000000000006', '00000000-0000-0000-0000-000000000027', '00000000-0000-0000-0000-000000000001'),
   ('00000000-0000-0000-0000-000000000007', '00000000-0000-0000-0000-000000000038', '00000000-0000-0000-0000-000000000001'),
   ('00000000-0000-0000-0000-000000000008', '00000000-0000-0000-0000-000000000042', '00000000-0000-0000-0000-000000000001');
+
+INSERT INTO daily_content (id, day_number, headline_message, subtext) VALUES
+  ('00000000-0000-0000-0000-000000000001', 1, "Everyone starts here", "")
