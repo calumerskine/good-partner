@@ -67,9 +67,15 @@ export default function SuggestionCard({
       {/* Actions */}
       <View style={tw`gap-3 mt-5`}>
         <Button
-          // Map AFFECTION's "pink" token → "raspberry" to match Button's actual color keys.
-          // Valid Button colors: grape, peach, mint, raspberry, orange, blue, yellow, muted, ghost, charcoal.
-          color={(categoryInfo.buttonColor === "pink" ? "raspberry" : categoryInfo.buttonColor) as any}
+          // Map color tokens that don't match Button's color keys:
+          // AFFECTION "pink" → "raspberry", REPAIR "green" → "mint"
+          color={
+            (categoryInfo.buttonColor === "pink"
+              ? "raspberry"
+              : categoryInfo.buttonColor === "green"
+                ? "mint"
+                : categoryInfo.buttonColor) as any
+          }
           onPress={() => onActivate(id)}
           disabled={isActivating || isSkipping}
         >
