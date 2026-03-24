@@ -444,9 +444,9 @@ git commit -m "feat(functions): replace morning/evening functions with unified r
 
 `UserProfile` is defined at line 1165. `queryKeys` is defined at lines 6–24. `getUserProfile` is at line 1212. `getActiveActions` is at line 632. `UserAction` type is at line 588.
 
-- [ ] **Step 1: Add reminderConfig and userActions to queryKeys factory**
+- [ ] **Step 1: Add reminderConfig to queryKeys factory**
 
-The current `queryKeys` object ends at line 24. Add two new entries:
+The current `queryKeys` object ends at line 24. Add one new entry:
 
 ```typescript
 // In the queryKeys object, add after `suggestedActions`:
@@ -773,6 +773,7 @@ git commit -m "feat(api): add reminder config and action reminder hooks"
 
 ```bash
 cd /Users/calumerskine/dev/apps/good-partner/app && pnpm add date-fns-tz @react-native-community/datetimepicker
+
 ```
 
 - [ ] **Step 2: Verify installations**
@@ -786,7 +787,8 @@ Expected: Both packages appear in `dependencies`.
 - [ ] **Step 3: Commit**
 
 ```bash
-cd /Users/calumerskine/dev/apps/good-partner/app
+# Run from repo root, not from app/
+cd /Users/calumerskine/dev/apps/good-partner
 git add app/package.json app/pnpm-lock.yaml
 git commit -m "chore: add date-fns-tz and datetimepicker dependencies"
 ```
