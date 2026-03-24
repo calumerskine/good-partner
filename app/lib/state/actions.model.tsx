@@ -1,4 +1,4 @@
-import { Wrench, Heart, Zap, Leaf } from "lucide-react-native";
+import { Heart, Zap, Leaf, Cross } from "lucide-react-native";
 
 export const ActionTypes = {
   ATTENTION: {
@@ -41,7 +41,7 @@ export const ActionTypes = {
     color: "green",
     darkColor: "darkMint",
     darkerColor: "darkerMint",
-    icon: (props?: any) => <Wrench {...props} />,
+    icon: (props?: any) => <Cross {...props} />,
     iconName: "wrench",
     buttonColor: "green",
   },

@@ -2,9 +2,13 @@ import { useAuth } from "@/hooks/use-auth";
 import { trackEvent } from "@/lib/analytics";
 import { resetRootTabListener } from "@/lib/helpers";
 import tw from "@/lib/tw";
-import Feather from "@expo/vector-icons/Feather";
 import { Redirect, Tabs } from "expo-router";
-import { FolderSearch, GraduationCap, Settings } from "lucide-react-native";
+import {
+  FolderSearch,
+  GraduationCap,
+  Home,
+  Settings,
+} from "lucide-react-native";
 import React from "react";
 import { Platform, View } from "react-native";
 
@@ -62,11 +66,7 @@ export default function TabLayout() {
           title: "Home",
           tabBarIcon: ({ focused }) => (
             <TabButton focused={focused}>
-              <Feather
-                name="home"
-                size={24}
-                color={focused ? activeText : dark}
-              />
+              <Home color={focused ? activeText : dark} />
             </TabButton>
           ),
         }}
