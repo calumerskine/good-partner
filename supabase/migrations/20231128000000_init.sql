@@ -303,9 +303,9 @@ BEGIN
   FROM eligible_users eu
   WHERE
     eu.morning_reminder_enabled = true
-    AND eu.morning_reminder_time BETWEEN
-      ((NOW() AT TIME ZONE 'UTC')::TIME - INTERVAL '2 minutes 30 seconds')
-      AND ((NOW() AT TIME ZONE 'UTC')::TIME + INTERVAL '2 minutes 30 seconds')
+    AND (
+      DATE_TRUNC('day', NOW() AT TIME ZONE 'UTC') + eu.morning_reminder_time
+    ) BETWEEN (NOW() - INTERVAL '2 minutes 30 seconds') AND (NOW() + INTERVAL '2 minutes 30 seconds')
 
   UNION ALL
 
@@ -322,9 +322,9 @@ BEGIN
   WHERE
     eu.evening_reminder_enabled = true
     AND eu.has_outstanding = true
-    AND eu.evening_reminder_time BETWEEN
-      ((NOW() AT TIME ZONE 'UTC')::TIME - INTERVAL '2 minutes 30 seconds')
-      AND ((NOW() AT TIME ZONE 'UTC')::TIME + INTERVAL '2 minutes 30 seconds')
+    AND (
+      DATE_TRUNC('day', NOW() AT TIME ZONE 'UTC') + eu.evening_reminder_time
+    ) BETWEEN (NOW() - INTERVAL '2 minutes 30 seconds') AND (NOW() + INTERVAL '2 minutes 30 seconds')
 
   UNION ALL
 
@@ -342,9 +342,15 @@ BEGIN
   JOIN user_profiles up ON up.user_id = ua.user_id
   WHERE
     up.notifications_enabled = true
-    AND ua.reminder_at >= NOW()
-    AND ua.reminder_at < NOW() + INTERVAL '5 minutes';
+    AND ua.is_active = true
+    AND ua.reminder_at BETWEEN
+      (NOW() - INTERVAL '2 minutes 30 seconds')
+      AND (NOW() + INTERVAL '2 minutes 30 seconds');
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 GRANT EXECUTE ON FUNCTION get_due_reminders() TO service_role;
+
+CREATE INDEX IF NOT EXISTS idx_user_actions_reminder_at
+  ON user_actions(reminder_at)
+  WHERE reminder_at IS NOT NULL;
