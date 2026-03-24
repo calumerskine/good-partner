@@ -22,6 +22,27 @@ import { useCallback, useState } from "react";
 import { ScrollView, Switch, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+// Convert a 'HH:MM' UTC time string into a local Date (today)
+const utcTimeStrToLocalDate = (utcTimeStr: string): Date => {
+  const [hours, minutes] = utcTimeStr.split(":").map(Number);
+  const d = new Date();
+  d.setUTCHours(hours, minutes, 0, 0);
+  return toZonedTime(d, tz);
+};
+
+// Convert a local Date back to a 'HH:MM' UTC string
+const localDateToUtcTimeStr = (date: Date): string => {
+  const utc = fromZonedTime(date, tz);
+  const h = utc.getUTCHours().toString().padStart(2, "0");
+  const m = utc.getUTCMinutes().toString().padStart(2, "0");
+  return `${h}:${m}`;
+};
+
+const formatTimeForDisplay = (utcTimeStr: string): string =>
+  format(utcTimeStrToLocalDate(utcTimeStr), "h:mm a");
+
 export default function SettingsScreen() {
   const router = useRouter();
   const { user, signOut } = useAuth();
@@ -29,7 +50,7 @@ export default function SettingsScreen() {
   const { data: notificationsEnabled } = useGetNotificationsEnabled(user?.id);
   const { mutateAsync: toggleNotifications } = useToggleNotificationsEnabled();
   const { data: reminderConfig } = useGetReminderConfig(user?.id);
-  const { mutateAsync: updateReminderConfig } = useUpdateReminderConfig();
+  const { mutateAsync: updateReminderConfig, isPending: isUpdatingReminders } = useUpdateReminderConfig();
   const [showMorningPicker, setShowMorningPicker] = useState(false);
   const [showEveningPicker, setShowEveningPicker] = useState(false);
   const { hapticsEnabled, loaded: hapticsLoaded, toggleHaptics } = useHaptics();
@@ -53,27 +74,6 @@ export default function SettingsScreen() {
     await toggleNotifications({ userId: user.id, enabled: shouldEnable });
     trackEvent("settings_notifications_toggled", { enabled: shouldEnable });
   }, 500);
-
-  const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-
-  // Convert a 'HH:MM' UTC time string into a local Date (today)
-  const utcTimeStrToLocalDate = (utcTimeStr: string): Date => {
-    const [hours, minutes] = utcTimeStr.split(":").map(Number);
-    const d = new Date();
-    d.setUTCHours(hours, minutes, 0, 0);
-    return toZonedTime(d, tz);
-  };
-
-  // Convert a local Date back to a 'HH:MM' UTC string
-  const localDateToUtcTimeStr = (date: Date): string => {
-    const utc = fromZonedTime(date, tz);
-    const h = utc.getUTCHours().toString().padStart(2, "0");
-    const m = utc.getUTCMinutes().toString().padStart(2, "0");
-    return `${h}:${m}`;
-  };
-
-  const formatTimeForDisplay = (utcTimeStr: string): string =>
-    format(utcTimeStrToLocalDate(utcTimeStr), "h:mm a");
 
   return (
     <SafeAreaView edges={["top"]} style={tw`flex-1 bg-white`}>
@@ -183,6 +183,7 @@ export default function SettingsScreen() {
                     <View style={tw`flex-row items-center gap-2`}>
                       <Switch
                         value={reminderConfig.morningReminderEnabled}
+                        disabled={isUpdatingReminders}
                         onValueChange={(val) =>
                           updateReminderConfig({
                             userId: user.id,
@@ -211,6 +212,7 @@ export default function SettingsScreen() {
                     <View style={tw`flex-row items-center gap-2`}>
                       <Switch
                         value={reminderConfig.eveningReminderEnabled}
+                        disabled={isUpdatingReminders}
                         onValueChange={(val) =>
                           updateReminderConfig({
                             userId: user.id,
@@ -243,7 +245,9 @@ export default function SettingsScreen() {
                 value={utcTimeStrToLocalDate(reminderConfig.morningReminderTime)}
                 mode="time"
                 onChange={(event, date) => {
-                  setShowMorningPicker(false);
+                  if (event.type === "dismissed" || event.type === "set") {
+                    setShowMorningPicker(false);
+                  }
                   if (event.type === "set" && date) {
                     updateReminderConfig({
                       userId: user.id,
@@ -258,7 +262,9 @@ export default function SettingsScreen() {
                 value={utcTimeStrToLocalDate(reminderConfig.eveningReminderTime)}
                 mode="time"
                 onChange={(event, date) => {
-                  setShowEveningPicker(false);
+                  if (event.type === "dismissed" || event.type === "set") {
+                    setShowEveningPicker(false);
+                  }
                   if (event.type === "set" && date) {
                     updateReminderConfig({
                       userId: user.id,
