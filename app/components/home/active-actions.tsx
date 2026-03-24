@@ -43,23 +43,15 @@ function ActionCard({
 
   return (
     <PressableCard color={categoryInfo.color} showShadow>
-      <View style={tw`p-5`}>
+      <View style={tw`p-6 items-start`}>
         {/* Header row */}
-        <View style={tw`flex-row items-center justify-between`}>
-          <Text
-            style={tw`text-lg font-gabarito font-bold text-ink flex-1 mr-3`}
-          >
-            {item.action.title}
+        <View
+          style={tw`bg-${categoryInfo.color}-300 rounded-lg flex flex-row items-center px-3 py-1`}
+        >
+          <Text style={tw`uppercase font-gabarito font-medium mr-2 text-sm`}>
+            {categoryInfo.title}
           </Text>
-          <View
-            style={[
-              tw`w-8 h-8 rounded-full items-center justify-center`,
-              // { backgroundColor: iconBg },
-            ]}
-          >
-            {categoryInfo.icon()}
-            {/* <Text style={{ fontSize: 16 }}>{categoryInfo.icon}</Text> */}
-          </View>
+          {categoryInfo.icon()}
         </View>
 
         {/* Footer row */}
@@ -86,7 +78,12 @@ function ActionCard({
             transition={{ type: "timing", duration: 180 }}
           >
             <Text
-              style={tw`text-base text-ink/80 font-gabarito leading-relaxed mb-4`}
+              style={tw`text-2xl font-gabarito font-bold text-black leading-1.3 mt-2`}
+            >
+              {item.action.title}
+            </Text>
+            <Text
+              style={tw`text-base text-ink/80 font-gabarito leading-relaxed mb-4 mt-2`}
               numberOfLines={4}
             >
               {item.action.description || "No description available"}

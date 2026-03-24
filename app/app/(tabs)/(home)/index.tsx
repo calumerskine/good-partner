@@ -41,13 +41,13 @@ export default function HomeScreen() {
   return (
     <SafeAreaView edges={["top"]} style={tw`bg-white flex-1 px-6`}>
       <ScrollView
-        contentContainerStyle={tw`flex-grow`}
+        contentContainerStyle={tw`pb-6`}
         showsVerticalScrollIndicator={false}
       >
         <HomeHeader dayNumber={dayNumber ?? 1} />
         {/* Daily message */}
         <Text
-          style={tw`flex-1 text-xl font-gabarito text-charcoal mt-3`}
+          style={tw`text-xl font-gabarito text-charcoal mt-3`}
           numberOfLines={1}
         >
           {dailyContent?.headlineMessage ?? "Everyone starts here"}

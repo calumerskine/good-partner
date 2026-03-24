@@ -36,7 +36,7 @@ export default function SuggestionCard({
     <PressableCard color={categoryInfo.color} shade={100} showShadow>
       <View style={tw`p-6 items-start`}>
         <View
-          style={tw`bg-white rounded-lg flex flex-row items-center px-3 py-1`}
+          style={tw`bg-${categoryInfo.color}-300 rounded-lg flex flex-row items-center px-3 py-1`}
         >
           <Text style={tw`uppercase font-gabarito font-medium mr-2 text-sm`}>
             {categoryInfo.title}
@@ -44,7 +44,7 @@ export default function SuggestionCard({
           {categoryInfo.icon()}
         </View>
         {/* Content */}
-        <View style={tw`flex-1 mt-3`}>
+        <View style={tw`flex-1 mt-2`}>
           <Text
             style={tw`text-2xl font-gabarito font-bold text-black leading-1.3 mt-4`}
           >
@@ -58,6 +58,7 @@ export default function SuggestionCard({
         </View>
         <View style={tw`gap-3 mt-5`}>
           <Button
+            size="sm"
             color={categoryInfo.buttonColor as any}
             onPress={() => onActivate(id)}
             disabled={isActivating || isSkipping}
@@ -66,6 +67,7 @@ export default function SuggestionCard({
             I'm on it
           </Button>
           <Button
+            size="sm"
             color="muted"
             onPress={() => onSkip(id)}
             disabled={isActivating || isSkipping}
