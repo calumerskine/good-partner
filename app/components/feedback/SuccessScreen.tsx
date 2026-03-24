@@ -1,7 +1,6 @@
 import { type ActionType } from "@/lib/state/actions.model";
 import tw from "@/lib/tw";
-import { XP_PER_COMPLETION, getLevelForXp } from "@/lib/xp";
-import FontAwesome from "@expo/vector-icons/FontAwesome";
+import { getLevelForXp } from "@/lib/xp";
 import { MotiView } from "moti";
 import { useEffect, useState } from "react";
 import { Text, View } from "react-native";
@@ -123,7 +122,7 @@ function AnimatedProgressIcon({
   icon,
   lightColor,
 }: {
-  icon: string;
+  icon: React.ReactComponent;
   lightColor: string;
 }) {
   const hexColor = getHexColor(lightColor);
@@ -191,7 +190,8 @@ function AnimatedProgressIcon({
           },
         ]}
       >
-        <FontAwesome name={icon as any} size={42} color={lightColor} />
+        {/* <FontAwesome name={icon as any} size={42} color={lightColor} /> */}
+        {icon({ size: 40 })}
         {/* <Text style={tw`text-5xl`}>{icon}</Text> */}
       </MotiView>
     </View>
@@ -339,14 +339,14 @@ export default function SuccessScreen({
   const isLevelUp = prevLevel.level !== newLevel.level;
   const [showLevelUp, setShowLevelUp] = useState(false);
 
-  useEffect(() => {
-    if (isLevelUp) {
-      const timer = setTimeout(() => {
-        setShowLevelUp(true);
-      }, ANIMATION.XP_TEXT_DELAY + 1200);
-      return () => clearTimeout(timer);
-    }
-  }, [isLevelUp]);
+  // useEffect(() => {
+  //   if (isLevelUp) {
+  //     const timer = setTimeout(() => {
+  //       setShowLevelUp(true);
+  //     }, ANIMATION.XP_TEXT_DELAY + 1200);
+  //     return () => clearTimeout(timer);
+  //   }
+  // }, [isLevelUp]);
 
   return (
     <View style={tw`flex-1 items-center justify-between px-6`}>
@@ -368,11 +368,9 @@ export default function SuccessScreen({
         />
       )}
 
-      {/* <View style={tw`flex-1`} /> */}
-
       <View style={tw`items-center gap-6 px-4 mt-36`}>
         <AnimatedProgressIcon
-          icon={category.iconName}
+          icon={category.icon}
           lightColor={category.lightColor}
         />
 
@@ -392,20 +390,20 @@ export default function SuccessScreen({
           </Text>
         </MotiView>
 
-        <AnimatedXPCounter
+        {/* <AnimatedXPCounter
           amount={XP_PER_COMPLETION}
           title={category.title}
           color={category.darkColor}
-        />
+        /> */}
 
-        <LevelProgress
+        {/* <LevelProgress
           previousXp={previousXp}
           newXp={newXp}
           color={category.darkColor}
-        />
+        /> */}
       </View>
 
-      {showLevelUp && (
+      {/* {showLevelUp && (
         <>
           <ConfettiCannon
             count={120}
@@ -432,7 +430,7 @@ export default function SuccessScreen({
             </Text>
           </MotiView>
         </>
-      )}
+      )} */}
 
       <View style={tw`flex-1`} />
 
