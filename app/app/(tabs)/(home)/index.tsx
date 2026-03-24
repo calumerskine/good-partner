@@ -21,7 +21,7 @@ export default function HomeScreen() {
     user?.id,
   );
 
-  const dayNumber = profile ? (profile.totalDaysActive ?? 0) + 1 : undefined;
+  const dayNumber = profile ? (profile.totalDaysActive ?? 1) : undefined;
   const { data: dailyContent } = useGetDailyContent(dayNumber);
 
   useFocusEffect(

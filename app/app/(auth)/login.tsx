@@ -15,14 +15,9 @@ import {
 } from "react-native";
 import Animated, {
   Easing,
-  cancelAnimation,
-  runOnJS,
   useAnimatedStyle,
   useSharedValue,
   withDelay,
-  withRepeat,
-  withSequence,
-  withSpring,
   withTiming,
 } from "react-native-reanimated";
 import {
@@ -70,118 +65,15 @@ export default function LoginScreen() {
     opacity: formOpacity.value,
   }));
 
-  const brownieStaticStyle = {
-    position: "absolute" as const,
-    left: BROWNIE_LEFT,
-    top: BROWNIE_START_TOP,
-    width: BROWNIE_SIZE,
-    height: BROWNIE_SIZE,
-  };
-
-  function runIdle() {
-    setIsIntroComplete(true);
-
-    // Bob: continuous sine wave ±4px around settled translateY position.
-    // Two withTiming calls cover both directions; reverse: false (no auto-reverse needed).
-    translateY.value = withRepeat(
-      withSequence(
-        withTiming(BROWNIE_Y_OFFSET - 4, {
-          duration: 2000,
-          easing: Easing.inOut(Easing.sin),
-        }),
-        withTiming(BROWNIE_Y_OFFSET + 4, {
-          duration: 2000,
-          easing: Easing.inOut(Easing.sin),
-        }),
-      ),
-      -1, // infinite
-      true, // no auto-reverse (sequence handles both directions)
-    );
-
-    // Wiggle: soft shake every 4–7 seconds, rescheduled recursively
-    // const scheduleWiggle = () => {
-    //   const delay = Math.random() * 3000 + 4000; // 4000–7000ms
-    //   wiggleTimerRef.current = setTimeout(() => {
-    //     // Cancel any in-flight translateX animation before starting a new one
-    //     cancelAnimation(translateX);
-    //     translateX.value = withSequence(
-    //       withTiming(3, { duration: 50 }),
-    //       withTiming(-3, { duration: 50 }),
-    //       withTiming(2, { duration: 40 }),
-    //       withTiming(-2, { duration: 40 }),
-    //       withTiming(0, { duration: 30 }),
-    //     );
-    //     scheduleWiggle();
-    //   }, delay);
-    // };
-    // scheduleWiggle();
-  }
-
-  function runStage2() {
-    // Slide brownie to top: translateY 0 → BROWNIE_Y_OFFSET (large negative = upward)
-    translateY.value = withSpring(BROWNIE_Y_OFFSET, {
-      mass: 1,
-      stiffness: 180,
-      damping: 22,
-    });
-
-    // Simultaneously scale down: 1.43 → 1.0 (eased, no bounce)
-    scale.value = withTiming(1.0, {
-      duration: 400,
-      easing: Easing.out(Easing.cubic),
-    });
-
-    // Form reveal: start 200ms into the slide, fade in over 600ms
-    // Chains to runIdle when complete
+  useEffect(() => {
     formOpacity.value = withDelay(
       200,
-      withTiming(1, { duration: 600, easing: Easing.out(Easing.quad) }, () => {
-        // formOpacity animation complete — start idle
-        runOnJS(runIdle)();
-      }),
+      withTiming(
+        1,
+        { duration: 600, easing: Easing.out(Easing.quad) },
+        () => {},
+      ),
     );
-  }
-
-  // Called from the spring worklet callback via runOnJS.
-  // Schedules Stage 2 to fire after the shake completes (200ms total shake duration).
-  function scheduleStage2() {
-    stageTimerRef.current = setTimeout(runStage2, 200);
-  }
-
-  useEffect(() => {
-    // Stage 1: Spawn — scale 0 → 1.43 with elastic spring
-    scale.value = withSpring(
-      1.43,
-      { mass: 0.6, stiffness: 280, damping: 10 },
-      () => {
-        // Spring settled (~400ms from mount) — fire shake and schedule Stage 2.
-        //
-        // Note: withSequence does not propagate callbacks from inner steps reliably
-        // in Reanimated v4. Instead, fire the shake (no callback needed) and
-        // independently schedule Stage 2 via runOnJS + setTimeout for the shake duration.
-        translateX.value = withSequence(
-          withTiming(5, { duration: 35 }),
-          withTiming(-5, { duration: 35 }),
-          withTiming(4, { duration: 30 }),
-          withTiming(-4, { duration: 30 }),
-          withTiming(2, { duration: 25 }),
-          withTiming(-2, { duration: 25 }),
-          withTiming(0, { duration: 20 }),
-        );
-        // Schedule Stage 2 after shake finishes (200ms = sum of all shake withTiming durations)
-        runOnJS(scheduleStage2)();
-      },
-    );
-
-    // Cleanup: cancel animations and pending timers on unmount
-    return () => {
-      cancelAnimation(scale);
-      cancelAnimation(translateX);
-      cancelAnimation(translateY);
-      cancelAnimation(formOpacity);
-      if (stageTimerRef.current) clearTimeout(stageTimerRef.current);
-      if (wiggleTimerRef.current) clearTimeout(wiggleTimerRef.current);
-    };
   }, []);
 
   const [mode, setMode] = useState<AuthMode>("login");
@@ -265,13 +157,11 @@ export default function LoginScreen() {
         >
           <View style={tw`mb-12`}>
             <Text
-              style={tw`text-5xl text-charcoal text-center font-gabarito font-black mb-3`}
+              style={tw`text-5xl text-ink text-center font-gabarito font-black mb-3`}
             >
               {mode === "login" ? "Welcome Back" : "Create Account"}
             </Text>
-            <Text
-              style={tw`text-xl text-charcoal/80 text-center font-gabarito`}
-            >
+            <Text style={tw`text-xl text-ink/80 text-center font-gabarito`}>
               {mode === "login"
                 ? "Sign in to continue your journey"
                 : "Start building meaningful connections"}
@@ -301,7 +191,7 @@ export default function LoginScreen() {
                   />
                   {errors.email && (
                     <Text
-                      style={tw`text-raspberry text-sm mt-2 ml-4 font-gabarito`}
+                      style={tw`text-red-600 text-sm mt-2 ml-4 font-gabarito`}
                     >
                       {errors.email.message}
                     </Text>
@@ -335,7 +225,7 @@ export default function LoginScreen() {
                   />
                   {errors.password && (
                     <Text
-                      style={tw`text-raspberry text-sm mt-2 ml-4 font-gabarito`}
+                      style={tw`text-red-600 text-sm mt-2 ml-4 font-gabarito`}
                     >
                       {errors.password.message}
                     </Text>
@@ -348,10 +238,10 @@ export default function LoginScreen() {
 
           {error && (
             <View
-              style={tw`w-full p-5 bg-raspberry/10 rounded-2xl border-2 border-raspberry/30 mb-6`}
+              style={tw`w-full p-5 bg-red-600/10 rounded-2xl border-2 border-red-600/30 mb-6`}
             >
               <Text
-                style={tw`text-raspberry font-gabarito text-base leading-relaxed`}
+                style={tw`text-red-600 font-gabarito text-base leading-relaxed`}
               >
                 {error}
               </Text>
@@ -368,7 +258,7 @@ export default function LoginScreen() {
             </Button>
 
             <View style={tw`flex-row items-center justify-center gap-2`}>
-              <Text style={tw`text-charcoal/80 font-gabarito text-base`}>
+              <Text style={tw`text-ink/80 font-gabarito text-base`}>
                 {mode === "login"
                   ? "Don't have an account?"
                   : "Already have an account?"}
