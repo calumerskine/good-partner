@@ -42,17 +42,19 @@ export function FocusRow({ categories, vertical = false }: FocusRowProps) {
     return null;
   }
 
-  const cards = categories.map((cat, index) => {
+  const renderCard = (
+    cat: CategoryCompletion,
+    index: number,
+    cardStyle?: object,
+  ) => {
     const actionType = ActionTypes[CATEGORY_MAP[cat.categoryKey]];
-    const lightColorHex = getHexColor(actionType.lightColor);
     const darkColorHex = getHexColor(actionType.darkColor);
-    const colorHex = getHexColor(actionType.color);
-
     const category = ActionTypes[CATEGORY_MAP[cat.categoryKey]];
 
     return (
       <MotiView
         key={cat.categoryKey}
+        style={cardStyle}
         from={{ opacity: 0, scale: 0.95 }}
         animate={{
           opacity: animated ? 1 : 0,
@@ -60,36 +62,51 @@ export function FocusRow({ categories, vertical = false }: FocusRowProps) {
         }}
         transition={{ delay: index * 100, duration: 300 }}
       >
-        <PressableCard color="indigo">
+        <PressableCard color={category.color} shade={200}>
           <View style={tw`p-4`}>
             <View
-              style={tw`flex flex-row-reverse justify-between items-baseline`}
+              style={tw`flex flex-row-reverse justify-between items-center`}
             >
-              <View style={[tw``]}>{category.icon()}</View>
-              <Text style={tw`text-xl text-ink font-gabarito font-bold mb-3`}>
+              <View>{category.icon({ size: 26 })}</View>
+              <Text style={tw`text-xl text-ink font-gabarito font-bold`}>
                 {actionType.title}
               </Text>
             </View>
 
             <Text
               style={[
-                tw`text-5xl font-gabarito font-black mb-2`,
-                { color: darkColorHex },
+                tw`text-5xl font-gabarito font-black pt-4 text-${category.color}-600`,
               ]}
             >
               {cat.totalCompletions}
             </Text>
-            <Text style={tw`text-sm text-ink/60 font-gabarito mb-1`}>
+            <Text style={tw`text-sm text-ink/80 font-gabarito`}>
               Actions Completed
             </Text>
           </View>
         </PressableCard>
       </MotiView>
     );
-  });
+  };
+
+  const cards = categories.map((cat, index) => renderCard(cat, index));
 
   if (vertical) {
-    return <View style={tw`gap-3`}>{cards}</View>;
+    const rows: CategoryCompletion[][] = [];
+    for (let i = 0; i < categories.length; i += 2) {
+      rows.push(categories.slice(i, i + 2));
+    }
+    return (
+      <View style={tw`gap-3`}>
+        {rows.map((pair, rowIndex) => (
+          <View key={rowIndex} style={tw`flex-row gap-3`}>
+            {pair.map((cat, colIndex) =>
+              renderCard(cat, rowIndex * 2 + colIndex, tw`flex-1`),
+            )}
+          </View>
+        ))}
+      </View>
+    );
   }
 
   return (
