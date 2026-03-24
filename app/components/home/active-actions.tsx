@@ -13,10 +13,12 @@ function ActionCard({
   item,
   isExpanded,
   onToggle,
+  active,
 }: {
   item: UserAction;
   isExpanded: boolean;
   onToggle: () => void;
+  active: boolean;
 }) {
   const completeAction = useCompleteAction();
   const categoryInfo =
@@ -42,8 +44,14 @@ function ActionCard({
   const iconBg = accentLight + "4D"; // 30% opacity
 
   return (
-    <PressableCard color={categoryInfo.color} showShadow>
+    <PressableCard color={categoryInfo.color} shade={200} showShadow>
       <View style={tw`p-6 items-start`}>
+        <View style={tw`flex flex-row items-center justify-between pb-6 gap-2`}>
+          <Text style={tw`font-bold`}>In Progress</Text>
+          <View
+            style={tw`bg-green-400 border-green-500 border w-4 h-4 rounded-full animate-ping`}
+          ></View>
+        </View>
         {/* Header row */}
         <View
           style={tw`bg-${categoryInfo.color}-300 rounded-lg flex flex-row items-center px-3 py-1`}
@@ -98,12 +106,7 @@ function ActionCard({
               >
                 {completeAction.isPending ? "Loading..." : "✓ I've done it!"}
               </Button>
-              <Button
-                color="ghost"
-                size="sm"
-                onPress={handleViewMore}
-                style={tw`self-center`}
-              >
+              <Button color="ghost" size="sm" onPress={handleViewMore}>
                 View more →
               </Button>
             </View>
@@ -142,6 +145,7 @@ export default function ActiveActions({
         <View style={tw`gap-4 mb-4`}>
           {userActions.map((item: UserAction) => (
             <ActionCard
+              active
               key={item.id}
               item={item}
               isExpanded

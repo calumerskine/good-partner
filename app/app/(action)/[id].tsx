@@ -72,7 +72,7 @@ export default function ActionDetailScreen() {
           <BackButton />
         </View>
         <View style={tw`items-center`}>
-          <Text style={tw`text-charcoal text-xl font-gabarito`}>
+          <Text style={tw`text-ink text-xl font-gabarito`}>
             Action not found
           </Text>
         </View>
@@ -133,10 +133,15 @@ export default function ActionDetailScreen() {
         <BackButton />
 
         <View style={tw`flex-row items-center gap-2`}>
-          <Text style={tw`text-4xl text-gray-400 font-gabarito font-black`}>
+          <Text
+            style={tw`text-4xl text-${categoryInfo.color}-500 font-gabarito font-black`}
+          >
             {categoryInfo.title}
           </Text>
-          {categoryInfo.icon({ size: 30, color: "grey" })}
+          {categoryInfo.icon({
+            size: 30,
+            style: tw`text-${categoryInfo.color}-500`,
+          })}
         </View>
       </View>
 
@@ -157,14 +162,14 @@ export default function ActionDetailScreen() {
               {actionData.title}
             </Text>
 
-            <Text style={tw`text-charcoal font-gabarito text-xl  mb-8`}>
+            <Text style={tw`text-ink font-gabarito text-xl  mb-8`}>
               {actionData.description}
             </Text>
 
             {!isCatalogView && completionCount > 0 && (
               <View style={tw`rounded-2xl px-6 py-3 bg-grape/20 mb-6 self-end`}>
                 <Text
-                  style={tw`text-charcoal/70 font-gabarito text-base font-bold self-end`}
+                  style={tw`text-ink/70 font-gabarito text-base font-bold self-end`}
                 >
                   {completionCount} {completionCount === 1 ? "time" : "times"}{" "}
                   completed
@@ -178,13 +183,11 @@ export default function ActionDetailScreen() {
               </View>
 
               <Text
-                style={tw`text-charcoal font-gabarito text-2xl font-bold mb-3 mr-6`}
+                style={tw`text-ink font-gabarito text-2xl font-bold mb-3 mr-6`}
               >
                 Why it matters
               </Text>
-              <Text
-                style={tw`text-charcoal font-gabarito text-lg leading-relaxed`}
-              >
+              <Text style={tw`text-ink font-gabarito text-lg leading-relaxed`}>
                 {actionData.reasoning}
               </Text>
             </View>
@@ -218,7 +221,7 @@ export default function ActionDetailScreen() {
                   onPress={handleDeactivate}
                   disabled={deactivateAction.isPending}
                 >
-                  <Text style={tw`text-charcoal`}>
+                  <Text style={tw`text-ink`}>
                     {deactivateAction.isPending
                       ? "Pausing..."
                       : "Pause for now"}

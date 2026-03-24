@@ -12,6 +12,7 @@ type Props = {
   isActivating: boolean;
   isSkipping: boolean;
   skipText: string;
+  forYou: React.ReactNode;
 };
 
 export default function SuggestionCard({
@@ -21,6 +22,7 @@ export default function SuggestionCard({
   isActivating,
   isSkipping,
   skipText,
+  forYou,
 }: Props) {
   const { id, title, description, category } = action;
   // ActionTypes keys are uppercase (ATTENTION, AFFECTION, etc.)
@@ -33,8 +35,9 @@ export default function SuggestionCard({
     : "";
 
   return (
-    <PressableCard color={categoryInfo.color} shade={100} showShadow>
+    <PressableCard color={categoryInfo.color} shade={200} showShadow>
       <View style={tw`p-6 items-start`}>
+        {forYou}
         <View
           style={tw`bg-${categoryInfo.color}-300 rounded-lg flex flex-row items-center px-3 py-1`}
         >

@@ -25,12 +25,12 @@ export default function ActionTypeScreen() {
         <BackButton />
         <View style={tw`flex-row items-center gap-2`}>
           <Text
-            style={tw`text-4xl text-${category.darkColor} font-gabarito font-black`}
+            style={tw`text-4xl text-${category.color}-500 font-gabarito font-black`}
           >
             {category.title}
           </Text>
 
-          {category.icon({ size: 30 })}
+          {category.icon({ size: 30, style: tw`text-${category.color}-500` })}
         </View>
       </View>
 

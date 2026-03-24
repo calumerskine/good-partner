@@ -47,7 +47,7 @@ export default function HomeScreen() {
         <HomeHeader dayNumber={dayNumber ?? 1} />
         {/* Daily message */}
         <Text
-          style={tw`text-xl font-gabarito text-charcoal mt-3`}
+          style={tw`text-xl font-gabarito text-charcoal mt-3 mb-5`}
           numberOfLines={1}
         >
           {dailyContent?.headlineMessage ?? "Everyone starts here"}

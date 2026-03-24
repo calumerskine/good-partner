@@ -94,7 +94,7 @@ export default function SuggestedActions({
 
   return (
     <View style={tw`flex-1`}>
-      <Text style={tw`text-2xl text-black font-gabarito font-bold mb-6`}>
+      <Text style={tw`text-2xl text-black font-gabarito font-bold mb-4`}>
         Your move for today:
       </Text>
 
@@ -114,9 +114,6 @@ export default function SuggestedActions({
         </Link>
       ) : currentAction ? (
         <View>
-          <Text style={tw`mb-4 font-medium`}>
-            For you {currentIndex + 1}/{suggestedActions.length}
-          </Text>
           <SuggestionCard
             action={currentAction}
             onActivate={handleActivate}
@@ -124,6 +121,11 @@ export default function SuggestedActions({
             isActivating={activateAction.isPending}
             isSkipping={skipAction.isPending}
             skipText={skipText(currentIndex)}
+            forYou={
+              <Text style={tw`mb-6 font-bold`}>
+                For you {currentIndex + 1}/{suggestedActions.length}
+              </Text>
+            }
           />
         </View>
       ) : null}
