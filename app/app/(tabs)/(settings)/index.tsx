@@ -5,15 +5,20 @@ import { useThrottle } from "@/hooks/use-throttle";
 import { trackEvent } from "@/lib/analytics";
 import {
   useGetNotificationsEnabled,
+  useGetReminderConfig,
   useGetUserProfile,
   useToggleNotificationsEnabled,
+  useUpdateReminderConfig,
 } from "@/lib/api";
 import { env } from "@/lib/env";
 import { oneSignalService } from "@/lib/onesignal";
 import { ActionTypes } from "@/lib/state/actions.model";
 import tw from "@/lib/tw";
+import DateTimePicker from "@react-native-community/datetimepicker";
 import { useFocusEffect, useRouter } from "expo-router";
-import { useCallback } from "react";
+import { format } from "date-fns";
+import { toZonedTime, fromZonedTime } from "date-fns-tz";
+import { useCallback, useState } from "react";
 import { ScrollView, Switch, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -23,6 +28,10 @@ export default function SettingsScreen() {
   const { data: profile } = useGetUserProfile(user?.id);
   const { data: notificationsEnabled } = useGetNotificationsEnabled(user?.id);
   const { mutateAsync: toggleNotifications } = useToggleNotificationsEnabled();
+  const { data: reminderConfig } = useGetReminderConfig(user?.id);
+  const { mutateAsync: updateReminderConfig } = useUpdateReminderConfig();
+  const [showMorningPicker, setShowMorningPicker] = useState(false);
+  const [showEveningPicker, setShowEveningPicker] = useState(false);
   const { hapticsEnabled, loaded: hapticsLoaded, toggleHaptics } = useHaptics();
 
   useFocusEffect(
@@ -44,6 +53,27 @@ export default function SettingsScreen() {
     await toggleNotifications({ userId: user.id, enabled: shouldEnable });
     trackEvent("settings_notifications_toggled", { enabled: shouldEnable });
   }, 500);
+
+  const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+  // Convert a 'HH:MM' UTC time string into a local Date (today)
+  const utcTimeStrToLocalDate = (utcTimeStr: string): Date => {
+    const [hours, minutes] = utcTimeStr.split(":").map(Number);
+    const d = new Date();
+    d.setUTCHours(hours, minutes, 0, 0);
+    return toZonedTime(d, tz);
+  };
+
+  // Convert a local Date back to a 'HH:MM' UTC string
+  const localDateToUtcTimeStr = (date: Date): string => {
+    const utc = fromZonedTime(date, tz);
+    const h = utc.getUTCHours().toString().padStart(2, "0");
+    const m = utc.getUTCMinutes().toString().padStart(2, "0");
+    return `${h}:${m}`;
+  };
+
+  const formatTimeForDisplay = (utcTimeStr: string): string =>
+    format(utcTimeStrToLocalDate(utcTimeStr), "h:mm a");
 
   return (
     <SafeAreaView edges={["top"]} style={tw`flex-1 bg-white`}>
@@ -127,12 +157,11 @@ export default function SettingsScreen() {
 
         {env.flags.useReminders && (
           <View style={tw`mb-6`}>
-            <Text
-              style={tw`text-lg font-gabarito font-bold text-charcoal mb-3`}
-            >
+            <Text style={tw`text-lg font-gabarito font-bold text-charcoal mb-3`}>
               Notifications
             </Text>
             <View style={tw`bg-white border-2 rounded-xl p-5`}>
+              {/* Master toggle */}
               <View style={tw`flex-row items-center justify-between mb-3`}>
                 <Text style={tw`text-charcoal font-gabarito font-bold text-lg`}>
                   Daily reminders
@@ -142,13 +171,103 @@ export default function SettingsScreen() {
                   onValueChange={handleSetNotifications}
                 />
               </View>
-              <Text
-                style={tw`font-gabarito text-sm text-charcoal/80 leading-relaxed`}
-              >
-                Get a gentle reminder to complete your daily action and stay on
-                track.
+              <Text style={tw`font-gabarito text-sm text-charcoal/80 leading-relaxed`}>
+                Get a gentle reminder to complete your daily action and stay on track.
               </Text>
+
+              {/* Per-type rows — only show when master switch is on */}
+              {notificationsEnabled && reminderConfig && (
+                <View style={tw`mt-4 gap-3`}>
+                  {/* Morning row */}
+                  <View style={tw`flex-row items-center justify-between`}>
+                    <View style={tw`flex-row items-center gap-2`}>
+                      <Switch
+                        value={reminderConfig.morningReminderEnabled}
+                        onValueChange={(val) =>
+                          updateReminderConfig({
+                            userId: user.id,
+                            config: { morningReminderEnabled: val },
+                          })
+                        }
+                      />
+                      <Text style={tw`font-gabarito text-charcoal`}>Morning</Text>
+                    </View>
+                    <View style={tw`flex-row items-center gap-3`}>
+                      <Text style={tw`font-gabarito text-charcoal/70`}>
+                        {formatTimeForDisplay(reminderConfig.morningReminderTime)}
+                      </Text>
+                      <Button
+                        size="sm"
+                        color="ghost"
+                        onPress={() => setShowMorningPicker(true)}
+                      >
+                        Edit
+                      </Button>
+                    </View>
+                  </View>
+
+                  {/* Evening row */}
+                  <View style={tw`flex-row items-center justify-between`}>
+                    <View style={tw`flex-row items-center gap-2`}>
+                      <Switch
+                        value={reminderConfig.eveningReminderEnabled}
+                        onValueChange={(val) =>
+                          updateReminderConfig({
+                            userId: user.id,
+                            config: { eveningReminderEnabled: val },
+                          })
+                        }
+                      />
+                      <Text style={tw`font-gabarito text-charcoal`}>Evening</Text>
+                    </View>
+                    <View style={tw`flex-row items-center gap-3`}>
+                      <Text style={tw`font-gabarito text-charcoal/70`}>
+                        {formatTimeForDisplay(reminderConfig.eveningReminderTime)}
+                      </Text>
+                      <Button
+                        size="sm"
+                        color="ghost"
+                        onPress={() => setShowEveningPicker(true)}
+                      >
+                        Edit
+                      </Button>
+                    </View>
+                  </View>
+                </View>
+              )}
             </View>
+
+            {/* Time pickers — rendered outside the card to avoid layout issues */}
+            {showMorningPicker && reminderConfig && (
+              <DateTimePicker
+                value={utcTimeStrToLocalDate(reminderConfig.morningReminderTime)}
+                mode="time"
+                onChange={(event, date) => {
+                  setShowMorningPicker(false);
+                  if (event.type === "set" && date) {
+                    updateReminderConfig({
+                      userId: user.id,
+                      config: { morningReminderTime: localDateToUtcTimeStr(date) },
+                    });
+                  }
+                }}
+              />
+            )}
+            {showEveningPicker && reminderConfig && (
+              <DateTimePicker
+                value={utcTimeStrToLocalDate(reminderConfig.eveningReminderTime)}
+                mode="time"
+                onChange={(event, date) => {
+                  setShowEveningPicker(false);
+                  if (event.type === "set" && date) {
+                    updateReminderConfig({
+                      userId: user.id,
+                      config: { eveningReminderTime: localDateToUtcTimeStr(date) },
+                    });
+                  }
+                }}
+              />
+            )}
           </View>
         )}
 
