@@ -4,7 +4,7 @@ export default function ProgressScreenLayout() {
   return (
     <Stack
       screenOptions={{
-        contentStyle: { backgroundColor: "black" },
+        contentStyle: { backgroundColor: "white" },
       }}
     >
       <Stack.Screen name="index" options={{ headerShown: false }} />

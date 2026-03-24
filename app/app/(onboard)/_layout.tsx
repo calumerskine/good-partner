@@ -18,7 +18,7 @@ export default function OnboardScreenLayout() {
     <Stack
       screenOptions={{
         headerShown: false,
-        contentStyle: { backgroundColor: "black" },
+        contentStyle: { backgroundColor: "white" },
       }}
     >
       <Stack.Screen name="index" />
