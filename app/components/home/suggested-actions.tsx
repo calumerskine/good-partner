@@ -8,11 +8,12 @@ import {
 } from "@/lib/api";
 import tw from "@/lib/tw";
 import { User } from "@supabase/supabase-js";
-import { Link, router } from "expo-router";
+import { router } from "expo-router";
 import { ArrowRight } from "lucide-react-native";
 import { useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import SuggestionCard from "./suggestion-card";
+import PressableCard from "../ui/pressable-card";
 
 function skipText(index: number) {
   switch (index) {
@@ -94,40 +95,38 @@ export default function SuggestedActions({
 
   return (
     <View style={tw`flex-1`}>
-      <Text style={tw`text-2xl text-black font-gabarito font-bold mb-4`}>
-        Your move for today:
-      </Text>
-
       {allExhausted ? (
         /* Browse Library state */
-        <Link href="/(tabs)/(actions)" asChild>
-          <Pressable
-            style={tw`flex-1 bg-grape rounded-2xl items-center justify-center gap-8 p-10 min-h-64`}
-          >
-            <Text
-              style={tw`text-3xl font-gabarito font-bold text-white leading-1.1 text-center`}
-            >
+
+        <PressableCard color="indigo" shade={500} href="/(tabs)/(actions)">
+          <View style={tw`p-6 flex justify-center items-center`}>
+            <Text style={tw`text-3xl font-gabarito font-bold text-white`}>
               Browse the full library
             </Text>
             <ArrowRight size={40} color="white" />
-          </Pressable>
-        </Link>
+          </View>
+        </PressableCard>
       ) : currentAction ? (
-        <View>
-          <SuggestionCard
-            action={currentAction}
-            onActivate={handleActivate}
-            onSkip={handleSkip}
-            isActivating={activateAction.isPending}
-            isSkipping={skipAction.isPending}
-            skipText={skipText(currentIndex)}
-            forYou={
-              <Text style={tw`mb-6 font-bold`}>
-                For you {currentIndex + 1}/{suggestedActions.length}
-              </Text>
-            }
-          />
-        </View>
+        <>
+          <Text style={tw`text-2xl text-black font-gabarito font-bold mb-4`}>
+            Your move for today:
+          </Text>
+          <View>
+            <SuggestionCard
+              action={currentAction}
+              onActivate={handleActivate}
+              onSkip={handleSkip}
+              isActivating={activateAction.isPending}
+              isSkipping={skipAction.isPending}
+              skipText={skipText(currentIndex)}
+              forYou={
+                <Text style={tw`mb-6 font-bold`}>
+                  For you {currentIndex + 1}/{suggestedActions.length}
+                </Text>
+              }
+            />
+          </View>
+        </>
       ) : null}
     </View>
   );
