@@ -8,17 +8,22 @@ import { useCallback, useState } from "react";
 import { Text, View } from "react-native";
 import Button from "../ui/button";
 import PressableCard from "../ui/pressable-card";
+import ActionReminderSheet from "@/components/reminders/action-reminder-sheet";
+import { format, isBefore, isToday, isTomorrow } from "date-fns";
+import { env } from "@/lib/env";
 
 function ActionCard({
   item,
   isExpanded,
   onToggle,
   active,
+  onRemind,
 }: {
   item: UserAction;
   isExpanded: boolean;
   onToggle: () => void;
   active: boolean;
+  onRemind: () => void;
 }) {
   const completeAction = useCompleteAction();
   const categoryInfo =
@@ -38,6 +43,12 @@ function ActionCard({
   const handleViewMore = useCallback(() => {
     router.push(`/(action)/${item.id}`);
   }, [item.id]);
+
+  const formatReminderLabel = (reminderAt: Date): string => {
+    if (isToday(reminderAt)) return `Today, ${format(reminderAt, "h:mm a")}`;
+    if (isTomorrow(reminderAt)) return `Tomorrow, ${format(reminderAt, "h:mm a")}`;
+    return format(reminderAt, "EEE, h:mm a");
+  };
 
   const accentLight = getHexColor(categoryInfo.lightColor);
   const accentDark = getHexColor(categoryInfo.darkColor);
@@ -109,6 +120,17 @@ function ActionCard({
               <Button color="ghost" size="sm" onPress={handleViewMore}>
                 View more →
               </Button>
+              {env.flags.useReminders && (
+                <Button
+                  color="ghost"
+                  size="sm"
+                  onPress={onRemind}
+                >
+                  {item.reminderAt && isBefore(new Date(), item.reminderAt)
+                    ? formatReminderLabel(item.reminderAt)
+                    : "Remind me"}
+                </Button>
+              )}
             </View>
           </MotiView>
         )}
@@ -125,6 +147,9 @@ export default function ActiveActions({
   userActions: UserAction[];
 }) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [reminderSheetActionId, setReminderSheetActionId] = useState<string | null>(null);
+
+  const reminderSheetAction = userActions.find((a) => a.id === reminderSheetActionId) ?? null;
 
   const handleToggle = useCallback((id: string) => {
     setExpandedId((prev) => (prev === id ? null : id));
@@ -150,6 +175,7 @@ export default function ActiveActions({
               item={item}
               isExpanded
               onToggle={() => handleToggle(item.id)}
+              onRemind={() => setReminderSheetActionId(item.id)}
             />
           ))}
         </View>
@@ -165,6 +191,13 @@ export default function ActiveActions({
             </Button>
           </Link>
         </View>
+      )}
+      {reminderSheetAction && (
+        <ActionReminderSheet
+          userActionId={reminderSheetAction.id}
+          currentReminderAt={reminderSheetAction.reminderAt}
+          onClose={() => setReminderSheetActionId(null)}
+        />
       )}
     </View>
   );
