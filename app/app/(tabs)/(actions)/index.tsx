@@ -52,12 +52,10 @@ export default function ActionsScreen() {
                 > */}
               <View style={tw`px-6 py-4`}>
                 <View style={tw`flex-row items-center gap-2`}>
-                  <Text
-                    style={tw`text-3xl text-${action.darkColor} font-gabarito font-medium`}
-                  >
+                  <Text style={tw`text-3xl text-ink font-gabarito font-medium`}>
                     {action.title}
                   </Text>
-                  {action.icon()}
+                  {action.icon({ style: tw`text-ink/80` })}
                 </View>
                 <View style={tw`mt-2`}>
                   <Text

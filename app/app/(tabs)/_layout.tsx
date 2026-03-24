@@ -4,7 +4,7 @@ import { resetRootTabListener } from "@/lib/helpers";
 import tw from "@/lib/tw";
 import Feather from "@expo/vector-icons/Feather";
 import { Redirect, Tabs } from "expo-router";
-import { ChartBar, ListTodo, Settings } from "lucide-react-native";
+import { FolderSearch, GraduationCap, Settings } from "lucide-react-native";
 import React from "react";
 import { Platform, View } from "react-native";
 
@@ -75,10 +75,10 @@ export default function TabLayout() {
         name="(actions)"
         listeners={resetRootTabListener}
         options={{
-          title: "Actions",
+          title: "Explore",
           tabBarIcon: ({ focused }) => (
             <TabButton focused={focused}>
-              <ListTodo color={focused ? activeText : dark} />
+              <FolderSearch color={focused ? activeText : dark} />
             </TabButton>
           ),
         }}
@@ -90,7 +90,7 @@ export default function TabLayout() {
           title: "Progress",
           tabBarIcon: ({ focused }) => (
             <TabButton focused={focused}>
-              <ChartBar color={focused ? activeText : dark} />
+              <GraduationCap color={focused ? activeText : dark} />
             </TabButton>
           ),
         }}
