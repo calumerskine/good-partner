@@ -91,24 +91,11 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Schedule morning reminder (10am UTC) - all users
--- Change to '0 10 * * *' for production
+-- Schedule reminder dispatch (every 5 minutes) - calls reminder-dispatch edge function
 SELECT schedule_reminder_job(
-  'morning-reminder',
-  '0 10 * * *',
-  -- For development (every minute)
-  -- '* * * * *',
-  'reminder-morning'
-);
-
--- Schedule evening reminder (7pm UTC) - only users with outstanding actions
--- Change to '0 19 * * *' for production
-SELECT schedule_reminder_job(
-  'evening-reminder',
-  '0 19 * * *',
-  -- For development (every minute)
-  -- '* * * * *',
-  'reminder-evening'
+  'reminder-dispatch',
+  '*/5 * * * *',
+  'reminder-dispatch'
 );
 
 -- Clean up helper function
