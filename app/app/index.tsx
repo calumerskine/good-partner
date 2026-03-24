@@ -16,7 +16,7 @@ export default function Index() {
   // Show loading spinner while checking authentication state
   if (isLoading || isProfileLoading) {
     return (
-      <View style={tw`flex-1 items-center justify-center bg-background`}>
+      <View style={tw`flex-1 items-center justify-center bg-white`}>
         <ActivityIndicator size="large" color="#2E3130" />
       </View>
     );

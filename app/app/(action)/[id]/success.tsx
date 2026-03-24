@@ -36,7 +36,7 @@ export default function ActionSuccessScreen() {
   };
 
   return (
-    <SafeAreaView style={tw`flex-1 bg-background`}>
+    <SafeAreaView style={tw`flex-1 bg-white`}>
       <FeedbackWizard
         completionId={completionId}
         category={category}

@@ -99,14 +99,14 @@ export default function OnboardAreasScreen() {
 
   if (isLoading) {
     return (
-      <View style={tw`flex-1 items-center justify-center bg-background`}>
+      <View style={tw`flex-1 items-center justify-center bg-white`}>
         <ActivityIndicator size="large" color="#2E3130" />
       </View>
     );
   }
 
   return (
-    <SafeAreaView style={tw`flex-1 bg-background`}>
+    <SafeAreaView style={tw`flex-1 bg-white`}>
       <ScrollView
         style={tw`flex-1`}
         contentContainerStyle={tw`px-6 pt-8 pb-8`}
@@ -143,7 +143,7 @@ export default function OnboardAreasScreen() {
         </View>
       </ScrollView>
 
-      <View style={tw`p-6 pb-2 bg-background`}>
+      <View style={tw`p-6 pb-2 bg-white`}>
         <Button
           onPress={onSubmit}
           disabled={

@@ -39,7 +39,7 @@ export default function RemindersPromptScreen() {
   };
 
   return (
-    <SafeAreaView style={tw`flex-1 bg-background`}>
+    <SafeAreaView style={tw`flex-1 bg-white`}>
       <View style={tw`flex-1 items-center justify-between px-6`}>
         <View style={tw`flex-1`} />
 
@@ -57,8 +57,8 @@ export default function RemindersPromptScreen() {
           <Text
             style={tw`text-charcoal/70 font-gabarito text-xl text-center mb-8 px-4`}
           >
-            A daily reminder can help you build consistency and follow through on
-            your actions.
+            A daily reminder can help you build consistency and follow through
+            on your actions.
           </Text>
         </View>
 

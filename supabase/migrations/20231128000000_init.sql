@@ -243,7 +243,7 @@ INSERT INTO action_tags (id, action_id, tag_id) VALUES
   ('00000000-0000-0000-0000-000000000008', '00000000-0000-0000-0000-000000000042', '00000000-0000-0000-0000-000000000001');
 
 INSERT INTO daily_content (id, day_number, headline_message, subtext) VALUES
-  ('00000000-0000-0000-0000-000000000001', 1, 'Everyone starts here', '')
+  ('00000000-0000-0000-0000-000000000001', 1, 'Everyone starts here', '');
 
 -- ============================================================================
 -- REMINDER DISPATCH: Single RPC for all due reminders
