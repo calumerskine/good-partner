@@ -34,6 +34,9 @@ const mutationKeys = {
   updateCategories: ["updateCategories"] as const,
   submitFeedback: ["submitFeedback"] as const,
   skipAction: ["skipAction"] as const,
+  updateReminderConfig: ["updateReminderConfig"] as const,
+  setActionReminder: ["setActionReminder"] as const,
+  clearActionReminder: ["clearActionReminder"] as const,
 };
 
 type OnboardForm = {
@@ -278,21 +281,27 @@ async function getReminderConfig(userId: string) {
 export function useUpdateReminderConfig() {
   const queryClient = useQueryClient();
   return useMutation({
+    mutationKey: mutationKeys.updateReminderConfig,
     mutationFn: async ({
       userId,
       config,
     }: {
       userId: string;
       config: Partial<{
-        morning_reminder_enabled: boolean;
-        evening_reminder_enabled: boolean;
-        morning_reminder_time: string;
-        evening_reminder_time: string;
+        morningReminderEnabled: boolean;
+        eveningReminderEnabled: boolean;
+        morningReminderTime: string;
+        eveningReminderTime: string;
       }>;
     }) => {
+      const dbConfig: Record<string, unknown> = {};
+      if (config.morningReminderEnabled !== undefined) dbConfig.morning_reminder_enabled = config.morningReminderEnabled;
+      if (config.eveningReminderEnabled !== undefined) dbConfig.evening_reminder_enabled = config.eveningReminderEnabled;
+      if (config.morningReminderTime !== undefined) dbConfig.morning_reminder_time = config.morningReminderTime;
+      if (config.eveningReminderTime !== undefined) dbConfig.evening_reminder_time = config.eveningReminderTime;
       const { error } = await supabase
         .from("user_profiles")
-        .update(config)
+        .update(dbConfig)
         .eq("user_id", userId);
       if (error) throw error;
     },
@@ -315,7 +324,9 @@ export function useUpdateReminderConfig() {
 export function useSetActionReminder() {
   const queryClient = useQueryClient();
   return useMutation({
+    mutationKey: mutationKeys.setActionReminder,
     mutationFn: async ({
+      userId: _userId,
       userActionId,
       reminderAt,
     }: {
@@ -340,7 +351,9 @@ export function useSetActionReminder() {
 export function useClearActionReminder() {
   const queryClient = useQueryClient();
   return useMutation({
+    mutationKey: mutationKeys.clearActionReminder,
     mutationFn: async ({
+      userId: _userId,
       userActionId,
     }: {
       userId: string;
