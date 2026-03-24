@@ -1,6 +1,7 @@
 -- ============================================================================
 -- ACTION REMINDER SYSTEM
--- Daily reminders at 10am (all users) and 7pm (users with incomplete actions)
+-- 5-minute polling dispatch job that calls the reminder-dispatch edge function,
+-- which determines which users are due for morning, evening, or action reminders.
 -- ============================================================================
 
 -- Enable required extensions
@@ -97,6 +98,3 @@ SELECT schedule_reminder_job(
   '*/5 * * * *',
   'reminder-dispatch'
 );
-
--- Clean up helper function
-DROP FUNCTION schedule_reminder_job(TEXT, TEXT, TEXT);
