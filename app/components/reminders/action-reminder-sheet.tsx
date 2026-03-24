@@ -8,7 +8,7 @@ import tw from "@/lib/tw";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { addDays, format, isBefore } from "date-fns";
 import { toZonedTime } from "date-fns-tz";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import Animated, {
   runOnJS,
@@ -45,6 +45,8 @@ export default function ActionReminderSheet({
 
   const [showCustomPicker, setShowCustomPicker] = useState(false);
   const [confirmation, setConfirmation] = useState<string | null>(null);
+  const dismissTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isSubmittingRef = useRef(false);
 
   const translateY = useSharedValue(500);
   const overlayOpacity = useSharedValue(0);
@@ -52,6 +54,12 @@ export default function ActionReminderSheet({
   useEffect(() => {
     translateY.value = withTiming(0, { duration: 300 });
     overlayOpacity.value = withTiming(1, { duration: 250 });
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (dismissTimerRef.current) clearTimeout(dismissTimerRef.current);
+    };
   }, []);
 
   const dismiss = () => {
@@ -70,14 +78,19 @@ export default function ActionReminderSheet({
   }));
 
   const handleSelect = async (reminderAt: Date) => {
-    if (!user) return;
-    await setReminder({
-      userId: user.id,
-      userActionId,
-      reminderAt: reminderAt.toISOString(),
-    });
-    setConfirmation(`Reminder set for ${format(reminderAt, "EEE, h:mm a")}`);
-    setTimeout(() => dismiss(), 1400);
+    if (!user || isSubmittingRef.current) return;
+    isSubmittingRef.current = true;
+    try {
+      await setReminder({
+        userId: user.id,
+        userActionId,
+        reminderAt: reminderAt.toISOString(),
+      });
+      setConfirmation(`Reminder set for ${format(reminderAt, "EEE, h:mm a")}`);
+      dismissTimerRef.current = setTimeout(() => dismiss(), 1400);
+    } finally {
+      isSubmittingRef.current = false;
+    }
   };
 
   const handleClear = async () => {
