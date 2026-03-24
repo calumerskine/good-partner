@@ -13,6 +13,8 @@ GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA cron TO postgres;
 
 -- ============================================================================
 -- CORE FUNCTION: Get users for reminders
+-- DEPRECATED: replaced by get_due_reminders() RPC in init.sql. Kept for
+-- backwards compatibility in case any existing sessions reference it.
 -- ============================================================================
 
 CREATE OR REPLACE FUNCTION get_reminder_users(only_with_outstanding BOOLEAN DEFAULT FALSE)

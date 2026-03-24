@@ -326,7 +326,7 @@ export function useSetActionReminder() {
   return useMutation({
     mutationKey: mutationKeys.setActionReminder,
     mutationFn: async ({
-      userId: _userId,
+      userId,
       userActionId,
       reminderAt,
     }: {
@@ -337,7 +337,8 @@ export function useSetActionReminder() {
       const { error } = await supabase
         .from("user_actions")
         .update({ reminder_at: reminderAt })
-        .eq("id", userActionId);
+        .eq("id", userActionId)
+        .eq("user_id", userId);
       if (error) throw error;
     },
     onSuccess: (_, { userId }) => {
@@ -353,7 +354,7 @@ export function useClearActionReminder() {
   return useMutation({
     mutationKey: mutationKeys.clearActionReminder,
     mutationFn: async ({
-      userId: _userId,
+      userId,
       userActionId,
     }: {
       userId: string;
@@ -362,7 +363,8 @@ export function useClearActionReminder() {
       const { error } = await supabase
         .from("user_actions")
         .update({ reminder_at: null })
-        .eq("id", userActionId);
+        .eq("id", userActionId)
+        .eq("user_id", userId);
       if (error) throw error;
     },
     onSuccess: (_, { userId }) => {
@@ -893,6 +895,7 @@ async function getAllUserActions(userId: string): Promise<UserAction[]> {
       user_id,
       activated_at,
       is_active,
+      reminder_at,
       actions (
         id,
         title,
