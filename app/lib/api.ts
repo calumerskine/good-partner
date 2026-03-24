@@ -21,6 +21,7 @@ const queryKeys = {
   categories: () => ["categories"] as const,
   suggestedActions: () => ["suggestedActions"] as const,
   dailyContent: (dayNumber: number) => ["dailyContent", dayNumber] as const,
+  reminderConfig: (userId: string) => ["reminderConfig", userId] as const,
 };
 
 const mutationKeys = {
@@ -592,6 +593,7 @@ export type UserAction = {
   activatedAt: Date;
   isActive: boolean;
   completionCount: number;
+  reminderAt: Date | null;
   action: {
     id: string;
     category: string;
@@ -607,6 +609,7 @@ type UserActionResponse = {
   user_id: string;
   activated_at: string;
   is_active: boolean;
+  reminder_at: string | null;
   actions: {
     id: string;
     category: string;
@@ -640,6 +643,7 @@ async function getActiveActions(userId: string): Promise<UserAction[]> {
       user_id,
       activated_at,
       is_active,
+      reminder_at,
       actions (
         id,
         title,
@@ -695,6 +699,7 @@ async function getActiveActions(userId: string): Promise<UserAction[]> {
       activatedAt: new Date(ua.activated_at),
       isActive: ua.is_active,
       completionCount: countMap.get(ua.id) || 0,
+      reminderAt: ua.reminder_at ? new Date(ua.reminder_at) : null,
       action: {
         id: ua.actions.id,
         category: ua.actions.action_categories?.name || "",
@@ -816,6 +821,7 @@ async function getAllUserActions(userId: string): Promise<UserAction[]> {
       activatedAt: new Date(ua.activated_at),
       isActive: ua.is_active,
       completionCount: countMap.get(ua.id) || 0,
+      reminderAt: ua.reminder_at ? new Date(ua.reminder_at) : null,
       action: {
         id: ua.actions.id,
         category: ua.actions.action_categories?.name || "",
@@ -1172,6 +1178,10 @@ export type UserProfile = {
   totalXp: number;
   currentStreakDays: number;
   totalDaysActive: number;
+  morningReminderEnabled: boolean;
+  eveningReminderEnabled: boolean;
+  morningReminderTime: string; // 'HH:MM' UTC
+  eveningReminderTime: string; // 'HH:MM' UTC
 };
 
 /**
@@ -1213,7 +1223,7 @@ async function getUserProfile(userId: string): Promise<UserProfile | null> {
   // First get the user profile
   const { data: profile, error: profileError } = await supabase
     .from("user_profiles")
-    .select("id, user_id, user_tier, created_at, has_completed_onboarding, total_xp, current_streak_days, total_days_active")
+    .select("id, user_id, user_tier, created_at, has_completed_onboarding, total_xp, current_streak_days, total_days_active, morning_reminder_enabled, evening_reminder_enabled, morning_reminder_time, evening_reminder_time")
     .eq("user_id", userId)
     .single();
 
@@ -1257,6 +1267,10 @@ async function getUserProfile(userId: string): Promise<UserProfile | null> {
     totalXp: profile.total_xp ?? 0,
     currentStreakDays: profile.current_streak_days ?? 0,
     totalDaysActive: profile.total_days_active ?? 0,
+    morningReminderEnabled: profile.morning_reminder_enabled ?? true,
+    eveningReminderEnabled: profile.evening_reminder_enabled ?? true,
+    morningReminderTime: profile.morning_reminder_time ?? '10:00',
+    eveningReminderTime: profile.evening_reminder_time ?? '19:00',
   };
 }
 
