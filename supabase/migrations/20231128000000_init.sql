@@ -18,7 +18,11 @@ CREATE TABLE user_profiles (
   notifications_enabled BOOLEAN DEFAULT FALSE,
   current_streak_days INTEGER DEFAULT 0,
   last_completion_date DATE,
-  total_days_active INTEGER DEFAULT 0
+  total_days_active INTEGER DEFAULT 0,
+  morning_reminder_enabled BOOLEAN DEFAULT TRUE,
+  evening_reminder_enabled BOOLEAN DEFAULT TRUE,
+  morning_reminder_time TIME DEFAULT '10:00',
+  evening_reminder_time TIME DEFAULT '19:00'
 );
 
 -- user_categories table: many-to-many relationship between users and action categories
@@ -240,3 +244,107 @@ INSERT INTO action_tags (id, action_id, tag_id) VALUES
 
 INSERT INTO daily_content (id, day_number, headline_message, subtext) VALUES
   ('00000000-0000-0000-0000-000000000001', 1, 'Everyone starts here', '')
+
+-- ============================================================================
+-- REMINDER DISPATCH: Single RPC for all due reminders
+-- ============================================================================
+
+CREATE OR REPLACE FUNCTION get_due_reminders()
+RETURNS TABLE (
+  user_id UUID,
+  reminder_type TEXT,
+  has_outstanding_actions BOOLEAN,
+  outstanding_count BIGINT,
+  action_id UUID,
+  action_title TEXT,
+  user_action_id UUID
+) AS $$
+BEGIN
+  RETURN QUERY
+  WITH
+  user_action_status AS (
+    SELECT
+      ua.user_id,
+      COUNT(*) FILTER (
+        WHERE NOT EXISTS (
+          SELECT 1 FROM completions c
+          WHERE c.user_action_id = ua.id
+          AND c.completed_at::DATE = CURRENT_DATE
+        )
+      ) AS outstanding_count
+    FROM user_actions ua
+    WHERE ua.is_active = true
+    GROUP BY ua.user_id
+  ),
+  eligible_users AS (
+    SELECT
+      up.user_id,
+      up.morning_reminder_enabled,
+      up.evening_reminder_enabled,
+      up.morning_reminder_time,
+      up.evening_reminder_time,
+      COALESCE(uas.outstanding_count, 0) AS outstanding_count,
+      COALESCE(uas.outstanding_count, 0) > 0 AS has_outstanding
+    FROM user_profiles up
+    LEFT JOIN user_action_status uas ON uas.user_id = up.user_id
+    WHERE
+      up.notifications_enabled = true
+      AND up.has_completed_onboarding = true
+  )
+  -- Morning reminders: all eligible users whose morning_reminder_time is now (+-2m30s)
+  SELECT
+    eu.user_id,
+    'morning'::TEXT,
+    eu.has_outstanding,
+    eu.outstanding_count,
+    NULL::UUID,
+    NULL::TEXT,
+    NULL::UUID
+  FROM eligible_users eu
+  WHERE
+    eu.morning_reminder_enabled = true
+    AND eu.morning_reminder_time BETWEEN
+      ((NOW() AT TIME ZONE 'UTC')::TIME - INTERVAL '2 minutes 30 seconds')
+      AND ((NOW() AT TIME ZONE 'UTC')::TIME + INTERVAL '2 minutes 30 seconds')
+
+  UNION ALL
+
+  -- Evening reminders: only users WITH outstanding actions, at their evening time
+  SELECT
+    eu.user_id,
+    'evening'::TEXT,
+    TRUE::BOOLEAN,
+    eu.outstanding_count,
+    NULL::UUID,
+    NULL::TEXT,
+    NULL::UUID
+  FROM eligible_users eu
+  WHERE
+    eu.evening_reminder_enabled = true
+    AND eu.has_outstanding = true
+    AND eu.evening_reminder_time BETWEEN
+      ((NOW() AT TIME ZONE 'UTC')::TIME - INTERVAL '2 minutes 30 seconds')
+      AND ((NOW() AT TIME ZONE 'UTC')::TIME + INTERVAL '2 minutes 30 seconds')
+
+  UNION ALL
+
+  -- Action-specific one-shot reminders
+  SELECT
+    ua.user_id,
+    'action'::TEXT,
+    FALSE::BOOLEAN,
+    0::BIGINT,
+    ua.action_id,
+    a.title,
+    ua.id
+  FROM user_actions ua
+  JOIN actions a ON a.id = ua.action_id
+  JOIN user_profiles up ON up.user_id = ua.user_id
+  WHERE
+    up.notifications_enabled = true
+    AND ua.reminder_at >= NOW()
+    AND ua.reminder_at < NOW() + INTERVAL '5 minutes';
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+GRANT EXECUTE ON FUNCTION get_due_reminders() TO service_role;
