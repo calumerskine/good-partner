@@ -246,6 +246,120 @@ async function getNotificationsEnabled(userId: string) {
   return data.notifications_enabled;
 }
 
+// ============================================================
+// REMINDER CONFIGURATION
+// ============================================================
+
+export function useGetReminderConfig(userId?: string) {
+  return useQuery({
+    queryKey: queryKeys.reminderConfig(userId!),
+    queryFn: () => getReminderConfig(userId!),
+    enabled: !!userId,
+  });
+}
+
+async function getReminderConfig(userId: string) {
+  const { data, error } = await supabase
+    .from("user_profiles")
+    .select(
+      "morning_reminder_enabled, evening_reminder_enabled, morning_reminder_time, evening_reminder_time",
+    )
+    .eq("user_id", userId)
+    .single();
+  if (error) throw error;
+  return {
+    morningReminderEnabled: data.morning_reminder_enabled ?? true,
+    eveningReminderEnabled: data.evening_reminder_enabled ?? true,
+    morningReminderTime: data.morning_reminder_time ?? "10:00",
+    eveningReminderTime: data.evening_reminder_time ?? "19:00",
+  };
+}
+
+export function useUpdateReminderConfig() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({
+      userId,
+      config,
+    }: {
+      userId: string;
+      config: Partial<{
+        morning_reminder_enabled: boolean;
+        evening_reminder_enabled: boolean;
+        morning_reminder_time: string;
+        evening_reminder_time: string;
+      }>;
+    }) => {
+      const { error } = await supabase
+        .from("user_profiles")
+        .update(config)
+        .eq("user_id", userId);
+      if (error) throw error;
+    },
+    onSuccess: (_, { userId }) => {
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.reminderConfig(userId),
+      });
+      // Also invalidate userProfile so settings screen reflects changes
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.userProfile(userId),
+      });
+    },
+  });
+}
+
+// ============================================================
+// ACTION-SPECIFIC REMINDERS
+// ============================================================
+
+export function useSetActionReminder() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({
+      userActionId,
+      reminderAt,
+    }: {
+      userId: string;
+      userActionId: string;
+      reminderAt: string; // ISO timestamp
+    }) => {
+      const { error } = await supabase
+        .from("user_actions")
+        .update({ reminder_at: reminderAt })
+        .eq("id", userActionId);
+      if (error) throw error;
+    },
+    onSuccess: (_, { userId }) => {
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.activeActions(userId),
+      });
+    },
+  });
+}
+
+export function useClearActionReminder() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({
+      userActionId,
+    }: {
+      userId: string;
+      userActionId: string;
+    }) => {
+      const { error } = await supabase
+        .from("user_actions")
+        .update({ reminder_at: null })
+        .eq("id", userActionId);
+      if (error) throw error;
+    },
+    onSuccess: (_, { userId }) => {
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.activeActions(userId),
+      });
+    },
+  });
+}
+
 export function useNukeUser() {
   return useMutation({
     mutationKey: mutationKeys.nukeUser,
