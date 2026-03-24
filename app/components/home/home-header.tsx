@@ -11,7 +11,7 @@ export default function HomeHeader({ dayNumber }: Props) {
       {/* Day badge */}
       <View style={tw`bg-indigo-400 px-4 py-1.5 rounded-full`}>
         <Text style={tw`text-white font-gabarito font-bold text-base`}>
-          Day {dayNumber}
+          Day {dayNumber === 0 ? 1 : dayNumber}
         </Text>
       </View>
 

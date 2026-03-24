@@ -156,6 +156,16 @@ export default function ActionDetailScreen() {
             contentContainerStyle={tw`px-8 pb-8`}
             showsVerticalScrollIndicator={false}
           >
+            {isActive ? (
+              <View
+                style={tw`flex w-24 flex-row items-center justify-between pb-6 gap-2`}
+              >
+                <Text style={tw`font-bold`}>In Progress</Text>
+                <View
+                  style={tw`bg-green-400 border-green-500 border w-4 h-4 rounded-full animate-ping`}
+                ></View>
+              </View>
+            ) : null}
             <Text
               style={tw`text-black font-gabarito font-black text-3xl leading-tight mb-6`}
             >

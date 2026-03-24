@@ -14,7 +14,7 @@ export default function OnboardIndexScreen() {
 
   return (
     <SafeAreaView
-      style={tw`flex-1 items-center justify-between bg-background px-6 py-20`}
+      style={tw`flex-1 items-center justify-between bg-white px-6 py-20`}
     >
       <View style={tw`flex-1`} />
 
