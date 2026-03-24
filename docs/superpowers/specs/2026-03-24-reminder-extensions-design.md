@@ -21,7 +21,7 @@ Extend the existing reminder system with two capabilities:
 
 ## Section 1: Database
 
-All changes go into `supabase/migrations/20231128000000_init.sql`. No new migration files.
+New columns and the `get_due_reminders()` RPC go into `supabase/migrations/20231128000000_init.sql`. The existing cron jobs live in `supabase/migrations/20251209000000_cron_reminders.sql` — the old jobs must be removed from that file and the new 5-minute job added there. No additional migration files.
 
 ### user_profiles — 4 new columns
 
@@ -50,10 +50,12 @@ $$);
 
 ### New RPC: `get_due_reminders()`
 
-Called by the edge function. Returns three result sets:
-1. Users due for morning reminder — `notifications_enabled = true`, `morning_reminder_enabled = true`, current UTC time within ±2.5 minutes of `morning_reminder_time`
-2. Users due for evening reminder — same logic with evening columns, filtered to users with outstanding actions (matching current behaviour)
-3. `user_actions` rows where `reminder_at` is within the next 5-minute window and `notifications_enabled = true`
+Called by the edge function. Returns a single result set with a `reminder_type` discriminator column. Each row has: `user_id`, `onesignal_player_id`, `reminder_type` (`'morning' | 'evening' | 'action'`), `has_outstanding_actions` (boolean), `outstanding_count` (integer), `action_id` (nullable, only for `'action'` rows), `action_title` (nullable, only for `'action'` rows), `user_action_id` (nullable, only for `'action'` rows).
+
+Row inclusion rules:
+1. `reminder_type = 'morning'` — `notifications_enabled = true`, `morning_reminder_enabled = true`, current UTC time within ±2.5 minutes of `morning_reminder_time`
+2. `reminder_type = 'evening'` — same logic with evening columns, **only for users with at least one outstanding action for the day** (matching current behaviour — this asymmetry is intentional: evening reminders are a nudge to complete outstanding actions, not a general check-in)
+3. `reminder_type = 'action'` — `notifications_enabled = true`, `reminder_at` is within the current 5-minute window (`NOW()` to `NOW() + interval '5 minutes'`). `action_title` is sourced from `actions.title` via the join `user_actions.action_id → actions.id`.
 
 No new tables. No RLS changes — existing `user_profiles` and `user_actions` RLS already covers the new columns and `reminder_at`.
 
@@ -79,33 +81,35 @@ Called every 5 minutes by the cron job:
 
 Notification payloads preserve the existing shape: `type`, `has_outstanding_actions`, `outstanding_count`. No changes needed on the app's notification handler.
 
-The function is idempotent — the ±2.5-minute window check prevents duplicate sends within the same 5-minute slot.
+The function is duplicate-resistant under normal operation — the ±2.5-minute window ensures a given user matches at most once per cron tick. It is not fully idempotent: a manual retry or parallel invocation within the same window would send duplicates for morning/evening, and the same risk applies to action reminders (since `reminder_at` is cleared at the end of the function, a retry before the clear completes could send a duplicate). This is acceptable for the current scale; add `morning_last_notified_at` / `evening_last_notified_at` watermarks to `user_profiles` and check `reminder_sent_at` on `user_actions` if stricter deduplication is needed later.
 
 ---
 
 ## Section 3: Types & API Hooks
 
-### app/lib/types.ts
+### app/lib/api.ts — UserProfile type extension
 
-Extend `UserProfile` with the 4 new columns (names must match DB exactly):
+`UserProfile` is defined in `app/lib/api.ts` (not a separate `types.ts`). Extend it with 4 new fields in camelCase, consistent with the existing convention (`userId`, `hasCompletedOnboarding`, etc.). Map from DB snake_case to camelCase in the existing `getUserProfile()` query function:
 
 ```typescript
-morning_reminder_enabled: boolean
-evening_reminder_enabled: boolean
-morning_reminder_time: string   // 'HH:MM' UTC
-evening_reminder_time: string   // 'HH:MM' UTC
+morningReminderEnabled: boolean
+eveningReminderEnabled: boolean
+morningReminderTime: string   // 'HH:MM' UTC
+eveningReminderTime: string   // 'HH:MM' UTC
 ```
 
 No separate `ReminderConfig` interface. Use `Pick<UserProfile, ...>` at call sites.
 
 ### app/lib/api.ts — 4 new hooks
 
+Add a `reminderConfig` entry to the existing `queryKeys` factory (e.g. `queryKeys.reminderConfig(userId)`) rather than using inline array literals, consistent with the existing pattern.
+
 | Hook | Purpose | Invalidates |
 |------|---------|-------------|
 | `useGetReminderConfig(userId?)` | Select 4 reminder columns from `user_profiles` | — |
-| `useUpdateReminderConfig()` | Update those columns | `['reminder-config', userId]` |
-| `useSetActionReminder()` | Set `user_actions.reminder_at` | `['user-actions', userId]` |
-| `useClearActionReminder()` | Set `user_actions.reminder_at = null` | `['user-actions', userId]` |
+| `useUpdateReminderConfig()` | Update those columns | `queryKeys.reminderConfig(userId)` |
+| `useSetActionReminder()` | Set `user_actions.reminder_at` | `queryKeys.userActions(userId)` |
+| `useClearActionReminder()` | Set `user_actions.reminder_at = null` | `queryKeys.userActions(userId)` |
 
 `useGetActionReminders` is not needed — `reminder_at` is already returned by the existing `useGetUserActions` query.
 
@@ -144,7 +148,7 @@ Built with `react-native-reanimated` (already installed). Owns both sheet behavi
 **Sheet content:**
 
 Preset buttons:
-- "Tonight" → today at user's `evening_reminder_time` (local)
+- "Tonight" → today at user's `evening_reminder_time` (local). **Disabled/hidden if the current local time is at or past `evening_reminder_time`** — setting a past time would cause the notification to silently never fire.
 - "Tomorrow morning" → tomorrow at `morning_reminder_time` (local)
 - "Tomorrow evening" → tomorrow at `evening_reminder_time` (local)
 
@@ -165,7 +169,7 @@ On any selection: calls `useSetActionReminder`, shows brief confirmation text, c
 ## Implementation Order
 
 1. DB — add columns and `get_due_reminders()` RPC to `init.sql`, update cron
-2. Types — extend `UserProfile` in `types.ts`
+2. Types — extend `UserProfile` in `api.ts`
 3. API hooks — add 4 hooks to `api.ts`
 4. Edge function — create `reminder-dispatch`, remove old functions
 5. Settings UI — extend settings screen with per-type toggles and time pickers
