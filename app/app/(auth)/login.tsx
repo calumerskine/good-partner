@@ -246,14 +246,14 @@ export default function LoginScreen() {
   // Show loading while checking auth state
   if (authLoading) {
     return (
-      <View style={tw`flex-1 items-center justify-center bg-background`}>
+      <View style={tw`flex-1 items-center justify-center bg-white`}>
         <ActivityIndicator size="large" color="#2E3130" />
       </View>
     );
   }
 
   return (
-    <View style={tw`flex-1 bg-background`}>
+    <View style={tw`flex-1 bg-white`}>
       {/* Form content — hidden until form reveal animation */}
       <SafeAreaView style={tw`flex-1 justify-start items-center px-6`}>
         <Animated.View
@@ -382,15 +382,6 @@ export default function LoginScreen() {
           </View>
         </Animated.View>
       </SafeAreaView>
-
-      {/* Brownie logo — absolutely positioned, lives above all content */}
-      <Animated.Image
-        source={brownieAsset}
-        style={[brownieStaticStyle, brownieAnimatedStyle]}
-        resizeMode="contain"
-        accessibilityRole="image"
-        accessibilityLabel="Good Partner logo"
-      />
     </View>
   );
 }

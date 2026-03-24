@@ -111,14 +111,14 @@ export default function EditFocusAreasScreen() {
 
   if (isLoading) {
     return (
-      <View style={tw`flex-1 items-center justify-center bg-background`}>
+      <View style={tw`flex-1 items-center justify-center bg-white`}>
         <ActivityIndicator size="large" color="#2E3130" />
       </View>
     );
   }
 
   return (
-    <SafeAreaView edges={["top"]} style={tw`flex-1 bg-background`}>
+    <SafeAreaView edges={["top"]} style={tw`flex-1 bg-white`}>
       <ScrollView
         style={tw`flex-1`}
         contentContainerStyle={tw`px-6 pt-8 pb-8`}
@@ -155,7 +155,7 @@ export default function EditFocusAreasScreen() {
         </View>
       </ScrollView>
 
-      <View style={tw`p-6 pt-2 bg-background`}>
+      <View style={tw`p-6 pt-2 bg-white`}>
         <View style={tw`h-4 mb-2`}>
           {selectedCategoryNames.length === 0 && (
             <Text style={tw`text-charcoal/80 font-gabarito text-center`}>

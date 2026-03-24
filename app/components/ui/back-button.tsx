@@ -30,7 +30,7 @@ export default function BackButton({ onPress }: Props) {
   return (
     <View style={[tw`relative`, { paddingBottom: 5 }]}>
       <View
-        style={[tw`bg-indigo-300 rounded-full absolute inset-0`, { top: 5 }]}
+        style={[tw`bg-slate-300 rounded-full absolute inset-0`, { top: 5 }]}
       />
       <Animated.View style={{ transform: [{ translateY }] }}>
         <Pressable
@@ -40,7 +40,7 @@ export default function BackButton({ onPress }: Props) {
             router.back();
             onPress?.();
           }}
-          style={tw`bg-indigo-200 rounded-full p-2`}
+          style={tw`bg-slate-200 rounded-full p-2`}
         >
           <ArrowLeft size={20} style={tw`text-ink`} />
         </Pressable>

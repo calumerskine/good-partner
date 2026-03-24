@@ -27,6 +27,7 @@ type Props = PressableProps & {
   size?: keyof typeof sizes;
   buttonStyle?: StyleProp<ViewStyle>;
   textStyle?: StyleProp<TextStyle>;
+  style?: string;
 };
 
 export default forwardRef(function Button(
@@ -37,6 +38,7 @@ export default forwardRef(function Button(
     disabled,
     buttonStyle,
     textStyle,
+    style,
     ...props
   }: Props,
   ref: React.Ref<View>,
@@ -71,7 +73,9 @@ export default forwardRef(function Button(
   };
 
   return (
-    <View style={[tw`relative min-w-full`, { paddingBottom: PRESS_DEPTH }]}>
+    <View
+      style={[tw.style(`relative`, { paddingBottom: PRESS_DEPTH }, `${style}`)]}
+    >
       {shadowClass && (
         <View
           style={[
@@ -88,8 +92,9 @@ export default forwardRef(function Button(
           disabled={isDisabled}
           onPressIn={onPressIn}
           onPressOut={onPressOut}
+          hitSlop={8}
           style={[
-            tw.style(`rounded-3xl w-full ${sizes[size].padding}`, faceClass),
+            tw.style(`rounded-3xl ${sizes[size].padding}`, faceClass),
             buttonStyle,
           ]}
         >

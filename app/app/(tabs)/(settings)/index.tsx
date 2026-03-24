@@ -46,7 +46,7 @@ export default function SettingsScreen() {
   }, 500);
 
   return (
-    <SafeAreaView edges={["top"]} style={tw`flex-1 bg-amber-400`}>
+    <SafeAreaView edges={["top"]} style={tw`flex-1 bg-white`}>
       <ScrollView
         style={tw`flex-1 w-full`}
         contentContainerStyle={tw`px-6 pb-8`}
@@ -85,7 +85,7 @@ export default function SettingsScreen() {
                   return (
                     <View key={cat.id} style={tw`flex-row items-center gap-3`}>
                       <View
-                        style={tw`w-3 h-3 rounded-full bg-${color} border border-${border}`}
+                        style={tw`w-4 h-4 rounded-full bg-${color}-300 border border-${color}-800`}
                       />
                       <Text
                         style={tw`text-charcoal/80 font-gabarito font-medium text-base`}
@@ -166,7 +166,7 @@ export default function SettingsScreen() {
               </Text>
               <Button
                 size="sm"
-                color="pink"
+                color="gray"
                 onPress={() => {
                   trackEvent("auth_signout");
                   signOut();

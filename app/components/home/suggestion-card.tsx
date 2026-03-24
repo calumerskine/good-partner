@@ -11,6 +11,7 @@ type Props = {
   onSkip: (actionId: string) => void;
   isActivating: boolean;
   isSkipping: boolean;
+  skipText: string;
 };
 
 export default function SuggestionCard({
@@ -19,6 +20,7 @@ export default function SuggestionCard({
   onSkip,
   isActivating,
   isSkipping,
+  skipText,
 }: Props) {
   const { id, title, description, category } = action;
   // ActionTypes keys are uppercase (ATTENTION, AFFECTION, etc.)
@@ -59,6 +61,7 @@ export default function SuggestionCard({
             color={categoryInfo.buttonColor as any}
             onPress={() => onActivate(id)}
             disabled={isActivating || isSkipping}
+            style="min-w-full"
           >
             I'm on it
           </Button>
@@ -67,7 +70,7 @@ export default function SuggestionCard({
             onPress={() => onSkip(id)}
             disabled={isActivating || isSkipping}
           >
-            Not the right time
+            {skipText}
           </Button>
         </View>
       </View>

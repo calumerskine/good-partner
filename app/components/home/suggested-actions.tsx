@@ -14,6 +14,24 @@ import { useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import SuggestionCard from "./suggestion-card";
 
+function skipText(index: number) {
+  switch (index) {
+    case 0:
+      return "Not the right time";
+    case 1:
+      return "Another suggestion";
+    case 2:
+      return "Another suggestion";
+    case 3:
+      return "Last suggestion for today";
+    case 4:
+      return "See more suggestions";
+    default:
+      "Not the right time";
+  }
+  return "Not the right time";
+}
+
 export default function SuggestedActions({
   user,
   profile,
@@ -95,13 +113,19 @@ export default function SuggestedActions({
           </Pressable>
         </Link>
       ) : currentAction ? (
-        <SuggestionCard
-          action={currentAction}
-          onActivate={handleActivate}
-          onSkip={handleSkip}
-          isActivating={activateAction.isPending}
-          isSkipping={skipAction.isPending}
-        />
+        <View>
+          <Text style={tw`mb-4 font-medium`}>
+            For you {currentIndex + 1}/{suggestedActions.length}
+          </Text>
+          <SuggestionCard
+            action={currentAction}
+            onActivate={handleActivate}
+            onSkip={handleSkip}
+            isActivating={activateAction.isPending}
+            isSkipping={skipAction.isPending}
+            skipText={skipText(currentIndex)}
+          />
+        </View>
       ) : null}
     </View>
   );

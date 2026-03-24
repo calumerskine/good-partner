@@ -59,7 +59,7 @@ CREATE TABLE user_actions (
 CREATE TABLE user_skips (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-  action_id UUID NOT NULL REFERENCES user_actions(id) ON DELETE CASCADE,
+  action_id UUID NOT NULL REFERENCES actions(id) ON DELETE CASCADE,
   skipped_at DATE DEFAULT CURRENT_DATE,
   UNIQUE(user_id, action_id, skipped_at)
 );

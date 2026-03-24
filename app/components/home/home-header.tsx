@@ -1,6 +1,5 @@
 import tw from "@/lib/tw";
-import { router } from "expo-router";
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 
 type Props = {
   dayNumber: number;
@@ -19,16 +18,17 @@ export default function HomeHeader({ dayNumber }: Props) {
       {/* Avatar → settings.
           Note: components/ui/avatar.tsx exists but is sized w-50 h-50 (large profile card use).
           Use an inline Pressable circle here — sized for a header icon. */}
-      <Pressable
+      {/* <Pressable
         onPress={() => router.push("/(tabs)/(settings)" as any)}
         style={tw`w-10 h-10 rounded-full bg-amber-400 items-center justify-center`}
         hitSlop={8}
-      >
-        {/* Placeholder initial — replace with real user initial/photo once design is confirmed */}
-        <Text style={tw`text-charcoal font-gabarito font-bold text-base`}>
+      > */}
+      {/* Placeholder initial — replace with real user initial/photo once design is confirmed */}
+      {/* <Text style={tw`text-charcoal font-gabarito font-bold text-base`}>
           Me
-        </Text>
-      </Pressable>
+        </Text> */}
+      {/* <Settings size/={20} /> */}
+      {/* </Pressable> */}
     </View>
   );
 }
