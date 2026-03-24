@@ -9,6 +9,7 @@ import {
   useCompleteAction,
   useDeactivateAction,
   useGetActionDetail,
+  useGetActiveActions,
   useGetUserAction,
 } from "@/lib/api";
 import { ActionTypes } from "@/lib/state/actions.model";
@@ -41,6 +42,25 @@ export default function ActionDetailScreen() {
   const completeAction = useCompleteAction();
 
   const { shouldPrompt, markShown } = useReminderPrompt(user?.id);
+  const { data: activeActions } = useGetActiveActions(user?.id);
+
+  // If browsing a catalog action that the user already has active, redirect to
+  // the user action page so active-state CTAs render correctly.
+  const activeMatchForCatalog = isCatalogView
+    ? activeActions?.find((a) => a.actionId === id)
+    : undefined;
+
+  useEffect(() => {
+    if (activeMatchForCatalog) {
+      router.replace(`/(action)/${activeMatchForCatalog.id}` as any);
+    }
+  }, [activeMatchForCatalog]);
+
+  // For catalog view, compare by action_id. For user action view, any active
+  // action counts as "other" since we only reach that branch when !isActive.
+  const hasOtherActiveAction = isCatalogView
+    ? (activeActions?.some((a) => a.actionId !== id) ?? false)
+    : (activeActions?.length ?? 0) > 0;
 
   useEffect(() => {
     trackEvent("screen_viewed", { screen_name: "Action Detail" });
@@ -204,17 +224,32 @@ export default function ActionDetailScreen() {
           </ScrollView>
           <View style={tw`w-full px-6 pb-0 pt-4`}>
             {isCatalogView ? (
-              <Button
-                onPress={handleActivate}
-                disabled={activateAction.isPending}
-                color={categoryInfo.color}
-              >
-                {activateAction.isPending
-                  ? "Activating..."
-                  : completionCount > 0
-                    ? "Activate Again"
-                    : "Activate This Action"}
-              </Button>
+              hasOtherActiveAction ? (
+                <View style={tw`gap-3`}>
+                  <Button color="gray" disabled size="sm">
+                    Finish todays action first
+                  </Button>
+                  <Button
+                    color="ghost"
+                    size="sm"
+                    onPress={() => router.replace("/(tabs)/(home)")}
+                  >
+                    View active action →
+                  </Button>
+                </View>
+              ) : (
+                <Button
+                  onPress={handleActivate}
+                  disabled={activateAction.isPending}
+                  color={categoryInfo.color}
+                >
+                  {activateAction.isPending
+                    ? "Activating..."
+                    : completionCount > 0
+                      ? "Activate Again"
+                      : "Activate This Action"}
+                </Button>
+              )
             ) : isActive ? (
               <View style={tw`gap-3`}>
                 <Button
@@ -236,6 +271,17 @@ export default function ActionDetailScreen() {
                       ? "Pausing..."
                       : "Pause for now"}
                   </Text>
+                </Button>
+              </View>
+            ) : hasOtherActiveAction ? (
+              <View style={tw`gap-3`}>
+                <Button disabled>Finish todays action first</Button>
+                <Button
+                  color="ghost"
+                  size="sm"
+                  onPress={() => router.replace("/(tabs)/(home)")}
+                >
+                  <Text style={tw`text-ink`}>View active action</Text>
                 </Button>
               </View>
             ) : (
