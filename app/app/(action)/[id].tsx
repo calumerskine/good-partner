@@ -235,7 +235,7 @@ export default function ActionDetailScreen() {
             {isCatalogView ? (
               hasOtherActiveAction ? (
                 <View style={tw`gap-3`}>
-                  <Button color="gray" disabled size="sm">
+                  <Button color="gray" disabled>
                     Finish todays action first
                   </Button>
                   <Button

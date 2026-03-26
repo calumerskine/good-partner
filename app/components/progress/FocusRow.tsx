@@ -62,7 +62,7 @@ export function FocusRow({ categories, vertical = false }: FocusRowProps) {
         }}
         transition={{ delay: index * 100, duration: 300 }}
       >
-        <PressableCard color={category.color} shade={200}>
+        <PressableCard color={category.color} shade={100}>
           <View style={tw`p-4`}>
             <View
               style={tw`flex flex-row-reverse justify-between items-center`}
@@ -75,7 +75,7 @@ export function FocusRow({ categories, vertical = false }: FocusRowProps) {
 
             <Text
               style={[
-                tw`text-5xl font-gabarito font-black pt-4 text-${category.color}-600`,
+                tw`text-5xl font-gabarito font-black pt-4 text-${category.color}-500`,
               ]}
             >
               {cat.totalCompletions}
