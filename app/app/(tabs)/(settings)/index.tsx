@@ -1,5 +1,6 @@
 import Button from "@/components/ui/button";
 import TimePickerSheet from "@/components/settings/time-picker-sheet";
+import { useMountAnimation } from "@/hooks/animations";
 import { useAuth } from "@/hooks/use-auth";
 import { useHaptics } from "@/hooks/use-haptics";
 import { useThrottle } from "@/hooks/use-throttle";
@@ -19,7 +20,7 @@ import { useFocusEffect, useRouter } from "expo-router";
 import { format } from "date-fns";
 import { toZonedTime } from "date-fns-tz";
 import { useCallback, useState } from "react";
-import { ScrollView, Switch, Text, View } from "react-native";
+import { Animated, ScrollView, Switch, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -41,13 +42,59 @@ export default function SettingsScreen() {
   const { data: notificationsEnabled } = useGetNotificationsEnabled(user?.id);
   const { mutateAsync: toggleNotifications } = useToggleNotificationsEnabled();
   const { data: reminderConfig } = useGetReminderConfig(user?.id);
-  const { mutateAsync: updateReminderConfig, isPending: isUpdatingReminders } = useUpdateReminderConfig();
-  const [activePicker, setActivePicker] = useState<"morning" | "evening" | null>(null);
+  const { mutateAsync: updateReminderConfig, isPending: isUpdatingReminders } =
+    useUpdateReminderConfig();
+  const [activePicker, setActivePicker] = useState<
+    "morning" | "evening" | null
+  >(null);
   const { hapticsEnabled, loaded: hapticsLoaded, toggleHaptics } = useHaptics();
+
+  const titleAnim = useMountAnimation({
+    fromOpacity: 0,
+    fromTranslateY: 10,
+    duration: 280,
+    delay: 0,
+  });
+  const userAnim = useMountAnimation({
+    fromOpacity: 0,
+    fromTranslateY: 10,
+    duration: 280,
+    delay: 80,
+  });
+  const focusAnim = useMountAnimation({
+    fromOpacity: 0,
+    fromTranslateY: 10,
+    duration: 280,
+    delay: 160,
+  });
+  const hapticsAnim = useMountAnimation({
+    fromOpacity: 0,
+    fromTranslateY: 10,
+    duration: 280,
+    delay: 240,
+  });
+  const remindersAnim = useMountAnimation({
+    fromOpacity: 0,
+    fromTranslateY: 10,
+    duration: 280,
+    delay: 320,
+  });
+  const debugAnim = useMountAnimation({
+    fromOpacity: 0,
+    fromTranslateY: 10,
+    duration: 280,
+    delay: 400,
+  });
 
   useFocusEffect(
     useCallback(() => {
       trackEvent("screen_viewed", { screen_name: "Settings" });
+      titleAnim.trigger();
+      userAnim.trigger();
+      focusAnim.trigger();
+      hapticsAnim.trigger();
+      remindersAnim.trigger();
+      debugAnim.trigger();
     }, []),
   );
 
@@ -72,16 +119,43 @@ export default function SettingsScreen() {
         contentContainerStyle={tw`px-6 pb-8`}
         showsVerticalScrollIndicator={false}
       >
-        <View style={tw`py-6 mb-3`}>
+        <Animated.View style={[tw`py-6 mb-0`, titleAnim.animatedStyle]}>
           <Text style={tw`text-4xl text-black font-gabarito font-black mb-2`}>
             Settings
           </Text>
-        </View>
+        </Animated.View>
 
-        <View style={tw`mb-6`}>
-          <View style={tw`bg-white border-2 rounded-xl p-5 mb-3`}>
+        <Animated.View style={[tw`mb-8`, userAnim.animatedStyle]}>
+          {/* <Text style={tw`text-lg font-gabarito font-bold text-ink mb-3`}>
+            Account
+          </Text> */}
+
+          <View style={tw`bg-white rounded-xl mb-3`}>
+            <View style={tw`flex-row items-baseline justify-between mb-1`}>
+              <Text style={tw`text-ink font-gabarito font-bold text-lg mb-3`}>
+                User
+              </Text>
+              <Button
+                size="sm"
+                color="rose"
+                onPress={() => {
+                  trackEvent("auth_signout");
+                  signOut();
+                }}
+              >
+                Sign Out
+              </Button>
+            </View>
+            <Text style={tw`text-ink/80 font-gabarito font-medium text-base`}>
+              {user.email}
+            </Text>
+          </View>
+        </Animated.View>
+
+        <Animated.View style={[tw`mb-8`, focusAnim.animatedStyle]}>
+          <View style={tw`bg-white rounded-xl mb-3`}>
             <View style={tw`flex-row items-baseline justify-between mb-3`}>
-              <Text style={tw`text-charcoal font-gabarito font-bold text-lg`}>
+              <Text style={tw`text-ink font-gabarito font-bold text-lg`}>
                 Your focus areas
               </Text>
               <Button
@@ -100,15 +174,12 @@ export default function SettingsScreen() {
                   const categoryKey = cat.name as keyof typeof ActionTypes;
                   const categoryData = ActionTypes[categoryKey];
                   const color = categoryData?.color || "white";
-                  const border = categoryData?.darkColor;
 
                   return (
                     <View key={cat.id} style={tw`flex-row items-center gap-3`}>
-                      <View
-                        style={tw`w-4 h-4 rounded-full bg-${color}-300 border border-${color}-800`}
-                      />
+                      <View style={tw`w-4 h-4 rounded-full bg-${color}-400`} />
                       <Text
-                        style={tw`text-charcoal/80 font-gabarito font-medium text-base`}
+                        style={tw`text-ink/80 font-gabarito font-medium text-base`}
                       >
                         {categoryData?.title || cat.name}
                       </Text>
@@ -122,47 +193,53 @@ export default function SettingsScreen() {
               </Text>
             )}
           </View>
-        </View>
+        </Animated.View>
 
-        <View style={tw`mb-6`}>
-          <Text style={tw`text-lg font-gabarito font-bold text-charcoal mb-3`}>
+        <Animated.View style={[tw`mb-8`, hapticsAnim.animatedStyle]}>
+          {/* <Text style={tw`text-lg font-gabarito font-bold text-ink mb-3`}>
             Preferences
-          </Text>
-          <View style={tw`bg-white border-2 rounded-xl p-5`}>
+          </Text> */}
+          <View style={tw`bg-white rounded-xl`}>
             <View style={tw`flex-row items-center justify-between mb-3`}>
-              <Text style={tw`text-charcoal font-gabarito font-bold text-lg`}>
+              <Text style={tw`text-ink font-gabarito font-bold text-lg`}>
                 Haptics
               </Text>
               {hapticsLoaded && (
-                <Switch value={hapticsEnabled} onValueChange={toggleHaptics} />
+                <Switch
+                  value={hapticsEnabled}
+                  onValueChange={toggleHaptics}
+                  trackColor={{ false: "#767577", true: "#8E97FD" }}
+                />
               )}
             </View>
-            <Text
-              style={tw`font-gabarito text-sm text-charcoal/80 leading-relaxed`}
-            >
+            <Text style={tw`font-gabarito text-sm text-ink/80 leading-relaxed`}>
               Vibration feedback on interactions.
             </Text>
           </View>
-        </View>
+        </Animated.View>
 
         {env.flags.useReminders && (
-          <View style={tw`mb-6`}>
-            <Text style={tw`text-lg font-gabarito font-bold text-charcoal mb-3`}>
+          <Animated.View style={[tw`mb-8`, remindersAnim.animatedStyle]}>
+            {/* <Text style={tw`text-lg font-gabarito font-bold text-ink mb-3`}>
               Notifications
-            </Text>
-            <View style={tw`bg-white border-2 rounded-xl p-5`}>
+            </Text> */}
+            <View style={tw`bg-white rounded-xl`}>
               {/* Master toggle */}
               <View style={tw`flex-row items-center justify-between mb-3`}>
-                <Text style={tw`text-charcoal font-gabarito font-bold text-lg`}>
+                <Text style={tw`text-ink font-gabarito font-bold text-lg`}>
                   Daily reminders
                 </Text>
                 <Switch
                   value={notificationsEnabled ?? false}
                   onValueChange={handleSetNotifications}
+                  trackColor={{ false: "#767577", true: "#8E97FD" }}
                 />
               </View>
-              <Text style={tw`font-gabarito text-sm text-charcoal/80 leading-relaxed`}>
-                Get a gentle reminder to complete your daily action and stay on track.
+              <Text
+                style={tw`font-gabarito text-sm text-ink/80 leading-relaxed`}
+              >
+                Get a gentle reminder to complete your daily action and stay on
+                track.
               </Text>
 
               {/* Per-type rows — only show when master switch is on */}
@@ -174,6 +251,7 @@ export default function SettingsScreen() {
                       <Switch
                         value={reminderConfig.morningReminderEnabled}
                         disabled={isUpdatingReminders}
+                        trackColor={{ false: "#767577", true: "#8E97FD" }}
                         onValueChange={(val) =>
                           updateReminderConfig({
                             userId: user.id,
@@ -181,11 +259,13 @@ export default function SettingsScreen() {
                           })
                         }
                       />
-                      <Text style={tw`font-gabarito text-charcoal`}>Morning</Text>
+                      <Text style={tw`font-gabarito text-ink`}>Morning</Text>
                     </View>
                     <View style={tw`flex-row items-center gap-3`}>
-                      <Text style={tw`font-gabarito text-charcoal/70`}>
-                        {formatTimeForDisplay(reminderConfig.morningReminderTime)}
+                      <Text style={tw`font-gabarito text-ink/70`}>
+                        {formatTimeForDisplay(
+                          reminderConfig.morningReminderTime,
+                        )}
                       </Text>
                       <Button
                         size="sm"
@@ -203,6 +283,7 @@ export default function SettingsScreen() {
                       <Switch
                         value={reminderConfig.eveningReminderEnabled}
                         disabled={isUpdatingReminders}
+                        trackColor={{ false: "#767577", true: "#8E97FD" }}
                         onValueChange={(val) =>
                           updateReminderConfig({
                             userId: user.id,
@@ -210,11 +291,13 @@ export default function SettingsScreen() {
                           })
                         }
                       />
-                      <Text style={tw`font-gabarito text-charcoal`}>Evening</Text>
+                      <Text style={tw`font-gabarito text-ink`}>Evening</Text>
                     </View>
                     <View style={tw`flex-row items-center gap-3`}>
-                      <Text style={tw`font-gabarito text-charcoal/70`}>
-                        {formatTimeForDisplay(reminderConfig.eveningReminderTime)}
+                      <Text style={tw`font-gabarito text-ink/70`}>
+                        {formatTimeForDisplay(
+                          reminderConfig.eveningReminderTime,
+                        )}
                       </Text>
                       <Button
                         size="sm"
@@ -228,96 +311,54 @@ export default function SettingsScreen() {
                 </View>
               )}
             </View>
-
-          </View>
+          </Animated.View>
         )}
 
-        <View style={tw`mb-6`}>
-          <Text style={tw`text-lg font-gabarito font-bold text-charcoal mb-3`}>
-            Account
-          </Text>
-
-          <View style={tw`bg-white border-2 rounded-xl p-5 mb-3`}>
-            <View style={tw`flex-row items-baseline justify-between mb-1`}>
-              <Text
-                style={tw`text-charcoal font-gabarito font-bold text-lg mb-3`}
-              >
-                User
-              </Text>
-              <Button
-                size="sm"
-                color="gray"
-                onPress={() => {
-                  trackEvent("auth_signout");
-                  signOut();
-                }}
-              >
-                Sign Out
-              </Button>
-            </View>
-            <Text
-              style={tw`text-charcoal/80 font-gabarito font-medium text-base`}
-            >
-              {user.email}
-            </Text>
-          </View>
-        </View>
-
         {__DEV__ && (
-          <View style={tw`mt-8`}>
-            <Text
-              style={tw`text-lg font-gabarito font-bold text-charcoal mb-3`}
-            >
+          <Animated.View style={[tw`mt-8`, debugAnim.animatedStyle]}>
+            <Text style={tw`text-lg font-gabarito font-bold text-ink mb-3`}>
               Debug Info
             </Text>
 
-            <View style={tw`bg-white border-2 rounded-2xl p-4 mb-3`}>
-              <Text
-                style={tw`text-charcoal font-gabarito font-bold text-sm mb-2`}
-              >
+            <View style={tw`bg-white rounded-2xl p-4 mb-3`}>
+              <Text style={tw`text-ink font-gabarito font-bold text-sm mb-2`}>
                 Database
               </Text>
-              <Text style={tw`text-charcoal font-mono text-xs`}>
+              <Text style={tw`text-ink font-mono text-xs`}>
                 {env.supabase.url.includes("localhost")
                   ? "Local"
                   : "Production"}
               </Text>
             </View>
 
-            <View style={tw`bg-white border-2 rounded-2xl p-4 mb-3`}>
-              <Text
-                style={tw`text-charcoal font-gabarito font-bold text-sm mb-2`}
-              >
+            <View style={tw`bg-white rounded-2xl p-4 mb-3`}>
+              <Text style={tw`text-ink font-gabarito font-bold text-sm mb-2`}>
                 Reminders
               </Text>
-              <Text style={tw`text-charcoal font-mono text-xs`}>
+              <Text style={tw`text-ink font-mono text-xs`}>
                 OneSignal status:{" "}
                 {oneSignalService.hasInitialised ? "Enabled" : "Disabled"}
               </Text>
             </View>
 
-            <View style={tw`bg-white border-2 rounded-2xl p-4 mb-3`}>
-              <Text
-                style={tw`text-charcoal font-gabarito font-bold text-sm mb-2`}
-              >
+            <View style={tw`bg-white rounded-2xl p-4 mb-3`}>
+              <Text style={tw`text-ink font-gabarito font-bold text-sm mb-2`}>
                 User
               </Text>
-              <Text style={tw`text-charcoal font-mono text-xs`}>
+              <Text style={tw`text-ink font-mono text-xs`}>
                 {JSON.stringify(user, null, 2)}
               </Text>
             </View>
 
-            <View style={tw`bg-white border-2 rounded-2xl p-4`}>
-              <Text
-                style={tw`text-charcoal font-gabarito font-bold text-sm mb-2`}
-              >
+            <View style={tw`bg-white rounded-2xl p-4`}>
+              <Text style={tw`text-ink font-gabarito font-bold text-sm mb-2`}>
                 Profile
               </Text>
-              <Text style={tw`text-charcoal font-mono text-xs`}>
+              <Text style={tw`text-ink font-mono text-xs`}>
                 {JSON.stringify(profile, null, 2)}
               </Text>
             </View>
-          </View>
+          </Animated.View>
         )}
       </ScrollView>
       {activePicker && reminderConfig && (

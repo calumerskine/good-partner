@@ -1,12 +1,13 @@
 import { FocusRow } from "@/components/progress/FocusRow";
 import Button from "@/components/ui/button";
+import { useMountAnimation } from "@/hooks/animations";
 import { useAuth } from "@/hooks/use-auth";
 import { trackEvent } from "@/lib/analytics";
 import { useGetAllUserActions } from "@/lib/api";
 import tw from "@/lib/tw";
 import { Link, useFocusEffect } from "expo-router";
 import { useCallback, useMemo } from "react";
-import { ActivityIndicator, ScrollView, Text, View } from "react-native";
+import { ActivityIndicator, Animated, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 type CategoryCompletion = {
@@ -19,9 +20,14 @@ export default function ProgressScreen() {
   const { user } = useAuth();
   const { data: userActions = [], isLoading } = useGetAllUserActions(user?.id);
 
+  const titleAnim   = useMountAnimation({ fromOpacity: 0, fromTranslateY: 10, duration: 280, delay: 0 });
+  const contentAnim = useMountAnimation({ fromOpacity: 0, fromTranslateY: 10, duration: 280, delay: 80 });
+
   useFocusEffect(
     useCallback(() => {
       trackEvent("screen_viewed", { screen_name: "Progress" });
+      titleAnim.trigger();
+      contentAnim.trigger();
     }, []),
   );
 
@@ -70,33 +76,35 @@ export default function ProgressScreen() {
         contentContainerStyle={tw`px-6 pb-8`}
         showsVerticalScrollIndicator={false}
       >
-        <View style={tw`py-6`}>
+        <Animated.View style={[tw`py-6`, titleAnim.animatedStyle]}>
           <Text style={tw`text-4xl text-ink font-gabarito font-black mb-1`}>
             Progress
           </Text>
-        </View>
+        </Animated.View>
 
         {/* <XPHeroCard totalXp={profile?.totalXp ?? 0} /> */}
 
-        {hasAnyActions ? (
-          <>
-            <Text style={tw`pb-4 font-gabarito text-lg text-ink-90`}>
-              Actions Completed
-            </Text>
-            <FocusRow categories={categoryProgress} vertical />
-          </>
-        ) : (
-          <View style={tw`flex-1 items-center justify-center px-6`}>
-            <Text style={tw`text-base text-ink/70 font-gabarito text-center`}>
-              Complete actions to see your progress here.
-            </Text>
-            <View style={tw`mt-12`}>
-              <Link href={"/(home)"} asChild>
-                <Button>See today's action</Button>
-              </Link>
+        <Animated.View style={contentAnim.animatedStyle}>
+          {hasAnyActions ? (
+            <>
+              <Text style={tw`pb-4 font-gabarito text-lg text-ink-90`}>
+                Actions Completed
+              </Text>
+              <FocusRow categories={categoryProgress} vertical />
+            </>
+          ) : (
+            <View style={tw`flex-1 items-center justify-center px-6`}>
+              <Text style={tw`text-base text-ink/70 font-gabarito text-center`}>
+                Complete actions to see your progress here.
+              </Text>
+              <View style={tw`mt-12`}>
+                <Link href={"/(home)"} asChild>
+                  <Button>See today's action</Button>
+                </Link>
+              </View>
             </View>
-          </View>
-        )}
+          )}
+        </Animated.View>
       </ScrollView>
     </SafeAreaView>
   );

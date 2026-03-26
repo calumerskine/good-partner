@@ -16,7 +16,7 @@ import {
 const PRESS_DEPTH = 5;
 
 const sizes = {
-  sm: { padding: "py-2 px-6", text: "text-base" },
+  sm: { padding: "py-2 px-6", text: "text-sm" },
   md: { padding: "py-4 px-8", text: "text-lg" },
   lg: { padding: "py-5 px-10", text: "text-xl" },
 };
@@ -55,12 +55,12 @@ export default forwardRef(function Button(
 
   const faceClass = isSpecial
     ? color === "muted"
-      ? "bg-white/50"
+      ? "bg-neutral-100"
       : "bg-transparent"
     : `bg-${color}-400`;
 
   const shadowClass =
-    color === "muted" ? "bg-black/10" : isSpecial ? null : `bg-${color}-500`;
+    color === "muted" ? "bg-neutral-300" : isSpecial ? null : `bg-${color}-500`;
 
   const onPressIn = (event: any) => {
     handlePressIn(event);
