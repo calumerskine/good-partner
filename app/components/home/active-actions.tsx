@@ -30,6 +30,14 @@ function ActionCard({
   const categoryInfo =
     ActionTypes[item.action.category as keyof typeof ActionTypes];
 
+  const handleDeactivate = useCallback(async () => {
+    try {
+      await deactivateAction.mutateAsync(item.id);
+    } catch (error) {
+      console.error("Error deactivating action:", error);
+    }
+  }, [deactivateAction, item.id]);
+
   const handleComplete = useCallback(async () => {
     try {
       const completion = await completeAction.mutateAsync(item.id);
@@ -130,6 +138,16 @@ function ActionCard({
                     : "Remind me"}
                 </Button>
               )}
+              <Button
+                color="ghost"
+                size="sm"
+                onPress={handleDeactivate}
+                disabled={deactivateAction.isPending}
+              >
+                {deactivateAction.isPending
+                  ? "Pausing..."
+                  : "Not today after all"}
+              </Button>
             </View>
           </MotiView>
         )}
