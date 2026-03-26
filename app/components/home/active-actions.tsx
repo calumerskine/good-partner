@@ -1,4 +1,4 @@
-import { UserAction, useCompleteAction } from "@/lib/api";
+import { UserAction, useCompleteAction, useDeactivateAction } from "@/lib/api";
 import { getHexColor } from "@/lib/colors";
 import { ActionTypes } from "@/lib/state/actions.model";
 import tw from "@/lib/tw";
@@ -26,6 +26,7 @@ function ActionCard({
   onRemind: () => void;
 }) {
   const completeAction = useCompleteAction();
+  const deactivateAction = useDeactivateAction();
   const categoryInfo =
     ActionTypes[item.action.category as keyof typeof ActionTypes];
 
@@ -46,7 +47,8 @@ function ActionCard({
 
   const formatReminderLabel = (reminderAt: Date): string => {
     if (isToday(reminderAt)) return `Today, ${format(reminderAt, "h:mm a")}`;
-    if (isTomorrow(reminderAt)) return `Tomorrow, ${format(reminderAt, "h:mm a")}`;
+    if (isTomorrow(reminderAt))
+      return `Tomorrow, ${format(reminderAt, "h:mm a")}`;
     return format(reminderAt, "EEE, h:mm a");
   };
 
@@ -55,7 +57,11 @@ function ActionCard({
   const iconBg = accentLight + "4D"; // 30% opacity
 
   return (
-    <PressableCard color={categoryInfo.color} shade={200} showShadow>
+    <PressableCard
+      color={categoryInfo.color}
+      shade={200}
+      href={`/(action)/${item.id}`}
+    >
       <View style={tw`p-6 items-start`}>
         <View style={tw`flex flex-row items-center justify-between pb-6 gap-2`}>
           <Text style={tw`font-bold`}>In Progress</Text>
@@ -117,15 +123,8 @@ function ActionCard({
               >
                 {completeAction.isPending ? "Loading..." : "✓ I've done it!"}
               </Button>
-              <Button color="ghost" size="sm" onPress={handleViewMore}>
-                View more →
-              </Button>
               {env.flags.useReminders && (
-                <Button
-                  color="ghost"
-                  size="sm"
-                  onPress={onRemind}
-                >
+                <Button color="ghost" size="sm" onPress={onRemind}>
                   {item.reminderAt && isBefore(new Date(), item.reminderAt)
                     ? formatReminderLabel(item.reminderAt)
                     : "Remind me"}
@@ -147,9 +146,12 @@ export default function ActiveActions({
   userActions: UserAction[];
 }) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
-  const [reminderSheetActionId, setReminderSheetActionId] = useState<string | null>(null);
+  const [reminderSheetActionId, setReminderSheetActionId] = useState<
+    string | null
+  >(null);
 
-  const reminderSheetAction = userActions.find((a) => a.id === reminderSheetActionId) ?? null;
+  const reminderSheetAction =
+    userActions.find((a) => a.id === reminderSheetActionId) ?? null;
 
   const handleToggle = useCallback((id: string) => {
     setExpandedId((prev) => (prev === id ? null : id));
