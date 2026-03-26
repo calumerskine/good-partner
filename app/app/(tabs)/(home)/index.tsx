@@ -12,7 +12,7 @@ import {
 import tw from "@/lib/tw";
 import { useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
-import { ActivityIndicator, ScrollView, Text, View } from "react-native";
+import { ActivityIndicator, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function HomeScreen() {
@@ -52,16 +52,11 @@ export default function HomeScreen() {
         {dailyContent?.headlineMessage ?? "Everyone starts here"}
       </Text>
       {userActions.length > 0 ? (
-        <ScrollView
-          contentContainerStyle={tw`pb-6`}
-          showsVerticalScrollIndicator={false}
-        >
-          <ActiveActions
-            isLoading={isLoading}
-            userActions={userActions}
-            onRemind={setReminderSheetActionId}
-          />
-        </ScrollView>
+        <ActiveActions
+          isLoading={isLoading}
+          userActions={userActions}
+          onRemind={setReminderSheetActionId}
+        />
       ) : (
         <SuggestedActions
           user={user}

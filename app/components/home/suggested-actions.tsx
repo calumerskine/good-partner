@@ -106,7 +106,7 @@ export default function SuggestedActions({
     : null;
 
   return (
-    <View style={tw`flex-1`}>
+    <View style={tw`flex-1 flex-col`}>
       {allExhausted ? (
         /* Browse Library state */
         <PressableCard color="indigo" shade={500}>
@@ -119,18 +119,20 @@ export default function SuggestedActions({
         </PressableCard>
       ) : currentAction ? (
         <>
-          <Text style={tw`text-2xl text-black font-gabarito font-bold mb-4`}>
-            Your move for today:
-          </Text>
-          <SuggestionCard
-            action={currentAction}
-            forYou={
-              <Text style={tw`font-bold pt-0.5`}>
-                For you {currentIndex + 1}/{suggestedActions.length}
-              </Text>
-            }
-          />
-          <View style={tw`gap-3 mt-8 pb-6`}>
+          <View style={tw`flex-1`}>
+            <Text style={tw`text-2xl text-black font-gabarito font-bold mb-4`}>
+              Your move for today:
+            </Text>
+            <SuggestionCard
+              action={currentAction}
+              forYou={
+                <Text style={tw`font-bold pt-0.5`}>
+                  For you {currentIndex + 1}/{suggestedActions.length}
+                </Text>
+              }
+            />
+          </View>
+          <View style={tw`pb-2 gap-3`}>
             <Button
               color={categoryInfo!.buttonColor as any}
               onPress={() => handleActivate(currentAction.id)}
@@ -140,7 +142,8 @@ export default function SuggestedActions({
               I'm on it
             </Button>
             <Button
-              color="muted"
+              color="ghost"
+              size="sm"
               onPress={() => handleSkip(currentAction.id)}
               disabled={activateAction.isPending || skipAction.isPending}
             >

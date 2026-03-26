@@ -50,7 +50,7 @@ export default forwardRef(function Button(
   const { translateY, handlePressIn, handlePressOut } = usePressAnimation({
     pressDepth: PRESS_DEPTH,
     disabled: isDisabled,
-    skipAnimation: isSpecial,
+    skipAnimation: color === "ghost",
   });
 
   const faceClass = isSpecial
@@ -59,7 +59,8 @@ export default forwardRef(function Button(
       : "bg-transparent"
     : `bg-${color}-400`;
 
-  const shadowClass = isSpecial ? null : `bg-${color}-500`;
+  const shadowClass =
+    color === "muted" ? "bg-black/10" : isSpecial ? null : `bg-${color}-500`;
 
   const onPressIn = (event: any) => {
     handlePressIn(event);
