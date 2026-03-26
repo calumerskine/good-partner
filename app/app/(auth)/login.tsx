@@ -4,14 +4,16 @@ import { useAuth } from "@/hooks/use-auth";
 import { trackEvent } from "@/lib/analytics";
 import tw from "@/lib/tw";
 import { Redirect } from "expo-router";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
   ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
   Text,
   TouchableOpacity,
   View,
-  useWindowDimensions,
 } from "react-native";
 import Animated, {
   Easing,
@@ -20,46 +22,16 @@ import Animated, {
   withDelay,
   withTiming,
 } from "react-native-reanimated";
-import {
-  SafeAreaView,
-  useSafeAreaInsets,
-} from "react-native-safe-area-context";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const brownieAsset = require("@/assets/images/brownie.webp");
 
 type AuthMode = "login" | "signup";
 
 export default function LoginScreen() {
-  const { width: screenWidth, height: screenHeight } = useWindowDimensions();
   const insets = useSafeAreaInsets();
 
-  const BROWNIE_SIZE = 120;
-  const BROWNIE_TOP_OFFSET = 24;
-
-  const BROWNIE_LEFT = (screenWidth - BROWNIE_SIZE) / 2;
-  const BROWNIE_START_TOP = (screenHeight - BROWNIE_SIZE) / 2;
-  const BROWNIE_END_TOP = insets.top + BROWNIE_TOP_OFFSET;
-  // translateY = 0 means brownie at center; BROWNIE_Y_OFFSET means brownie at top
-  const BROWNIE_Y_OFFSET = BROWNIE_END_TOP - BROWNIE_START_TOP; // large negative number
-  // Padding for form so content sits below settled brownie (BROWNIE_END_TOP already includes insets.top)
-  const FORM_PADDING_TOP = BROWNIE_END_TOP + BROWNIE_SIZE + 16;
-
-  const [isIntroComplete, setIsIntroComplete] = useState(false);
-  const stageTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const wiggleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  const scale = useSharedValue(0);
-  const translateX = useSharedValue(0);
-  const translateY = useSharedValue(0);
   const formOpacity = useSharedValue(0);
-
-  const brownieAnimatedStyle = useAnimatedStyle(() => ({
-    transform: [
-      { translateX: translateX.value },
-      { translateY: translateY.value },
-      { scale: scale.value },
-    ],
-  }));
 
   const formAnimatedStyle = useAnimatedStyle(() => ({
     opacity: formOpacity.value,
@@ -145,16 +117,22 @@ export default function LoginScreen() {
   }
 
   return (
-    <View style={tw`flex-1 bg-white`}>
+    <KeyboardAvoidingView
+      style={tw`flex-1 bg-white`}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+    >
       {/* Form content — hidden until form reveal animation */}
-      <SafeAreaView style={tw`flex-1 justify-start items-center px-6`}>
-        <Animated.View
-          style={[
-            tw`w-full max-w-md`,
-            { paddingTop: FORM_PADDING_TOP },
-            formAnimatedStyle,
-          ]}
-        >
+      <ScrollView
+        style={tw`flex-1`}
+        contentContainerStyle={[
+          tw`flex-grow items-center justify-center px-6`,
+          { paddingTop: insets.top + 16, paddingBottom: insets.bottom + 16 },
+        ]}
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag"
+        showsVerticalScrollIndicator={false}
+      >
+        <Animated.View style={[tw`w-full max-w-md`, formAnimatedStyle]}>
           <View style={tw`mb-12`}>
             <Text
               style={tw`text-5xl text-ink text-center font-gabarito font-black mb-3`}
@@ -271,7 +249,7 @@ export default function LoginScreen() {
             </View>
           </View>
         </Animated.View>
-      </SafeAreaView>
-    </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
