@@ -25,7 +25,7 @@ export default function SuggestionCard({ action, forYou }: Props) {
       shade={200}
       showShadow
       fillHeight
-      style={tw`h-80`}
+      style={tw`h-76`}
       onPress={() => router.push(`/(action)/${id}?catalog=true` as any)}
     >
       <View style={tw`p-6 items-start flex-1`}>
@@ -42,7 +42,7 @@ export default function SuggestionCard({ action, forYou }: Props) {
         </View>
         <View style={tw`flex-1 mt-2`}>
           <Text
-            style={tw`text-2xl font-gabarito font-bold text-black leading-1.3 mt-4`}
+            style={tw`text-2xl font-gabarito font-bold text-black mt-4`}
             numberOfLines={2}
             ellipsizeMode="tail"
           >
@@ -50,7 +50,7 @@ export default function SuggestionCard({ action, forYou }: Props) {
           </Text>
           {firstSentence ? (
             <Text
-              style={tw`text-lg text-black font-gabarito leading-1.6 mt-3`}
+              style={tw`text-lg text-black font-gabarito leading-relaxed mt-3`}
               numberOfLines={3}
               ellipsizeMode="tail"
             >

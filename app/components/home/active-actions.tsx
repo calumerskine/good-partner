@@ -13,13 +13,20 @@ function ActionCard({ item }: { item: UserAction }) {
   const categoryInfo =
     ActionTypes[item.action.category as keyof typeof ActionTypes];
 
+  const firstSentence = item.action.description
+    ? item.action.description.substring(
+        0,
+        item.action.description.indexOf(".") + 1,
+      )
+    : "";
+
   return (
     <PressableCard
       color={categoryInfo.color}
       shade={200}
       showShadow
       fillHeight
-      style={tw`h-64`}
+      style={tw`h-76`}
       onPress={() => router.push(`/(action)/${item.id}` as any)}
     >
       <View style={tw`p-6 items-start flex-1`}>
@@ -41,7 +48,7 @@ function ActionCard({ item }: { item: UserAction }) {
             {categoryInfo.icon()}
           </View>
         </View>
-        <View style={tw`flex-1 mt-0`}>
+        <View style={tw`flex-1 mt-2`}>
           <Text
             style={tw`text-2xl font-gabarito font-bold text-black`}
             numberOfLines={2}
@@ -50,11 +57,11 @@ function ActionCard({ item }: { item: UserAction }) {
             {item.action.title}
           </Text>
           <Text
-            style={tw`text-base text-ink/80 font-gabarito leading-relaxed mt-2`}
+            style={tw`text-lg text-black font-gabarito leading-relaxed mt-3`}
             numberOfLines={4}
             ellipsizeMode="tail"
           >
-            {item.action.description || ""}
+            {firstSentence}
           </Text>
         </View>
       </View>
@@ -137,8 +144,8 @@ export default function ActiveActions({
 }) {
   return (
     <View style={tw`flex-1 flex-col`}>
-      <View style={tw`py-4`}>
-        <Text style={tw`text-2xl text-black font-gabarito font-bold mb-6`}>
+      <View style={tw`py-0`}>
+        <Text style={tw`text-2xl text-black font-gabarito font-bold mb-4`}>
           Your move for today:
         </Text>
       </View>
