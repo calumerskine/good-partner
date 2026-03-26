@@ -1,5 +1,6 @@
 import BackButton from "@/components/ui/back-button";
 import Button from "@/components/ui/button";
+import PressableCard from "@/components/ui/pressable-card";
 import { useAuth } from "@/hooks/use-auth";
 import { useReminderPrompt } from "@/hooks/use-reminder-prompt";
 import { trackEvent } from "@/lib/analytics";
@@ -207,20 +208,28 @@ export default function ActionDetailScreen() {
               </View>
             )}
 
-            <View style={tw`rounded-2xl p-7 bg-white mb-6 border-2 `}>
-              <View style={tw`absolute right-4 top-4`}>
-                <Lightbulb />
-              </View>
+            <PressableCard
+              style={tw`mb-6`}
+              color={categoryInfo.color}
+              shade={200}
+            >
+              <View style={tw`p-6`}>
+                <View style={tw`absolute right-4 top-4`}>
+                  <Lightbulb />
+                </View>
 
-              <Text
-                style={tw`text-ink font-gabarito text-2xl font-bold mb-3 mr-6`}
-              >
-                Why it matters
-              </Text>
-              <Text style={tw`text-ink font-gabarito text-lg leading-relaxed`}>
-                {actionData.reasoning}
-              </Text>
-            </View>
+                <Text
+                  style={tw`text-ink font-gabarito text-2xl font-bold mb-3 mr-6`}
+                >
+                  Why it matters
+                </Text>
+                <Text
+                  style={tw`text-ink font-gabarito text-lg leading-relaxed`}
+                >
+                  {actionData.reasoning}
+                </Text>
+              </View>
+            </PressableCard>
           </ScrollView>
           <View style={tw`w-full px-6 pb-0 pt-4`}>
             {isCatalogView ? (
