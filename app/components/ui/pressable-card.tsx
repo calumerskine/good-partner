@@ -17,6 +17,7 @@ type PressableCardProps = {
   pressDepth?: number;
   showShadow?: boolean;
   style?: StyleProp<ViewStyle>;
+  fillHeight?: boolean;
   disabled?: boolean;
   accessibilityLabel?: string;
   accessibilityRole?: "button" | "link" | "none";
@@ -58,6 +59,7 @@ export default function PressableCard({
   pressDepth = PRESS_DEPTH,
   showShadow = false,
   style,
+  fillHeight = false,
   disabled = false,
   accessibilityLabel,
   accessibilityRole,
@@ -125,7 +127,9 @@ export default function PressableCard({
       disabled={disabled}
       accessibilityLabel={accessibilityLabel}
       accessibilityRole={role === "none" ? undefined : role}
-      style={tw.style(`rounded-2xl overflow-hidden`, faceClass)}
+      style={fillHeight
+        ? [tw.style(`rounded-2xl overflow-hidden`, faceClass), { flex: 1 }]
+        : tw.style(`rounded-2xl overflow-hidden`, faceClass)}
     >
       {children}
     </Pressable>
@@ -141,7 +145,9 @@ export default function PressableCard({
           ]}
         />
       )}
-      <Animated.View style={{ transform: [{ translateY }] }}>
+      <Animated.View style={fillHeight
+        ? [{ transform: [{ translateY }] }, { flex: 1 }]
+        : { transform: [{ translateY }] }}>
         {href && !disabled ? (
           <Link href={href} asChild>
             {pressableEl}

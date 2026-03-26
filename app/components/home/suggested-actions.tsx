@@ -6,6 +6,7 @@ import {
   useSkipAction,
   UserProfile,
 } from "@/lib/api";
+import { ActionTypes } from "@/lib/state/actions.model";
 import tw from "@/lib/tw";
 import { User } from "@supabase/supabase-js";
 import { router } from "expo-router";
@@ -13,6 +14,7 @@ import { ArrowRight } from "lucide-react-native";
 import { useState } from "react";
 import { Text, View } from "react-native";
 import SuggestionCard from "./suggestion-card";
+import Button from "../ui/button";
 import PressableCard from "../ui/pressable-card";
 
 function skipText(index: number) {
@@ -97,13 +99,17 @@ export default function SuggestedActions({
     | CatalogAction
     | undefined;
   const allExhausted = currentIndex >= suggestedActions.length;
+  const categoryInfo = currentAction
+    ? ActionTypes[
+        currentAction.category.toUpperCase() as keyof typeof ActionTypes
+      ]
+    : null;
 
   return (
     <View style={tw`flex-1`}>
       {allExhausted ? (
         /* Browse Library state */
-
-        <PressableCard color="indigo" shade={500} href="/(tabs)/(actions)">
+        <PressableCard color="indigo" shade={500}>
           <View style={tw`p-6 flex justify-center items-center`}>
             <Text style={tw`text-3xl font-gabarito font-bold text-white`}>
               Browse the full library
@@ -116,20 +122,30 @@ export default function SuggestedActions({
           <Text style={tw`text-2xl text-black font-gabarito font-bold mb-4`}>
             Your move for today:
           </Text>
-          <View>
-            <SuggestionCard
-              action={currentAction}
-              onActivate={handleActivate}
-              onSkip={handleSkip}
-              isActivating={activateAction.isPending}
-              isSkipping={skipAction.isPending}
-              skipText={skipText(currentIndex)}
-              forYou={
-                <Text style={tw`mb-6 font-bold`}>
-                  For you {currentIndex + 1}/{suggestedActions.length}
-                </Text>
-              }
-            />
+          <SuggestionCard
+            action={currentAction}
+            forYou={
+              <Text style={tw`font-bold pt-0.5`}>
+                For you {currentIndex + 1}/{suggestedActions.length}
+              </Text>
+            }
+          />
+          <View style={tw`gap-3 mt-8 pb-6`}>
+            <Button
+              color={categoryInfo!.buttonColor as any}
+              onPress={() => handleActivate(currentAction.id)}
+              disabled={activateAction.isPending || skipAction.isPending}
+              style="min-w-full"
+            >
+              I'm on it
+            </Button>
+            <Button
+              color="muted"
+              onPress={() => handleSkip(currentAction.id)}
+              disabled={activateAction.isPending || skipAction.isPending}
+            >
+              {skipText(currentIndex)}
+            </Button>
           </View>
         </>
       ) : null}

@@ -12,7 +12,7 @@ import {
 import tw from "@/lib/tw";
 import { useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
-import { Text, ActivityIndicator, ScrollView, View } from "react-native";
+import { ActivityIndicator, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function HomeScreen() {
@@ -43,32 +43,32 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView edges={["top"]} style={tw`bg-white flex-1 px-6`}>
-      <ScrollView
-        contentContainerStyle={tw`pb-6`}
-        showsVerticalScrollIndicator={false}
+      <HomeHeader dayNumber={dayNumber ?? 1} />
+      {/* Daily message */}
+      <Text
+        style={tw`text-xl font-gabarito text-charcoal mt-3 mb-5`}
+        numberOfLines={1}
       >
-        <HomeHeader dayNumber={dayNumber ?? 1} />
-        {/* Daily message */}
-        <Text
-          style={tw`text-xl font-gabarito text-charcoal mt-3 mb-5`}
-          numberOfLines={1}
+        {dailyContent?.headlineMessage ?? "Everyone starts here"}
+      </Text>
+      {userActions.length > 0 ? (
+        <ScrollView
+          contentContainerStyle={tw`pb-6`}
+          showsVerticalScrollIndicator={false}
         >
-          {dailyContent?.headlineMessage ?? "Everyone starts here"}
-        </Text>
-        {userActions.length > 0 ? (
           <ActiveActions
             isLoading={isLoading}
             userActions={userActions}
             onRemind={setReminderSheetActionId}
           />
-        ) : (
-          <SuggestedActions
-            user={user}
-            profile={profile}
-            isLoading={isLoading}
-          />
-        )}
-      </ScrollView>
+        </ScrollView>
+      ) : (
+        <SuggestedActions
+          user={user}
+          profile={profile}
+          isLoading={isLoading}
+        />
+      )}
       {reminderSheetAction && (
         <ActionReminderSheet
           userActionId={reminderSheetAction.id}
