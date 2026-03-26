@@ -1,4 +1,4 @@
-import { useMountAnimation } from "@/hooks/animations";
+import { useMountAnimation, useSwipeOut } from "@/hooks/animations";
 import { useReminderPrompt } from "@/hooks/use-reminder-prompt";
 import {
   CatalogAction,
@@ -48,13 +48,13 @@ export default function SuggestedActions({
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const headingAnim = useMountAnimation({ fromOpacity: 0, fromTranslateY: 8, duration: 250, delay: 0 });
-  const cardAnim = useMountAnimation({ fromOpacity: 0, fromTranslateY: 8, duration: 250, delay: 80 });
   const buttonsAnim = useMountAnimation({ fromOpacity: 0, fromTranslateY: 8, duration: 250, delay: 160 });
+  const swipeOut = useSwipeOut();
 
   useFocusEffect(
     useCallback(() => {
       headingAnim.trigger();
-      cardAnim.trigger();
+      swipeOut.triggerFocusEntrance(80);
       buttonsAnim.trigger();
     }, []),
   );
@@ -83,16 +83,22 @@ export default function SuggestedActions({
 
   const handleSkip = async (actionId: string) => {
     if (!user) return;
+    const nextIndex = currentIndex + 1;
     try {
-      await skipAction.mutateAsync({ userId: user.id, actionId });
-      const nextIndex = currentIndex + 1;
+      await Promise.all([
+        new Promise<void>((resolve) => swipeOut.triggerExit(resolve)),
+        skipAction.mutateAsync({ userId: user.id, actionId }),
+      ]);
+      // Card is now opacity 0, off-screen left. Safe to swap content.
       if (nextIndex >= suggestedActions.length) {
         router.replace("/(tabs)/(actions)" as any);
       } else {
         setCurrentIndex(nextIndex);
+        swipeOut.triggerEntrance();
       }
     } catch (error) {
       console.error("Error skipping action:", error);
+      swipeOut.reset();
     }
   };
 
@@ -138,7 +144,7 @@ export default function SuggestedActions({
                 Your move for today:
               </Text>
             </Animated.View>
-            <Animated.View style={[tw`flex-1`, cardAnim.animatedStyle]}>
+            <Animated.View style={[tw`flex-1`, swipeOut.animatedStyle]}>
               <SuggestionCard
                 action={currentAction}
                 forYou={

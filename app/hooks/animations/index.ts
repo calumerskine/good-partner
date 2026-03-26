@@ -10,3 +10,5 @@ export type { PulseConfig } from "./use-pulse";
 
 export { useShake } from "./use-shake";
 export type { ShakeConfig } from "./use-shake";
+
+export { useSwipeOut } from "./use-swipe-out";
