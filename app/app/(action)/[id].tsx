@@ -255,6 +255,7 @@ export default function ActionDetailScreen() {
                 <Button
                   onPress={handleComplete}
                   disabled={completeAction.isPending}
+                  color="green"
                 >
                   {completeAction.isPending
                     ? "Completing..."

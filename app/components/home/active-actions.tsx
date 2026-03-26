@@ -105,7 +105,7 @@ function ActionCardButtons({
       <Button
         onPress={handleComplete}
         disabled={completeAction.isPending}
-        color={categoryInfo.buttonColor}
+        color="green"
         style="min-w-full"
       >
         {completeAction.isPending ? "Loading..." : "✓ I've done it!"}
