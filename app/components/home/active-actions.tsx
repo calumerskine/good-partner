@@ -8,7 +8,6 @@ import { useCallback, useState } from "react";
 import { Text, View } from "react-native";
 import Button from "../ui/button";
 import PressableCard from "../ui/pressable-card";
-import ActionReminderSheet from "@/components/reminders/action-reminder-sheet";
 import { format, isBefore, isToday, isTomorrow } from "date-fns";
 import { env } from "@/lib/env";
 
@@ -159,17 +158,13 @@ function ActionCard({
 export default function ActiveActions({
   isLoading,
   userActions,
+  onRemind,
 }: {
   isLoading: boolean;
   userActions: UserAction[];
+  onRemind: (id: string) => void;
 }) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
-  const [reminderSheetActionId, setReminderSheetActionId] = useState<
-    string | null
-  >(null);
-
-  const reminderSheetAction =
-    userActions.find((a) => a.id === reminderSheetActionId) ?? null;
 
   const handleToggle = useCallback((id: string) => {
     setExpandedId((prev) => (prev === id ? null : id));
@@ -195,7 +190,7 @@ export default function ActiveActions({
               item={item}
               isExpanded
               onToggle={() => handleToggle(item.id)}
-              onRemind={() => setReminderSheetActionId(item.id)}
+              onRemind={() => onRemind(item.id)}
             />
           ))}
         </View>
@@ -211,13 +206,6 @@ export default function ActiveActions({
             </Button>
           </Link>
         </View>
-      )}
-      {reminderSheetAction && (
-        <ActionReminderSheet
-          userActionId={reminderSheetAction.id}
-          currentReminderAt={reminderSheetAction.reminderAt}
-          onClose={() => setReminderSheetActionId(null)}
-        />
       )}
     </View>
   );

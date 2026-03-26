@@ -1,6 +1,7 @@
 import ActiveActions from "@/components/home/active-actions";
 import HomeHeader from "@/components/home/home-header";
 import SuggestedActions from "@/components/home/suggested-actions";
+import ActionReminderSheet from "@/components/reminders/action-reminder-sheet";
 import { useAuth } from "@/hooks/use-auth";
 import { trackEvent } from "@/lib/analytics";
 import {
@@ -10,7 +11,7 @@ import {
 } from "@/lib/api";
 import tw from "@/lib/tw";
 import { useFocusEffect } from "expo-router";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { Text, ActivityIndicator, ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -20,6 +21,8 @@ export default function HomeScreen() {
   const { isLoading: isProfileLoading, data: profile } = useGetUserProfile(
     user?.id,
   );
+  const [reminderSheetActionId, setReminderSheetActionId] = useState<string | null>(null);
+  const reminderSheetAction = userActions.find((a) => a.id === reminderSheetActionId) ?? null;
 
   const dayNumber = profile ? (profile.totalDaysActive ?? 1) : undefined;
   const { data: dailyContent } = useGetDailyContent(dayNumber);
@@ -53,7 +56,11 @@ export default function HomeScreen() {
           {dailyContent?.headlineMessage ?? "Everyone starts here"}
         </Text>
         {userActions.length > 0 ? (
-          <ActiveActions isLoading={isLoading} userActions={userActions} />
+          <ActiveActions
+            isLoading={isLoading}
+            userActions={userActions}
+            onRemind={setReminderSheetActionId}
+          />
         ) : (
           <SuggestedActions
             user={user}
@@ -62,6 +69,13 @@ export default function HomeScreen() {
           />
         )}
       </ScrollView>
+      {reminderSheetAction && (
+        <ActionReminderSheet
+          userActionId={reminderSheetAction.id}
+          currentReminderAt={reminderSheetAction.reminderAt}
+          onClose={() => setReminderSheetActionId(null)}
+        />
+      )}
     </SafeAreaView>
   );
 }

@@ -1,13 +1,11 @@
 import { useAuth } from "@/hooks/use-auth";
 import {
   useClearActionReminder,
-  useGetReminderConfig,
   useSetActionReminder,
 } from "@/lib/api";
 import tw from "@/lib/tw";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { addDays, format, isBefore } from "date-fns";
-import { toZonedTime } from "date-fns-tz";
+import { addHours, format, isBefore, set } from "date-fns";
 import { useEffect, useRef, useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import Animated, {
@@ -23,23 +21,12 @@ interface ActionReminderSheetProps {
   onClose: () => void;
 }
 
-// Convert a 'HH:MM' UTC time string to a local Date on a given day offset.
-// Sets UTC hours directly on a Date to avoid double-offset bug.
-function utcTimeToLocalDate(utcTimeStr: string, dayOffset = 0): Date {
-  const [hours, minutes] = utcTimeStr.split(":").map(Number);
-  const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-  const d = addDays(new Date(), dayOffset);
-  d.setUTCHours(hours, minutes, 0, 0);
-  return toZonedTime(d, tz);
-}
-
 export default function ActionReminderSheet({
   userActionId,
   currentReminderAt,
   onClose,
 }: ActionReminderSheetProps) {
   const { user } = useAuth();
-  const { data: reminderConfig } = useGetReminderConfig(user?.id);
   const { mutateAsync: setReminder } = useSetActionReminder();
   const { mutateAsync: clearReminder } = useClearActionReminder();
 
@@ -99,20 +86,9 @@ export default function ActionReminderSheet({
     dismiss();
   };
 
-  // Compute preset dates from the user's configured times
-  const tonightDate = reminderConfig
-    ? utcTimeToLocalDate(reminderConfig.eveningReminderTime, 0)
-    : null;
-  const tomorrowMorningDate = reminderConfig
-    ? utcTimeToLocalDate(reminderConfig.morningReminderTime, 1)
-    : null;
-  const tomorrowEveningDate = reminderConfig
-    ? utcTimeToLocalDate(reminderConfig.eveningReminderTime, 1)
-    : null;
-
-  // "Tonight" is only valid if we haven't passed the evening time yet
-  const isTonightAvailable =
-    tonightDate !== null && isBefore(new Date(), tonightDate);
+  const inTwoHoursDate = addHours(new Date(), 2);
+  const tonightAt9 = set(new Date(), { hours: 21, minutes: 0, seconds: 0, milliseconds: 0 });
+  const isTonightAvailable = isBefore(new Date(), tonightAt9);
 
   return (
     <>
@@ -147,44 +123,28 @@ export default function ActionReminderSheet({
         ) : (
           <>
             <View style={tw`gap-3 mb-3`}>
-              {isTonightAvailable && tonightDate && (
-                <Pressable
-                  style={tw`border-2 border-charcoal/15 rounded-xl p-4`}
-                  onPress={() => handleSelect(tonightDate)}
-                >
-                  <Text style={tw`font-gabarito font-bold text-charcoal`}>
-                    Tonight
-                  </Text>
-                  <Text style={tw`font-gabarito text-sm text-charcoal/55 mt-0.5`}>
-                    {format(tonightDate, "h:mm a")}
-                  </Text>
-                </Pressable>
-              )}
+              <Pressable
+                style={tw`border-2 border-charcoal/15 rounded-xl p-4`}
+                onPress={() => handleSelect(inTwoHoursDate)}
+              >
+                <Text style={tw`font-gabarito font-bold text-charcoal`}>
+                  In 2 hours
+                </Text>
+                <Text style={tw`font-gabarito text-sm text-charcoal/55 mt-0.5`}>
+                  {format(inTwoHoursDate, "h:mm a")}
+                </Text>
+              </Pressable>
 
-              {tomorrowMorningDate && (
+              {isTonightAvailable && (
                 <Pressable
                   style={tw`border-2 border-charcoal/15 rounded-xl p-4`}
-                  onPress={() => handleSelect(tomorrowMorningDate)}
+                  onPress={() => handleSelect(tonightAt9)}
                 >
                   <Text style={tw`font-gabarito font-bold text-charcoal`}>
-                    Tomorrow morning
+                    Tonight at 9pm
                   </Text>
                   <Text style={tw`font-gabarito text-sm text-charcoal/55 mt-0.5`}>
-                    {format(tomorrowMorningDate, "EEE, h:mm a")}
-                  </Text>
-                </Pressable>
-              )}
-
-              {tomorrowEveningDate && (
-                <Pressable
-                  style={tw`border-2 border-charcoal/15 rounded-xl p-4`}
-                  onPress={() => handleSelect(tomorrowEveningDate)}
-                >
-                  <Text style={tw`font-gabarito font-bold text-charcoal`}>
-                    Tomorrow evening
-                  </Text>
-                  <Text style={tw`font-gabarito text-sm text-charcoal/55 mt-0.5`}>
-                    {format(tomorrowEveningDate, "EEE, h:mm a")}
+                    9:00 PM
                   </Text>
                 </Pressable>
               )}
@@ -194,7 +154,7 @@ export default function ActionReminderSheet({
                 onPress={() => setShowCustomPicker(true)}
               >
                 <Text style={tw`font-gabarito font-bold text-charcoal`}>
-                  Custom time
+                  Custom
                 </Text>
                 <Text style={tw`font-gabarito text-sm text-charcoal/55 mt-0.5`}>
                   Pick a date and time
