@@ -70,7 +70,12 @@ export default function SuggestedActions({
     if (!user) return;
     try {
       await skipAction.mutateAsync({ userId: user.id, actionId });
-      setCurrentIndex((i) => i + 1);
+      const nextIndex = currentIndex + 1;
+      if (nextIndex >= suggestedActions.length) {
+        router.replace("/(tabs)/(actions)" as any);
+      } else {
+        setCurrentIndex(nextIndex);
+      }
     } catch (error) {
       console.error("Error skipping action:", error);
     }
