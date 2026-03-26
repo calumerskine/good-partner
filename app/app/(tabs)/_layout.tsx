@@ -13,7 +13,7 @@ import React from "react";
 import { Platform, View } from "react-native";
 
 const themeColor = tw`bg-indigo-500`["backgroundColor"] as string;
-const dark = tw`bg-indigo-900`["backgroundColor"] as string;
+const dark = tw`bg-ink`["backgroundColor"] as string;
 const activeText = tw`bg-indigo-50`["backgroundColor"] as string;
 
 export default function TabLayout() {

@@ -1,3 +1,4 @@
+import { useMountAnimation } from "@/hooks/animations";
 import { useReminderPrompt } from "@/hooks/use-reminder-prompt";
 import {
   CatalogAction,
@@ -9,10 +10,10 @@ import {
 import { ActionTypes } from "@/lib/state/actions.model";
 import tw from "@/lib/tw";
 import { User } from "@supabase/supabase-js";
-import { router } from "expo-router";
+import { router, useFocusEffect } from "expo-router";
 import { ArrowRight } from "lucide-react-native";
-import { useState } from "react";
-import { Text, View } from "react-native";
+import { useCallback, useState } from "react";
+import { Animated, Text, View } from "react-native";
 import SuggestionCard from "./suggestion-card";
 import Button from "../ui/button";
 import PressableCard from "../ui/pressable-card";
@@ -45,6 +46,18 @@ export default function SuggestedActions({
   isLoading: boolean;
 }) {
   const [currentIndex, setCurrentIndex] = useState(0);
+
+  const headingAnim = useMountAnimation({ fromOpacity: 0, fromTranslateY: 8, duration: 250, delay: 0 });
+  const cardAnim = useMountAnimation({ fromOpacity: 0, fromTranslateY: 8, duration: 250, delay: 80 });
+  const buttonsAnim = useMountAnimation({ fromOpacity: 0, fromTranslateY: 8, duration: 250, delay: 160 });
+
+  useFocusEffect(
+    useCallback(() => {
+      headingAnim.trigger();
+      cardAnim.trigger();
+      buttonsAnim.trigger();
+    }, []),
+  );
 
   const { data: suggestedActions = [] } = useGetSuggestedActions(
     user?.id,
@@ -120,19 +133,23 @@ export default function SuggestedActions({
       ) : currentAction ? (
         <>
           <View style={tw`flex-1`}>
-            <Text style={tw`text-2xl text-black font-gabarito font-bold mb-4`}>
-              Your move for today:
-            </Text>
-            <SuggestionCard
-              action={currentAction}
-              forYou={
-                <Text style={tw`font-bold pt-0.5`}>
-                  For you {currentIndex + 1}/{suggestedActions.length}
-                </Text>
-              }
-            />
+            <Animated.View style={headingAnim.animatedStyle}>
+              <Text style={tw`text-2xl text-black font-gabarito font-bold mb-4`}>
+                Your move for today:
+              </Text>
+            </Animated.View>
+            <Animated.View style={[tw`flex-1`, cardAnim.animatedStyle]}>
+              <SuggestionCard
+                action={currentAction}
+                forYou={
+                  <Text style={tw`font-bold pt-0.5`}>
+                    For you {currentIndex + 1}/{suggestedActions.length}
+                  </Text>
+                }
+              />
+            </Animated.View>
           </View>
-          <View style={tw`pb-2 gap-3`}>
+          <Animated.View style={[tw`pb-2 gap-3`, buttonsAnim.animatedStyle]}>
             <Button
               color={categoryInfo!.buttonColor as any}
               onPress={() => handleActivate(currentAction.id)}
@@ -149,7 +166,7 @@ export default function SuggestedActions({
             >
               {skipText(currentIndex)}
             </Button>
-          </View>
+          </Animated.View>
         </>
       ) : null}
     </View>

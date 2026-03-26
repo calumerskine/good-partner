@@ -21,8 +21,11 @@ export function useMountAnimation({
   const scale = useRef(new Animated.Value(fromScale)).current;
   const translateY = useRef(new Animated.Value(fromTranslateY)).current;
 
-  useEffect(() => {
-    const animations = Animated.parallel([
+  const trigger = () => {
+    opacity.setValue(fromOpacity);
+    scale.setValue(fromScale);
+    translateY.setValue(fromTranslateY);
+    Animated.parallel([
       Animated.timing(opacity, {
         toValue: 1,
         duration,
@@ -45,8 +48,11 @@ export function useMountAnimation({
             }),
           ]
         : []),
-    ]);
-    animations.start();
+    ]).start();
+  };
+
+  useEffect(() => {
+    trigger();
   }, []);
 
   const animatedStyle = {
@@ -54,5 +60,5 @@ export function useMountAnimation({
     transform: [{ scale }, { translateY }],
   };
 
-  return { animatedStyle };
+  return { animatedStyle, trigger };
 }

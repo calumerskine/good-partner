@@ -10,9 +10,10 @@ import {
   useGetUserProfile,
 } from "@/lib/api";
 import tw from "@/lib/tw";
+import { useMountAnimation } from "@/hooks/animations";
 import { useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
-import { ActivityIndicator, Text, View } from "react-native";
+import { ActivityIndicator, Animated, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function HomeScreen() {
@@ -27,9 +28,14 @@ export default function HomeScreen() {
   const dayNumber = profile ? (profile.totalDaysActive ?? 1) : undefined;
   const { data: dailyContent } = useGetDailyContent(dayNumber);
 
+  const headerAnim = useMountAnimation({ fromOpacity: 0, fromTranslateY: 8, duration: 250, delay: 0 });
+  const headlineAnim = useMountAnimation({ fromOpacity: 0, fromTranslateY: 8, duration: 250, delay: 80 });
+
   useFocusEffect(
     useCallback(() => {
       trackEvent("screen_viewed", { screen_name: "Home" });
+      headerAnim.trigger();
+      headlineAnim.trigger();
     }, []),
   );
 
@@ -43,14 +49,18 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView edges={["top"]} style={tw`bg-white flex-1 px-6`}>
-      <HomeHeader dayNumber={dayNumber ?? 1} />
+      <Animated.View style={headerAnim.animatedStyle}>
+        <HomeHeader dayNumber={dayNumber ?? 1} />
+      </Animated.View>
       {/* Daily message */}
-      <Text
-        style={tw`text-xl font-gabarito text-charcoal mt-3 mb-5`}
-        numberOfLines={1}
-      >
-        {dailyContent?.headlineMessage ?? "Everyone starts here"}
-      </Text>
+      <Animated.View style={headlineAnim.animatedStyle}>
+        <Text
+          style={tw`text-xl font-gabarito text-charcoal mt-3 mb-5`}
+          numberOfLines={1}
+        >
+          {dailyContent?.headlineMessage ?? "Everyone starts here"}
+        </Text>
+      </Animated.View>
       {userActions.length > 0 ? (
         <ActiveActions
           isLoading={isLoading}

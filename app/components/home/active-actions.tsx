@@ -1,10 +1,11 @@
+import { useMountAnimation } from "@/hooks/animations";
 import { UserAction, useCompleteAction, useDeactivateAction } from "@/lib/api";
 import { ActionTypes } from "@/lib/state/actions.model";
 import { env } from "@/lib/env";
 import tw from "@/lib/tw";
-import { Link, router } from "expo-router";
+import { Link, router, useFocusEffect } from "expo-router";
 import { useCallback } from "react";
-import { ScrollView, Text, View } from "react-native";
+import { Animated, ScrollView, Text, View } from "react-native";
 import { format, isBefore, isToday, isTomorrow } from "date-fns";
 import Button from "../ui/button";
 import PressableCard from "../ui/pressable-card";
@@ -142,13 +143,25 @@ export default function ActiveActions({
   userActions: UserAction[];
   onRemind: (id: string) => void;
 }) {
+  const headingAnim = useMountAnimation({ fromOpacity: 0, fromTranslateY: 8, duration: 250, delay: 0 });
+  const cardsAnim = useMountAnimation({ fromOpacity: 0, fromTranslateY: 8, duration: 250, delay: 80 });
+  const buttonsAnim = useMountAnimation({ fromOpacity: 0, fromTranslateY: 8, duration: 250, delay: 160 });
+
+  useFocusEffect(
+    useCallback(() => {
+      headingAnim.trigger();
+      cardsAnim.trigger();
+      buttonsAnim.trigger();
+    }, []),
+  );
+
   return (
     <View style={tw`flex-1 flex-col`}>
-      <View style={tw`py-0`}>
+      <Animated.View style={headingAnim.animatedStyle}>
         <Text style={tw`text-2xl text-black font-gabarito font-bold mb-4`}>
           Your move for today:
         </Text>
-      </View>
+      </Animated.View>
 
       {isLoading ? (
         <View style={tw`py-12 items-center`}>
@@ -156,16 +169,18 @@ export default function ActiveActions({
         </View>
       ) : userActions.length > 0 ? (
         <>
-          <ScrollView
-            style={tw`flex-1`}
-            contentContainerStyle={tw`gap-4 pb-4`}
-            showsVerticalScrollIndicator={false}
-          >
-            {userActions.map((item: UserAction) => (
-              <ActionCard key={item.id} item={item} />
-            ))}
-          </ScrollView>
-          <View style={tw`pb-2`}>
+          <Animated.View style={[tw`flex-1`, cardsAnim.animatedStyle]}>
+            <ScrollView
+              style={tw`flex-1`}
+              contentContainerStyle={tw`gap-4 pb-4`}
+              showsVerticalScrollIndicator={false}
+            >
+              {userActions.map((item: UserAction) => (
+                <ActionCard key={item.id} item={item} />
+              ))}
+            </ScrollView>
+          </Animated.View>
+          <Animated.View style={[tw`pb-2`, buttonsAnim.animatedStyle]}>
             {userActions.map((item: UserAction) => (
               <ActionCardButtons
                 key={item.id}
@@ -173,7 +188,7 @@ export default function ActiveActions({
                 onRemind={() => onRemind(item.id)}
               />
             ))}
-          </View>
+          </Animated.View>
         </>
       ) : (
         <View style={tw`rounded-2xl p-8 bg-mediumGrey`}>
