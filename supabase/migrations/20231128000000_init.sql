@@ -73,7 +73,7 @@ CREATE TABLE completions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_action_id UUID NOT NULL REFERENCES user_actions(id) ON DELETE CASCADE,
   completed_at TIMESTAMPTZ DEFAULT NOW(),
-  was_noticed TEXT CHECK (was_noticed IN ('not_yet', 'a_little', 'yes_definitely')),
+  was_noticed TEXT DEFAULT NULL,
   felt TEXT CHECK (felt IN ('neutral', 'good', 'great'))
 );
 

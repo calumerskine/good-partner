@@ -1546,12 +1546,10 @@ async function updateUserCategories(
 // Feedback API
 // ============================================================
 
-export type NoticedValue = "not_yet" | "a_little" | "yes_definitely";
 export type FeltValue = "neutral" | "good" | "great";
 
 export interface FeedbackInput {
   completionId: string;
-  wasNoticed: NoticedValue;
   felt: FeltValue;
 }
 
@@ -1570,11 +1568,11 @@ export function useSubmitFeedback() {
 }
 
 async function submitFeedback(input: FeedbackInput) {
-  const { completionId, wasNoticed, felt } = input;
+  const { completionId, felt } = input;
 
   const { error } = await supabase
     .from("completions")
-    .update({ was_noticed: wasNoticed, felt })
+    .update({ was_noticed: null, felt })
     .eq("id", completionId);
 
   if (error) {
