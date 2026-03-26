@@ -71,20 +71,15 @@ export default function FeedbackWizard({
           </Text>
         </View>
 
-        <View style={tw`gap-3`}>
-          <Text
-            style={tw`text-charcoal/70 font-gabarito text-lg text-center mb-2`}
-          >
-            How did it feel for you?
-          </Text>
-          <Button color="blue" onPress={() => handleFeltSelect("neutral")}>
-            Neutral
+        <View style={tw`gap-6`}>
+          <Button color="muted" onPress={() => handleFeltSelect("neutral")}>
+            Neutral 😐
           </Button>
-          <Button color="blue" onPress={() => handleFeltSelect("good")}>
-            Good
+          <Button color="muted" onPress={() => handleFeltSelect("good")}>
+            Good 🙂
           </Button>
-          <Button color="blue" onPress={() => handleFeltSelect("great")}>
-            Great
+          <Button color="muted" onPress={() => handleFeltSelect("great")}>
+            Great 🤩
           </Button>
         </View>
       </View>

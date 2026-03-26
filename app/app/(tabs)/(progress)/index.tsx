@@ -79,7 +79,12 @@ export default function ProgressScreen() {
         {/* <XPHeroCard totalXp={profile?.totalXp ?? 0} /> */}
 
         {hasAnyActions ? (
-          <FocusRow categories={categoryProgress} vertical />
+          <>
+            <Text style={tw`pb-4 font-gabarito text-lg text-ink-90`}>
+              Actions Completed
+            </Text>
+            <FocusRow categories={categoryProgress} vertical />
+          </>
         ) : (
           <View style={tw`flex-1 items-center justify-center px-6`}>
             <Text style={tw`text-base text-ink/70 font-gabarito text-center`}>

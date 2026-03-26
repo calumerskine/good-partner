@@ -80,9 +80,6 @@ export function FocusRow({ categories, vertical = false }: FocusRowProps) {
             >
               {cat.totalCompletions}
             </Text>
-            <Text style={tw`text-sm text-ink/80 font-gabarito`}>
-              Actions Completed
-            </Text>
           </View>
         </PressableCard>
       </MotiView>
