@@ -1,4 +1,5 @@
 import Button from "@/components/ui/button";
+import TimePickerSheet from "@/components/settings/time-picker-sheet";
 import { useAuth } from "@/hooks/use-auth";
 import { useHaptics } from "@/hooks/use-haptics";
 import { useThrottle } from "@/hooks/use-throttle";
@@ -14,30 +15,20 @@ import { env } from "@/lib/env";
 import { oneSignalService } from "@/lib/onesignal";
 import { ActionTypes } from "@/lib/state/actions.model";
 import tw from "@/lib/tw";
-import DateTimePicker from "@react-native-community/datetimepicker";
 import { useFocusEffect, useRouter } from "expo-router";
 import { format } from "date-fns";
-import { toZonedTime, fromZonedTime } from "date-fns-tz";
+import { toZonedTime } from "date-fns-tz";
 import { useCallback, useState } from "react";
 import { ScrollView, Switch, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-// Convert a 'HH:MM' UTC time string into a local Date (today)
 const utcTimeStrToLocalDate = (utcTimeStr: string): Date => {
   const [hours, minutes] = utcTimeStr.split(":").map(Number);
   const d = new Date();
   d.setUTCHours(hours, minutes, 0, 0);
   return toZonedTime(d, tz);
-};
-
-// Convert a local Date back to a 'HH:MM' UTC string
-const localDateToUtcTimeStr = (date: Date): string => {
-  const utc = fromZonedTime(date, tz);
-  const h = utc.getUTCHours().toString().padStart(2, "0");
-  const m = utc.getUTCMinutes().toString().padStart(2, "0");
-  return `${h}:${m}`;
 };
 
 const formatTimeForDisplay = (utcTimeStr: string): string =>
@@ -51,8 +42,7 @@ export default function SettingsScreen() {
   const { mutateAsync: toggleNotifications } = useToggleNotificationsEnabled();
   const { data: reminderConfig } = useGetReminderConfig(user?.id);
   const { mutateAsync: updateReminderConfig, isPending: isUpdatingReminders } = useUpdateReminderConfig();
-  const [showMorningPicker, setShowMorningPicker] = useState(false);
-  const [showEveningPicker, setShowEveningPicker] = useState(false);
+  const [activePicker, setActivePicker] = useState<"morning" | "evening" | null>(null);
   const { hapticsEnabled, loaded: hapticsLoaded, toggleHaptics } = useHaptics();
 
   useFocusEffect(
@@ -200,7 +190,7 @@ export default function SettingsScreen() {
                       <Button
                         size="sm"
                         color="ghost"
-                        onPress={() => setShowMorningPicker(true)}
+                        onPress={() => setActivePicker("morning")}
                       >
                         Edit
                       </Button>
@@ -229,7 +219,7 @@ export default function SettingsScreen() {
                       <Button
                         size="sm"
                         color="ghost"
-                        onPress={() => setShowEveningPicker(true)}
+                        onPress={() => setActivePicker("evening")}
                       >
                         Edit
                       </Button>
@@ -239,41 +229,6 @@ export default function SettingsScreen() {
               )}
             </View>
 
-            {/* Time pickers — rendered outside the card to avoid layout issues */}
-            {showMorningPicker && reminderConfig && (
-              <DateTimePicker
-                value={utcTimeStrToLocalDate(reminderConfig.morningReminderTime)}
-                mode="time"
-                onChange={(event, date) => {
-                  if (event.type === "dismissed" || event.type === "set") {
-                    setShowMorningPicker(false);
-                  }
-                  if (event.type === "set" && date) {
-                    updateReminderConfig({
-                      userId: user.id,
-                      config: { morningReminderTime: localDateToUtcTimeStr(date) },
-                    });
-                  }
-                }}
-              />
-            )}
-            {showEveningPicker && reminderConfig && (
-              <DateTimePicker
-                value={utcTimeStrToLocalDate(reminderConfig.eveningReminderTime)}
-                mode="time"
-                onChange={(event, date) => {
-                  if (event.type === "dismissed" || event.type === "set") {
-                    setShowEveningPicker(false);
-                  }
-                  if (event.type === "set" && date) {
-                    updateReminderConfig({
-                      userId: user.id,
-                      config: { eveningReminderTime: localDateToUtcTimeStr(date) },
-                    });
-                  }
-                }}
-              />
-            )}
           </View>
         )}
 
@@ -365,6 +320,26 @@ export default function SettingsScreen() {
           </View>
         )}
       </ScrollView>
+      {activePicker && reminderConfig && (
+        <TimePickerSheet
+          type={activePicker}
+          currentUtcTime={
+            activePicker === "morning"
+              ? reminderConfig.morningReminderTime
+              : reminderConfig.eveningReminderTime
+          }
+          onSave={(utcTimeStr) =>
+            updateReminderConfig({
+              userId: user.id,
+              config:
+                activePicker === "morning"
+                  ? { morningReminderTime: utcTimeStr }
+                  : { eveningReminderTime: utcTimeStr },
+            })
+          }
+          onClose={() => setActivePicker(null)}
+        />
+      )}
     </SafeAreaView>
   );
 }
