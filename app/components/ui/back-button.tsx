@@ -1,3 +1,4 @@
+import { useHaptics } from "@/hooks/use-haptics";
 import tw from "@/lib/tw";
 import { router } from "expo-router";
 import { ArrowLeft } from "lucide-react-native";
@@ -9,6 +10,7 @@ type Props = {
 };
 
 export default function BackButton({ onPress }: Props) {
+  const { trigger } = useHaptics();
   const translateY = useRef(new Animated.Value(0)).current;
 
   const handlePressIn = () => {
@@ -37,6 +39,7 @@ export default function BackButton({ onPress }: Props) {
           onPressIn={handlePressIn}
           onPressOut={handlePressOut}
           onPress={() => {
+            trigger("impactLight");
             router.back();
             onPress?.();
           }}

@@ -141,15 +141,16 @@ export default function EditFocusAreasScreen() {
         <View style={tw`mb-6`}>
           {Object.entries(PAIN_POINTS).map(([key, value]) => {
             return (
-              <CategoryButton
-                key={key}
-                text={value.title}
-                description={value.description}
-                color={value.color}
-                category={key}
-                onPress={onPressCategory}
-                selected={selectedCategoryNames.includes(key)}
-              />
+              <View key={key} style={tw`mb-1`}>
+                <CategoryButton
+                  text={value.title}
+                  description={value.description}
+                  color={value.color}
+                  category={key}
+                  onPress={onPressCategory}
+                  selected={selectedCategoryNames.includes(key)}
+                />
+              </View>
             );
           })}
         </View>

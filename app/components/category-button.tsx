@@ -1,6 +1,36 @@
 import tw from "@/lib/tw";
-import { CheckCircle, Circle } from "lucide-react-native";
-import { Pressable, Text, View } from "react-native";
+import { useEffect } from "react";
+import { Text, View } from "react-native";
+import Animated, {
+  interpolateColor,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
+import PressableRadio from "./ui/pressable-radio";
+import { Check } from "lucide-react-native";
+import { useHaptics } from "@/hooks/use-haptics";
+
+const COLOR_300: Record<string, string> = {
+  blue: "#93c5fd",
+  pink: "#f9a8d4",
+  yellow: "#fde047",
+  green: "#86efac",
+};
+
+const COLOR_200: Record<string, string> = {
+  blue: "#bfdbfe",
+  pink: "#fbcfe8",
+  yellow: "#fef08a",
+  green: "#bbf7d0",
+};
+
+const COLOR_500: Record<string, string> = {
+  blue: "#3b82f6",
+  pink: "#ec4899",
+  yellow: "#eab308",
+  green: "#22c55e",
+};
 
 export const CategoryButton = ({
   text,
@@ -17,34 +47,76 @@ export const CategoryButton = ({
   onPress: (category: string) => void;
   selected?: boolean;
 }) => {
-  return (
-    <Pressable
-      onPress={() => onPress(category)}
-      style={tw.style(
-        `rounded-2xl p-6 border-2 mb-4`,
-        `bg-${color}-${selected ? 300 : 200} border-black`,
-      )}
-    >
-      <View style={tw`flex-row items-start justify-between mb-2`}>
-        <View style={tw`flex-1 pr-4`}>
-          <Text style={tw`font-gabarito font-bold text-xl text-ink mb-2`}>
-            {text}
-          </Text>
-          <Text style={tw`font-gabarito text-base text-ink/80`}>
-            {description}
-          </Text>
-        </View>
+  const { trigger } = useHaptics();
+  const progress = useSharedValue(selected ? 1 : 0);
 
-        <View
-          style={tw.style(
-            `w-6 h-6 rounded-full border-2 items-center justify-center border-${color}-800`,
-            // selected ? `bg-${color} ` : "bg-white",
-          )}
+  useEffect(() => {
+    progress.value = withTiming(selected ? 1 : 0, { duration: 150 });
+  }, [selected]);
+
+  const animatedBorderStyle = useAnimatedStyle(() => ({
+    borderColor: interpolateColor(
+      progress.value,
+      [0, 1],
+      ["#e5e7eb", COLOR_300[color] ?? "#e5e7eb"],
+    ),
+  }));
+
+  const animatedCircleStyle = useAnimatedStyle(() => ({
+    backgroundColor: interpolateColor(
+      progress.value,
+      [0, 1],
+      [COLOR_200[color] ?? "#e5e7eb", COLOR_500[color] ?? "#e5e7eb"],
+    ),
+  }));
+
+  const animatedCheckStyle = useAnimatedStyle(() => ({
+    opacity: progress.value,
+  }));
+
+  return (
+    <PressableRadio
+      onPress={() => {
+        onPress(category);
+        trigger("impactMedium");
+      }}
+      selected={selected ?? false}
+      color="white"
+      showColor={false}
+      shade={300}
+      deepFactor={1}
+    >
+      <Animated.View
+        style={[tw`p-6 border-2 rounded-2xl`, animatedBorderStyle]}
+      >
+        {/* <View
+          style={tw`bg-${color}-300 rounded-lg flex flex-row items-center px-3 py-1`}
         >
-          {selected ? <CheckCircle /> : <Circle />}
-          {/* {selected && <Text style={tw`text-ink text-sm`}>✓</Text>} */}
+          <Text style={tw`uppercase font-gabarito font-medium mr-2 text-sm`}>
+            {category}
+          </Text>
+        </View> */}
+        <View style={tw`flex-row items-start justify-between`}>
+          <View style={tw`flex-1 pr-4`}>
+            <Text style={tw`font-gabarito font-bold text-xl text-ink-700 mb-2`}>
+              {text}
+            </Text>
+            <Text style={tw`font-gabarito text-base text-ink/80`}>
+              {description}
+            </Text>
+          </View>
+          <Animated.View
+            style={[
+              tw`w-9 h-9 rounded-full items-center justify-center`,
+              animatedCircleStyle,
+            ]}
+          >
+            <Animated.View style={animatedCheckStyle}>
+              <Check size={24} style={tw`text-${color}-100`} />
+            </Animated.View>
+          </Animated.View>
         </View>
-      </View>
-    </Pressable>
+      </Animated.View>
+    </PressableRadio>
   );
 };
