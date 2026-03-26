@@ -1,9 +1,10 @@
 import { FocusRow } from "@/components/progress/FocusRow";
+import Button from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
 import { trackEvent } from "@/lib/analytics";
 import { useGetAllUserActions } from "@/lib/api";
 import tw from "@/lib/tw";
-import { useFocusEffect } from "expo-router";
+import { Link, useFocusEffect } from "expo-router";
 import { useCallback, useMemo } from "react";
 import { ActivityIndicator, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -84,6 +85,11 @@ export default function ProgressScreen() {
             <Text style={tw`text-base text-ink/70 font-gabarito text-center`}>
               Complete actions to see your progress here.
             </Text>
+            <View style={tw`mt-12`}>
+              <Link href={"/(home)"} asChild>
+                <Button>See today's action</Button>
+              </Link>
+            </View>
           </View>
         )}
       </ScrollView>
