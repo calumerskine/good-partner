@@ -110,8 +110,6 @@ export default function SettingsScreen() {
     }, []),
   );
 
-  if (!user) return null;
-
   const handleSetNotifications = useThrottle(async () => {
     const shouldEnable = !notificationsEnabled;
 
@@ -120,7 +118,7 @@ export default function SettingsScreen() {
       if (!granted) return;
     }
 
-    await toggleNotifications({ userId: user.id, enabled: shouldEnable });
+    await toggleNotifications({ userId: user?.id!, enabled: shouldEnable });
     trackEvent("settings_notifications_toggled", { enabled: shouldEnable });
   }, 500);
 
@@ -132,9 +130,11 @@ export default function SettingsScreen() {
       if (!granted) return;
     }
 
-    await toggleActionNotifications({ userId: user.id, enabled: shouldEnable });
+    await toggleActionNotifications({ userId: user?.id!, enabled: shouldEnable });
     trackEvent("settings_action_notifications_toggled", { enabled: shouldEnable });
   }, 500);
+
+  if (!user) return null;
 
   return (
     <SafeAreaView edges={["top"]} style={tw`flex-1 bg-white`}>
