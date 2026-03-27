@@ -5,7 +5,7 @@ import { env } from "@/lib/env";
 import tw from "@/lib/tw";
 import { Link, router } from "expo-router";
 import { useCallback } from "react";
-import { Animated, ScrollView, Text, View } from "react-native";
+import { Animated, Text, View } from "react-native";
 import { format, isBefore, isToday, isTomorrow } from "date-fns";
 import Button from "../ui/button";
 import PressableCard from "../ui/pressable-card";
@@ -143,10 +143,24 @@ export default function ActiveActions({
   userActions: UserAction[];
   onRemind: (id: string) => void;
 }) {
-  const headingAnim = useMountAnimation({ fromOpacity: 0, fromTranslateY: 8, duration: 250, delay: 0 });
-  const cardsAnim = useMountAnimation({ fromOpacity: 0, fromTranslateY: 8, duration: 250, delay: 80 });
-  const buttonsAnim = useMountAnimation({ fromOpacity: 0, fromTranslateY: 8, duration: 250, delay: 160 });
-
+  const headingAnim = useMountAnimation({
+    fromOpacity: 0,
+    fromTranslateY: 8,
+    duration: 250,
+    delay: 0,
+  });
+  const cardsAnim = useMountAnimation({
+    fromOpacity: 0,
+    fromTranslateY: 8,
+    duration: 250,
+    delay: 80,
+  });
+  const buttonsAnim = useMountAnimation({
+    fromOpacity: 0,
+    fromTranslateY: 8,
+    duration: 250,
+    delay: 160,
+  });
 
   return (
     <View style={tw`flex-1 flex-col`}>
@@ -163,15 +177,11 @@ export default function ActiveActions({
       ) : userActions.length > 0 ? (
         <>
           <Animated.View style={[tw`flex-1`, cardsAnim.animatedStyle]}>
-            <ScrollView
-              style={tw`flex-1`}
-              contentContainerStyle={tw`gap-4 pb-4`}
-              showsVerticalScrollIndicator={false}
-            >
+            <View style={tw`flex-1 gap-4 pb-4`}>
               {userActions.map((item: UserAction) => (
                 <ActionCard key={item.id} item={item} />
               ))}
-            </ScrollView>
+            </View>
           </Animated.View>
           <Animated.View style={[tw`pb-2`, buttonsAnim.animatedStyle]}>
             {userActions.map((item: UserAction) => (
