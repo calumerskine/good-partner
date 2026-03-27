@@ -1,5 +1,6 @@
 import { AuthProvider } from "@/hooks/use-auth";
 import { useFonts } from "@/hooks/use-fonts";
+import { useNotifee } from "@/hooks/use-notifee";
 import { useReminders } from "@/hooks/use-reminders";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { SplashScreen, Stack } from "expo-router";
@@ -42,6 +43,7 @@ export default function RootLayout() {
 
 function RootLayoutNav() {
   useReminders();
+  useNotifee();
 
   return (
     <Stack
