@@ -10,9 +10,9 @@ import {
 import { ActionTypes } from "@/lib/state/actions.model";
 import tw from "@/lib/tw";
 import { User } from "@supabase/supabase-js";
-import { router, useFocusEffect } from "expo-router";
+import { router } from "expo-router";
 import { ArrowRight } from "lucide-react-native";
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import { Animated, Text, View } from "react-native";
 import SuggestionCard from "./suggestion-card";
 import Button from "../ui/button";
@@ -50,14 +50,6 @@ export default function SuggestedActions({
   const headingAnim = useMountAnimation({ fromOpacity: 0, fromTranslateY: 8, duration: 250, delay: 0 });
   const buttonsAnim = useMountAnimation({ fromOpacity: 0, fromTranslateY: 8, duration: 250, delay: 160 });
   const swipeOut = useSwipeOut();
-
-  useFocusEffect(
-    useCallback(() => {
-      headingAnim.trigger();
-      swipeOut.triggerFocusEntrance(80);
-      buttonsAnim.trigger();
-    }, []),
-  );
 
   const { data: suggestedActions = [] } = useGetSuggestedActions(
     user?.id,
