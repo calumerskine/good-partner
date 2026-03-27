@@ -6,13 +6,16 @@ import { useHaptics } from "@/hooks/use-haptics";
 import { useThrottle } from "@/hooks/use-throttle";
 import { trackEvent } from "@/lib/analytics";
 import {
+  useGetActionNotificationsEnabled,
   useGetNotificationsEnabled,
   useGetReminderConfig,
   useGetUserProfile,
+  useToggleActionNotificationsEnabled,
   useToggleNotificationsEnabled,
   useUpdateReminderConfig,
 } from "@/lib/api";
 import { env } from "@/lib/env";
+import { notifeeService } from "@/lib/notifee";
 import { oneSignalService } from "@/lib/onesignal";
 import { ActionTypes } from "@/lib/state/actions.model";
 import tw from "@/lib/tw";
@@ -44,6 +47,8 @@ export default function SettingsScreen() {
   const { data: reminderConfig } = useGetReminderConfig(user?.id);
   const { mutateAsync: updateReminderConfig, isPending: isUpdatingReminders } =
     useUpdateReminderConfig();
+  const { data: actionNotificationsEnabled } = useGetActionNotificationsEnabled(user?.id);
+  const { mutateAsync: toggleActionNotifications } = useToggleActionNotificationsEnabled();
   const [activePicker, setActivePicker] = useState<
     "morning" | "evening" | null
   >(null);
@@ -79,11 +84,17 @@ export default function SettingsScreen() {
     duration: 280,
     delay: 320,
   });
-  const debugAnim = useMountAnimation({
+  const actionNotifAnim = useMountAnimation({
     fromOpacity: 0,
     fromTranslateY: 10,
     duration: 280,
     delay: 400,
+  });
+  const debugAnim = useMountAnimation({
+    fromOpacity: 0,
+    fromTranslateY: 10,
+    duration: 280,
+    delay: 480,
   });
 
   useFocusEffect(
@@ -94,6 +105,7 @@ export default function SettingsScreen() {
       focusAnim.trigger();
       hapticsAnim.trigger();
       remindersAnim.trigger();
+      actionNotifAnim.trigger();
       debugAnim.trigger();
     }, []),
   );
@@ -110,6 +122,18 @@ export default function SettingsScreen() {
 
     await toggleNotifications({ userId: user.id, enabled: shouldEnable });
     trackEvent("settings_notifications_toggled", { enabled: shouldEnable });
+  }, 500);
+
+  const handleSetActionNotifications = useThrottle(async () => {
+    const shouldEnable = !actionNotificationsEnabled;
+
+    if (shouldEnable) {
+      const granted = await notifeeService.requestPermission();
+      if (!granted) return;
+    }
+
+    await toggleActionNotifications({ userId: user.id, enabled: shouldEnable });
+    trackEvent("settings_action_notifications_toggled", { enabled: shouldEnable });
   }, 500);
 
   return (
@@ -310,6 +334,26 @@ export default function SettingsScreen() {
                   </View>
                 </View>
               )}
+            </View>
+          </Animated.View>
+        )}
+
+        {env.flags.useActionNotifications && (
+          <Animated.View style={[tw`mb-8`, actionNotifAnim.animatedStyle]}>
+            <View style={tw`bg-white rounded-xl`}>
+              <View style={tw`flex-row items-center justify-between mb-3`}>
+                <Text style={tw`text-ink font-gabarito font-bold text-lg`}>
+                  Action reminders
+                </Text>
+                <Switch
+                  value={actionNotificationsEnabled ?? false}
+                  onValueChange={handleSetActionNotifications}
+                  trackColor={{ false: "#767577", true: "#8E97FD" }}
+                />
+              </View>
+              <Text style={tw`font-gabarito text-sm text-ink/80 leading-relaxed`}>
+                Get a notification while your action is in progress to help you remember to complete it.
+              </Text>
             </View>
           </Animated.View>
         )}
