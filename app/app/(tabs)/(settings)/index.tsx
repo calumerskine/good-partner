@@ -7,11 +7,9 @@ import { useThrottle } from "@/hooks/use-throttle";
 import { trackEvent } from "@/lib/analytics";
 import {
   useGetActionNotificationsEnabled,
-  useGetNotificationsEnabled,
   useGetReminderConfig,
   useGetUserProfile,
   useToggleActionNotificationsEnabled,
-  useToggleNotificationsEnabled,
   useUpdateReminderConfig,
 } from "@/lib/api";
 import { env } from "@/lib/env";
@@ -43,8 +41,6 @@ export default function SettingsScreen() {
   const router = useRouter();
   const { user, signOut } = useAuth();
   const { data: profile } = useGetUserProfile(user?.id);
-  const { data: notificationsEnabled } = useGetNotificationsEnabled(user?.id);
-  const { mutateAsync: toggleNotifications } = useToggleNotificationsEnabled();
   const { data: reminderConfig } = useGetReminderConfig(user?.id);
   const { mutateAsync: updateReminderConfig, isPending: isUpdatingReminders } =
     useUpdateReminderConfig();
@@ -106,18 +102,6 @@ export default function SettingsScreen() {
       trackEvent("screen_viewed", { screen_name: "Settings" });
     }, []),
   );
-
-  const handleSetNotifications = useThrottle(async () => {
-    const shouldEnable = !notificationsEnabled;
-
-    if (shouldEnable) {
-      const granted = await oneSignalService.getPermission();
-      if (!granted) return;
-    }
-
-    await toggleNotifications({ userId: user?.id!, enabled: shouldEnable });
-    trackEvent("settings_notifications_toggled", { enabled: shouldEnable });
-  }, 500);
 
   const handleSetActionNotifications = useThrottle(async () => {
     const shouldEnable = !actionNotificationsEnabled;
@@ -217,102 +201,6 @@ export default function SettingsScreen() {
           </View>
         </Animated.View>
 
-        {env.flags.useReminders && (
-          <Animated.View style={[tw`mb-8`, remindersAnim.animatedStyle]}>
-            {/* <Text style={tw`text-lg font-gabarito font-bold text-ink mb-3`}>
-              Notifications
-            </Text> */}
-            <View style={tw`bg-white rounded-xl`}>
-              {/* Master toggle */}
-              <View style={tw`flex-row items-center justify-between mb-3`}>
-                <Text style={tw`text-ink font-gabarito font-bold text-lg`}>
-                  Daily check-in
-                </Text>
-                <Switch
-                  value={notificationsEnabled ?? false}
-                  onValueChange={handleSetNotifications}
-                  trackColor={{ false: "#767577", true: "#8E97FD" }}
-                />
-              </View>
-              <Text
-                style={tw`font-gabarito text-sm text-ink/80 leading-relaxed`}
-              >
-                Get a gentle reminder to complete your daily action and stay on
-                track.
-              </Text>
-
-              {/* Per-type rows — only show when master switch is on */}
-              {notificationsEnabled && reminderConfig && (
-                <View style={tw`mt-4 gap-3`}>
-                  {/* Morning row */}
-                  <View style={tw`flex-row items-center justify-between`}>
-                    <View style={tw`flex-row items-center gap-2`}>
-                      <Switch
-                        value={reminderConfig.morningReminderEnabled}
-                        disabled={isUpdatingReminders}
-                        trackColor={{ false: "#767577", true: "#8E97FD" }}
-                        onValueChange={(val) =>
-                          updateReminderConfig({
-                            userId: user.id,
-                            config: { morningReminderEnabled: val },
-                          })
-                        }
-                      />
-                      <Text style={tw`font-gabarito text-ink`}>Morning</Text>
-                    </View>
-                    <View style={tw`flex-row items-center gap-3`}>
-                      <Text style={tw`font-gabarito text-ink/70`}>
-                        {formatTimeForDisplay(
-                          reminderConfig.morningReminderTime,
-                        )}
-                      </Text>
-                      <Button
-                        size="sm"
-                        color="ghost"
-                        onPress={() => setActivePicker("morning")}
-                      >
-                        Edit
-                      </Button>
-                    </View>
-                  </View>
-
-                  {/* Evening row */}
-                  <View style={tw`flex-row items-center justify-between`}>
-                    <View style={tw`flex-row items-center gap-2`}>
-                      <Switch
-                        value={reminderConfig.eveningReminderEnabled}
-                        disabled={isUpdatingReminders}
-                        trackColor={{ false: "#767577", true: "#8E97FD" }}
-                        onValueChange={(val) =>
-                          updateReminderConfig({
-                            userId: user.id,
-                            config: { eveningReminderEnabled: val },
-                          })
-                        }
-                      />
-                      <Text style={tw`font-gabarito text-ink`}>Evening</Text>
-                    </View>
-                    <View style={tw`flex-row items-center gap-3`}>
-                      <Text style={tw`font-gabarito text-ink/70`}>
-                        {formatTimeForDisplay(
-                          reminderConfig.eveningReminderTime,
-                        )}
-                      </Text>
-                      <Button
-                        size="sm"
-                        color="ghost"
-                        onPress={() => setActivePicker("evening")}
-                      >
-                        Edit
-                      </Button>
-                    </View>
-                  </View>
-                </View>
-              )}
-            </View>
-          </Animated.View>
-        )}
-
         {env.flags.useActionNotifications && (
           <Animated.View style={[tw`mb-8`, actionNotifAnim.animatedStyle]}>
             <View style={tw`bg-white rounded-xl`}>
@@ -336,30 +224,120 @@ export default function SettingsScreen() {
           </Animated.View>
         )}
 
+        {env.flags.useReminders && (
+          <Animated.View style={[tw`mb-8`, remindersAnim.animatedStyle]}>
+            {/* <Text style={tw`text-lg font-gabarito font-bold text-ink mb-3`}>
+              Notifications
+            </Text> */}
+            <View style={tw`bg-white rounded-xl`}>
+              <View style={tw`flex-row items-center justify-between mb-3`}>
+                <Text style={tw`text-ink font-gabarito font-bold text-lg`}>
+                  Daily check-in
+                </Text>
+              </View>
+              <Text
+                style={tw`font-gabarito text-sm text-ink/80 leading-relaxed`}
+              >
+                Get a gentle reminder to complete your daily action and stay on
+                track.
+              </Text>
+
+              {reminderConfig && (
+                <View style={tw`mt-4 gap-3`}>
+                  {/* Morning row */}
+                  <View style={tw`flex-row items-center justify-between`}>
+                    <View style={tw`flex-row items-baseline gap-3`}>
+                      <Text style={tw`font-gabarito text-ink`}>Morning</Text>
+                      <Button
+                        size="sm"
+                        color="ghost"
+                        onPress={() => setActivePicker("morning")}
+                      >
+                        {formatTimeForDisplay(
+                          reminderConfig.morningReminderTime,
+                        )}
+                      </Button>
+                    </View>
+                    <View style={tw`flex-row items-center gap-2`}>
+                      <Switch
+                        value={reminderConfig.morningReminderEnabled}
+                        disabled={isUpdatingReminders}
+                        trackColor={{ false: "#767577", true: "#8E97FD" }}
+                        onValueChange={(val) =>
+                          updateReminderConfig({
+                            userId: user.id,
+                            config: { morningReminderEnabled: val },
+                          })
+                        }
+                      />
+                    </View>
+                  </View>
+
+                  {/* Evening row */}
+                  <View style={tw`flex-row items-center justify-between`}>
+                    <View style={tw`flex-row items-baseline gap-3`}>
+                      <Text style={tw`font-gabarito text-ink`}>Evening</Text>
+
+                      <Button
+                        size="sm"
+                        color="ghost"
+                        onPress={() => setActivePicker("evening")}
+                      >
+                        {formatTimeForDisplay(
+                          reminderConfig.eveningReminderTime,
+                        )}
+                      </Button>
+                    </View>
+                    <View style={tw`flex-row items-center gap-2`}>
+                      <Switch
+                        value={reminderConfig.eveningReminderEnabled}
+                        disabled={isUpdatingReminders}
+                        trackColor={{ false: "#767577", true: "#8E97FD" }}
+                        onValueChange={(val) =>
+                          updateReminderConfig({
+                            userId: user.id,
+                            config: { eveningReminderEnabled: val },
+                          })
+                        }
+                      />
+                    </View>
+                  </View>
+                </View>
+              )}
+            </View>
+          </Animated.View>
+        )}
+
         <Animated.View style={[tw`mb-8`, userAnim.animatedStyle]}>
           {/* <Text style={tw`text-lg font-gabarito font-bold text-ink mb-3`}>
             Account
           </Text> */}
 
           <View style={tw`bg-white rounded-xl mb-3`}>
-            <View style={tw`flex-row items-baseline justify-between mb-1`}>
-              <Text style={tw`text-ink font-gabarito font-bold text-lg mb-3`}>
-                User
-              </Text>
-              <Button
-                size="sm"
-                color="rose"
-                onPress={() => {
-                  trackEvent("auth_signout");
-                  signOut();
-                }}
-              >
-                Sign Out
-              </Button>
+            <View style={tw`flex-row justify-between mb-1`}>
+              <View>
+                <Text style={tw`text-ink font-gabarito font-bold text-lg mb-3`}>
+                  User
+                </Text>
+                <Text
+                  style={tw`text-ink/80 font-gabarito font-medium text-base`}
+                >
+                  {user.email}
+                </Text>
+              </View>
+              <View style={tw`pt-8`}>
+                <Button
+                  size="sm"
+                  color="muted"
+                  onPress={() => {
+                    trackEvent("auth_signout");
+                    signOut();
+                  }}
+                >
+                  Sign Out
+                </Button>
+              </View>
             </View>
-            <Text style={tw`text-ink/80 font-gabarito font-medium text-base`}>
-              {user.email}
-            </Text>
           </View>
         </Animated.View>
 

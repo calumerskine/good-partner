@@ -319,8 +319,7 @@ BEGIN
     FROM user_profiles up
     LEFT JOIN user_action_status uas ON uas.user_id = up.user_id
     WHERE
-      up.notifications_enabled = true
-      AND up.has_completed_onboarding = true
+      up.has_completed_onboarding = true
   )
   -- Morning reminders: all eligible users whose morning_reminder_time is now (+-2m30s)
   SELECT
@@ -372,7 +371,7 @@ BEGIN
   JOIN actions a ON a.id = ua.action_id
   JOIN user_profiles up ON up.user_id = ua.user_id
   WHERE
-    up.notifications_enabled = true
+    up.action_notifications_enabled = true
     AND ua.is_active = true
     AND ua.reminder_at BETWEEN
       (NOW() - INTERVAL '2 minutes 30 seconds')
