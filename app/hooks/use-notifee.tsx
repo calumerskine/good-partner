@@ -25,13 +25,21 @@ export function useNotifee() {
 
   // Show/cancel notification based on active action state
   useEffect(() => {
-    if (!env.flags.useActionNotifications || !actionNotificationsEnabled) return;
+    if (!env.flags.useActionNotifications) return;
+
+    if (!actionNotificationsEnabled) {
+      if (prevActiveActionId.current) {
+        notifeeService.cancelActionNotification();
+        prevActiveActionId.current = null;
+      }
+      return;
+    }
 
     const activeAction = activeActions?.[0];
     const activeActionId = activeAction?.id ?? null;
 
     if (activeActionId && activeActionId !== prevActiveActionId.current) {
-      notifeeService.displayActionNotification(activeAction.id, activeAction.action.title);
+      notifeeService.displayActionNotification(activeAction.id, activeAction.action?.title ?? "");
       prevActiveActionId.current = activeActionId;
     } else if (!activeActionId && prevActiveActionId.current) {
       notifeeService.cancelActionNotification();
