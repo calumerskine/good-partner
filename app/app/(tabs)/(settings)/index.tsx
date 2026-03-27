@@ -23,7 +23,8 @@ import { useFocusEffect, useRouter } from "expo-router";
 import { format } from "date-fns";
 import { toZonedTime } from "date-fns-tz";
 import { useCallback, useState } from "react";
-import { Animated, ScrollView, Switch, Text, View } from "react-native";
+import { Animated, ScrollView, Text, View } from "react-native";
+import Switch from "@/components/ui/switch";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -148,33 +149,6 @@ export default function SettingsScreen() {
           <Text style={tw`text-4xl text-black font-gabarito font-black mb-2`}>
             Settings
           </Text>
-        </Animated.View>
-
-        <Animated.View style={[tw`mb-8`, userAnim.animatedStyle]}>
-          {/* <Text style={tw`text-lg font-gabarito font-bold text-ink mb-3`}>
-            Account
-          </Text> */}
-
-          <View style={tw`bg-white rounded-xl mb-3`}>
-            <View style={tw`flex-row items-baseline justify-between mb-1`}>
-              <Text style={tw`text-ink font-gabarito font-bold text-lg mb-3`}>
-                User
-              </Text>
-              <Button
-                size="sm"
-                color="rose"
-                onPress={() => {
-                  trackEvent("auth_signout");
-                  signOut();
-                }}
-              >
-                Sign Out
-              </Button>
-            </View>
-            <Text style={tw`text-ink/80 font-gabarito font-medium text-base`}>
-              {user.email}
-            </Text>
-          </View>
         </Animated.View>
 
         <Animated.View style={[tw`mb-8`, focusAnim.animatedStyle]}>
@@ -361,6 +335,33 @@ export default function SettingsScreen() {
             </View>
           </Animated.View>
         )}
+
+        <Animated.View style={[tw`mb-8`, userAnim.animatedStyle]}>
+          {/* <Text style={tw`text-lg font-gabarito font-bold text-ink mb-3`}>
+            Account
+          </Text> */}
+
+          <View style={tw`bg-white rounded-xl mb-3`}>
+            <View style={tw`flex-row items-baseline justify-between mb-1`}>
+              <Text style={tw`text-ink font-gabarito font-bold text-lg mb-3`}>
+                User
+              </Text>
+              <Button
+                size="sm"
+                color="rose"
+                onPress={() => {
+                  trackEvent("auth_signout");
+                  signOut();
+                }}
+              >
+                Sign Out
+              </Button>
+            </View>
+            <Text style={tw`text-ink/80 font-gabarito font-medium text-base`}>
+              {user.email}
+            </Text>
+          </View>
+        </Animated.View>
 
         {__DEV__ && (
           <Animated.View style={[tw`mt-8`, debugAnim.animatedStyle]}>
