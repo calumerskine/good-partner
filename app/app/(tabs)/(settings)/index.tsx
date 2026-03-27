@@ -7,9 +7,11 @@ import { useThrottle } from "@/hooks/use-throttle";
 import { trackEvent } from "@/lib/analytics";
 import {
   useGetActionNotificationsEnabled,
+  useGetNotificationsEnabled,
   useGetReminderConfig,
   useGetUserProfile,
   useToggleActionNotificationsEnabled,
+  useToggleNotificationsEnabled,
   useUpdateReminderConfig,
 } from "@/lib/api";
 import { env } from "@/lib/env";
@@ -49,6 +51,8 @@ export default function SettingsScreen() {
   );
   const { mutateAsync: toggleActionNotifications } =
     useToggleActionNotificationsEnabled();
+  const { data: notificationsEnabled } = useGetNotificationsEnabled(user?.id);
+  const { mutateAsync: toggleNotifications } = useToggleNotificationsEnabled();
   const [activePicker, setActivePicker] = useState<
     "morning" | "evening" | null
   >(null);
@@ -109,6 +113,10 @@ export default function SettingsScreen() {
     if (shouldEnable) {
       const granted = await notifeeService.requestPermission();
       if (!granted) return;
+      if (env.flags.useReminders && !notificationsEnabled) {
+        await oneSignalService.getPermission();
+        await toggleNotifications({ userId: user?.id!, enabled: true });
+      }
     }
 
     await toggleActionNotifications({

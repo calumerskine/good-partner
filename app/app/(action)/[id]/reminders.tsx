@@ -1,7 +1,12 @@
 import Button from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
 import { trackEvent } from "@/lib/analytics";
-import { useToggleNotificationsEnabled } from "@/lib/api";
+import {
+  useToggleActionNotificationsEnabled,
+  useToggleNotificationsEnabled,
+} from "@/lib/api";
+import { env } from "@/lib/env";
+import { notifeeService } from "@/lib/notifee";
 import { oneSignalService } from "@/lib/onesignal";
 import tw from "@/lib/tw";
 import { router } from "expo-router";
@@ -12,6 +17,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 export default function RemindersPromptScreen() {
   const { user } = useAuth();
   const { mutateAsync: toggleNotifications } = useToggleNotificationsEnabled();
+  const { mutateAsync: toggleActionNotifications } =
+    useToggleActionNotificationsEnabled();
 
   useEffect(() => {
     trackEvent("screen_viewed", { screen_name: "Reminders Prompt" });
@@ -25,6 +32,10 @@ export default function RemindersPromptScreen() {
       const granted = await oneSignalService.getPermission();
       if (granted) {
         await toggleNotifications({ userId: user.id, enabled: true });
+        if (env.flags.useActionNotifications) {
+          await notifeeService.requestPermission();
+          await toggleActionNotifications({ userId: user.id, enabled: true });
+        }
       }
       trackEvent("reminders_prompt_responded", { value: "enabled" });
     } catch (error) {
