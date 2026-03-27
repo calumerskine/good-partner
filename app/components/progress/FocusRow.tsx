@@ -1,4 +1,3 @@
-import { getHexColor } from "@/lib/colors";
 import { ActionTypes } from "@/lib/state/actions.model";
 import tw from "@/lib/tw";
 import { MotiView } from "moti";
@@ -48,7 +47,6 @@ export function FocusRow({ categories, vertical = false }: FocusRowProps) {
     cardStyle?: object,
   ) => {
     const actionType = ActionTypes[CATEGORY_MAP[cat.categoryKey]];
-    const darkColorHex = getHexColor(actionType.darkColor);
     const category = ActionTypes[CATEGORY_MAP[cat.categoryKey]];
 
     return (

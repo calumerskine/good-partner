@@ -1,13 +1,13 @@
-import tailwindConfig from "@/tailwind.config.js";
+import tw from "@/lib/tw";
 
-export const colors = (tailwindConfig.theme?.extend?.colors ||
-  {}) as unknown as Record<string, string>;
+const fallback = "#8E97FD";
 
-export const getHexColor = (colorName: string): string => {
-  return colors[colorName] || "#8E97FD";
-};
+export const getHexColor = (name: string): string =>
+  tw.color(name) ?? fallback;
 
 type ColorSet = { surface: string; main: string; ink: string };
-export const getCategoryColors = (category: string): ColorSet => {
-  return colors[category] as unknown as ColorSet;
-};
+export const getCategoryColors = (category: string): ColorSet => ({
+  surface: tw.color(`${category}-surface`) ?? fallback,
+  main: tw.color(`${category}-main`) ?? fallback,
+  ink: tw.color(`${category}-ink`) ?? fallback,
+});

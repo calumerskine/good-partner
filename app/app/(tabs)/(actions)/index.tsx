@@ -10,8 +10,19 @@ import { useCallback } from "react";
 import { Animated, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-function AnimatedCard({ delay, children }: { delay: number; children: React.ReactNode }) {
-  const anim = useMountAnimation({ fromOpacity: 0, fromTranslateY: 10, duration: 280, delay });
+function AnimatedCard({
+  delay,
+  children,
+}: {
+  delay: number;
+  children: React.ReactNode;
+}) {
+  const anim = useMountAnimation({
+    fromOpacity: 0,
+    fromTranslateY: 10,
+    duration: 280,
+    delay,
+  });
   return <Animated.View style={anim.animatedStyle}>{children}</Animated.View>;
 }
 
@@ -20,8 +31,18 @@ export default function ActionsScreen() {
   const { data: profile } = useGetUserProfile(user?.id);
   const { data: userActions = [], isLoading } = useGetActiveActions(user?.id);
 
-  const titleAnim = useMountAnimation({ fromOpacity: 0, fromTranslateY: 10, duration: 280, delay: 0 });
-  const subtitleAnim = useMountAnimation({ fromOpacity: 0, fromTranslateY: 10, duration: 280, delay: 80 });
+  const titleAnim = useMountAnimation({
+    fromOpacity: 0,
+    fromTranslateY: 10,
+    duration: 280,
+    delay: 0,
+  });
+  const subtitleAnim = useMountAnimation({
+    fromOpacity: 0,
+    fromTranslateY: 10,
+    duration: 280,
+    delay: 80,
+  });
 
   useFocusEffect(
     useCallback(() => {
@@ -50,34 +71,30 @@ export default function ActionsScreen() {
         <View style={tw`gap-4 mb-4`}>
           {Object.entries(ActionTypes).map(([key, action], index) => (
             <AnimatedCard key={key} delay={160 + index * 60}>
-            <PressableCard
-              href={`/(tabs)/(actions)/${key}`}
-              color={action.color}
-              shade={200}
-            >
-              {/* <LinearGradient
-                  colors={[getHexColor("grape"), getHexColor(action.color)]}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 0.85, y: 0.85 }}
-                  style={tw`rounded-2xl p-6 pt-5`}
-                > */}
-              <View style={tw`px-6 py-4`}>
-                <View style={tw`flex-row items-center gap-2`}>
-                  <Text style={tw`text-3xl text-ink font-gabarito font-medium`}>
-                    {action.title}
-                  </Text>
-                  {action.icon({ style: tw`text-ink/80` })}
+              <PressableCard
+                href={`/(tabs)/(actions)/${key}`}
+                color={action.color}
+                shade={200}
+              >
+                <View style={tw`px-6 py-4`}>
+                  <View style={tw`flex-row items-center gap-2`}>
+                    <Text
+                      style={tw`text-3xl text-ink font-gabarito font-medium`}
+                    >
+                      {action.title}
+                    </Text>
+                    {action.icon({ style: tw`text-ink/80` })}
+                  </View>
+                  <View style={tw`mt-2`}>
+                    <Text
+                      style={tw`text-base font-gabarito text-ink/90 leading-1.2`}
+                    >
+                      {action.description}
+                    </Text>
+                  </View>
                 </View>
-                <View style={tw`mt-2`}>
-                  <Text
-                    style={tw`text-base font-gabarito text-ink/90 leading-1.2`}
-                  >
-                    {action.description}
-                  </Text>
-                </View>
-              </View>
-              {/* </LinearGradient> */}
-            </PressableCard>
+                {/* </LinearGradient> */}
+              </PressableCard>
             </AnimatedCard>
           ))}
         </View>

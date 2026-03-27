@@ -1,3 +1,4 @@
+import { getHexColor } from "@/lib/colors";
 import { ActionTypes } from "@/lib/state/actions.model";
 import tw from "@/lib/tw";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
@@ -64,7 +65,7 @@ export function StatusGrid({ categories }: StatusGridProps) {
               <FontAwesome
                 name={actionType.iconName as any}
                 size={28}
-                color={isActive ? actionType.darkColor : "#9CA3AF"}
+                color={isActive ? getHexColor(actionType.darkColor) : "#9CA3AF"}
               />
 
               <Text style={tw`text-4xl font-gabarito font-black text-charcoal mt-2 mb-1`}>

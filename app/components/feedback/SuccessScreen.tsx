@@ -1,3 +1,4 @@
+import { getHexColor } from "@/lib/colors";
 import { type ActionType } from "@/lib/state/actions.model";
 import tw from "@/lib/tw";
 import { getLevelForXp } from "@/lib/xp";
@@ -49,35 +50,6 @@ const ANIMATION = {
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
-function getHexColor(colorName: string): string {
-  const colors: Record<string, string> = {
-    grape: "#8E97FD",
-    darkGrape: "#6E78E8",
-    darkerGrape: "#5A67D8",
-    lightBlue: "#9CD8EC",
-    blue: "#6FC3DF",
-    darkBlue: "#3FA9C9",
-    darkerBlue: "#2B7A8B",
-    lightRaspberry: "#FCD1E8",
-    raspberry: "#F895C2",
-    darkRaspberry: "#E66AAE",
-    darkerRaspberry: "#D4559E",
-    lightMint: "#B1E3CD",
-    mint: "#7FD9B8",
-    darkMint: "#2BAB7C",
-    darkerMint: "#1E7A5B",
-    peach: "#FFCC90",
-    lightYellow: "#FCE2B4",
-    yellow: "#F6C86B",
-    darkYellow: "#E9AA0A",
-    darkerYellow: "#C98908",
-    charcoal: "#2E3130",
-    orange: "#FF9E23",
-    background: "#F6F3E6",
-    mediumGrey: "#D4D1C3",
-  };
-  return colors[colorName] || "#9CD8EC";
-}
 
 function Sparkles({ color }: { color: string }) {
   const positions = [

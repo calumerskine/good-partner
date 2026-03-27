@@ -11,26 +11,11 @@ import PressableRadio from "./ui/pressable-radio";
 import { Check } from "lucide-react-native";
 import { useHaptics } from "@/hooks/use-haptics";
 
-const COLOR_300: Record<string, string> = {
-  blue: "#93c5fd",
-  pink: "#f9a8d4",
-  yellow: "#fde047",
-  green: "#86efac",
-};
+const fallbackColor = "#e5e7eb";
 
-const COLOR_200: Record<string, string> = {
-  blue: "#bfdbfe",
-  pink: "#fbcfe8",
-  yellow: "#fef08a",
-  green: "#bbf7d0",
-};
-
-const COLOR_500: Record<string, string> = {
-  blue: "#3b82f6",
-  pink: "#ec4899",
-  yellow: "#eab308",
-  green: "#22c55e",
-};
+function twColor(name: string): string {
+  return tw.color(name) ?? fallbackColor;
+}
 
 export const CategoryButton = ({
   text,
@@ -50,6 +35,10 @@ export const CategoryButton = ({
   const { trigger } = useHaptics();
   const progress = useSharedValue(selected ? 1 : 0);
 
+  const borderColorSelected = twColor(`${color}-300`);
+  const circleBgUnselected = twColor(`${color}-200`);
+  const circleBgSelected = twColor(`${color}-500`);
+
   useEffect(() => {
     progress.value = withTiming(selected ? 1 : 0, { duration: 150 });
   }, [selected]);
@@ -58,7 +47,7 @@ export const CategoryButton = ({
     borderColor: interpolateColor(
       progress.value,
       [0, 1],
-      ["#e5e7eb", COLOR_300[color] ?? "#e5e7eb"],
+      [fallbackColor, borderColorSelected],
     ),
   }));
 
@@ -66,7 +55,7 @@ export const CategoryButton = ({
     backgroundColor: interpolateColor(
       progress.value,
       [0, 1],
-      [COLOR_200[color] ?? "#e5e7eb", COLOR_500[color] ?? "#e5e7eb"],
+      [circleBgUnselected, circleBgSelected],
     ),
   }));
 
@@ -98,7 +87,7 @@ export const CategoryButton = ({
         </View> */}
         <View style={tw`flex-row items-start justify-between`}>
           <View style={tw`flex-1 pr-4`}>
-            <Text style={tw`font-gabarito font-bold text-xl text-ink-700 mb-2`}>
+            <Text style={tw`font-gabarito font-bold text-xl text-ink/70 mb-2`}>
               {text}
             </Text>
             <Text style={tw`font-gabarito text-base text-ink/80`}>
