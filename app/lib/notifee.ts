@@ -1,15 +1,21 @@
-import notifee, { EventType, Event } from "@notifee/react-native";
+import notifee, { EventType, Event, AuthorizationStatus } from "@notifee/react-native";
+import { Platform } from "react-native";
 import { router } from "expo-router";
 
 class NotifeeService {
   private currentNotificationId: string | null = null;
 
   async requestPermission(): Promise<boolean> {
+    if (Platform.OS !== "ios") return false;
     const settings = await notifee.requestPermission();
-    return settings.authorizationStatus >= 1;
+    return (
+      settings.authorizationStatus === AuthorizationStatus.AUTHORIZED ||
+      settings.authorizationStatus === AuthorizationStatus.PROVISIONAL
+    );
   }
 
   async displayActionNotification(userActionId: string, actionTitle: string) {
+    if (Platform.OS !== "ios") return;
     await this.cancelActionNotification();
 
     this.currentNotificationId = await notifee.displayNotification({
