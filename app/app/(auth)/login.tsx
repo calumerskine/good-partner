@@ -135,7 +135,7 @@ export default function LoginScreen() {
         <Animated.View style={[tw`w-full max-w-md`, formAnimatedStyle]}>
           <View style={tw`mb-12`}>
             <Text
-              style={tw`text-5xl text-ink text-center font-gabarito font-black mb-3`}
+              style={tw`text-4xl text-ink text-center font-gabarito font-black mb-3`}
             >
               {mode === "login" ? "Welcome Back" : "Create Account"}
             </Text>
