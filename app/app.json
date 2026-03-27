@@ -47,6 +47,7 @@
           "mode": "development"
         }
       ],
+      ["@notifee/react-native"],
       "expo-router",
       "expo-font"
     ],
