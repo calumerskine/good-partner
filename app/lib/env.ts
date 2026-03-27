@@ -6,6 +6,7 @@ export const env = z
     flags: z.object({
       useAnalytics: z.boolean(),
       useReminders: z.boolean(),
+      useActionNotifications: z.boolean(),
     }),
     onesignal: z.object({
       appId: z.string(),
@@ -23,6 +24,7 @@ export const env = z
     flags: {
       useAnalytics: process.env.EXPO_PUBLIC_ANALYTICS === "true",
       useReminders: process.env.EXPO_PUBLIC_REMINDERS === "true",
+      useActionNotifications: process.env.EXPO_PUBLIC_ACTION_NOTIFICATIONS === "true",
     },
     onesignal: {
       appId: process.env.EXPO_PUBLIC_ONESIGNAL_APP_ID,
