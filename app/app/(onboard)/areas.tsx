@@ -129,7 +129,7 @@ export default function OnboardAreasScreen() {
         <View style={tw`mb-6`}>
           {Object.entries(PAIN_POINTS).map(([key, value]) => {
             return (
-              <View key={key} style={tw`mb-1`}>
+              <View key={key} style={tw`mb-2`}>
                 <CategoryButton
                   key={key}
                   text={value.title}
