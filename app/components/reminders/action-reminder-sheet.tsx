@@ -1,19 +1,16 @@
 import { useAuth } from "@/hooks/use-auth";
-import {
-  useClearActionReminder,
-  useSetActionReminder,
-} from "@/lib/api";
+import { useClearActionReminder, useSetActionReminder } from "@/lib/api";
 import tw from "@/lib/tw";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { addHours, format, isBefore, set } from "date-fns";
 import { useEffect, useRef, useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import Animated, {
-  runOnJS,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
+import { scheduleOnRN } from "react-native-worklets";
 
 interface ActionReminderSheetProps {
   userActionId: string;
@@ -52,7 +49,7 @@ export default function ActionReminderSheet({
   const dismiss = () => {
     translateY.value = withTiming(500, { duration: 280 });
     overlayOpacity.value = withTiming(0, { duration: 220 }, () =>
-      runOnJS(onClose)(),
+      scheduleOnRN(onClose),
     );
   };
 
@@ -87,7 +84,12 @@ export default function ActionReminderSheet({
   };
 
   const inTwoHoursDate = addHours(new Date(), 2);
-  const tonightAt9 = set(new Date(), { hours: 21, minutes: 0, seconds: 0, milliseconds: 0 });
+  const tonightAt9 = set(new Date(), {
+    hours: 21,
+    minutes: 0,
+    seconds: 0,
+    milliseconds: 0,
+  });
   const isTonightAvailable = isBefore(new Date(), tonightAt9);
 
   return (
@@ -108,15 +110,15 @@ export default function ActionReminderSheet({
         ]}
       >
         {/* Drag handle */}
-        <View style={tw`w-10 h-1 bg-charcoal/20 rounded-full self-center mb-5`} />
+        <View style={tw`w-10 h-1 bg-black/20 rounded-full self-center mb-5`} />
 
-        <Text style={tw`text-xl font-gabarito font-bold text-charcoal mb-4`}>
+        <Text style={tw`text-xl font-gabarito font-bold text-black mb-4`}>
           Set a reminder
         </Text>
 
         {confirmation ? (
           <View style={tw`py-8 items-center`}>
-            <Text style={tw`font-gabarito text-charcoal text-base`}>
+            <Text style={tw`font-gabarito text-black text-base`}>
               {confirmation}
             </Text>
           </View>
@@ -124,39 +126,39 @@ export default function ActionReminderSheet({
           <>
             <View style={tw`gap-3 mb-3`}>
               <Pressable
-                style={tw`border-2 border-charcoal/15 rounded-xl p-4`}
+                style={tw`border-2 border-black/15 rounded-xl p-4`}
                 onPress={() => handleSelect(inTwoHoursDate)}
               >
-                <Text style={tw`font-gabarito font-bold text-charcoal`}>
+                <Text style={tw`font-gabarito font-bold text-black`}>
                   In 2 hours
                 </Text>
-                <Text style={tw`font-gabarito text-sm text-charcoal/55 mt-0.5`}>
+                <Text style={tw`font-gabarito text-sm text-black/55 mt-0.5`}>
                   {format(inTwoHoursDate, "h:mm a")}
                 </Text>
               </Pressable>
 
               {isTonightAvailable && (
                 <Pressable
-                  style={tw`border-2 border-charcoal/15 rounded-xl p-4`}
+                  style={tw`border-2 border-black/15 rounded-xl p-4`}
                   onPress={() => handleSelect(tonightAt9)}
                 >
-                  <Text style={tw`font-gabarito font-bold text-charcoal`}>
+                  <Text style={tw`font-gabarito font-bold text-black`}>
                     Tonight at 9pm
                   </Text>
-                  <Text style={tw`font-gabarito text-sm text-charcoal/55 mt-0.5`}>
+                  <Text style={tw`font-gabarito text-sm text-black/55 mt-0.5`}>
                     9:00 PM
                   </Text>
                 </Pressable>
               )}
 
               <Pressable
-                style={tw`border-2 border-charcoal/15 rounded-xl p-4`}
+                style={tw`border-2 border-black/15 rounded-xl p-4`}
                 onPress={() => setShowCustomPicker(true)}
               >
-                <Text style={tw`font-gabarito font-bold text-charcoal`}>
+                <Text style={tw`font-gabarito font-bold text-black`}>
                   Custom
                 </Text>
-                <Text style={tw`font-gabarito text-sm text-charcoal/55 mt-0.5`}>
+                <Text style={tw`font-gabarito text-sm text-black/55 mt-0.5`}>
                   Pick a date and time
                 </Text>
               </Pressable>

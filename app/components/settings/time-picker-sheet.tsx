@@ -5,11 +5,11 @@ import { fromZonedTime, toZonedTime } from "date-fns-tz";
 import { useEffect, useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import Animated, {
-  runOnJS,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
+import { scheduleOnRN } from "react-native-worklets";
 
 const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
@@ -56,7 +56,7 @@ export default function TimePickerSheet({
   const dismiss = () => {
     translateY.value = withTiming(500, { duration: 280 });
     overlayOpacity.value = withTiming(0, { duration: 220 }, () =>
-      runOnJS(onClose)(),
+      scheduleOnRN(onClose),
     );
   };
 
@@ -88,10 +88,10 @@ export default function TimePickerSheet({
           sheetStyle,
         ]}
       >
-        <View style={tw`w-10 h-1 bg-charcoal/20 rounded-full self-center mb-5`} />
+        <View style={tw`w-10 h-1 bg-black/20 rounded-full self-center mb-5`} />
 
         <View style={tw`flex-row items-center justify-between mb-2`}>
-          <Text style={tw`text-xl font-gabarito font-bold text-charcoal`}>
+          <Text style={tw`text-xl font-gabarito font-bold text-black`}>
             {type === "morning" ? "Morning reminder" : "Evening reminder"}
           </Text>
         </View>
@@ -100,7 +100,7 @@ export default function TimePickerSheet({
           value={pendingDate}
           mode="time"
           display="spinner"
-          onChange={(_, date) => {
+          onValueChange={(_, date) => {
             if (date) setPendingDate(date);
           }}
           style={tw`w-full`}
@@ -108,16 +108,20 @@ export default function TimePickerSheet({
 
         <View style={tw`flex-row gap-3 mt-2`}>
           <Pressable
-            style={tw`flex-1 border-2 border-charcoal/15 rounded-xl py-3 items-center`}
-            onPress={() => { trigger("impactLight"); dismiss(); }}
+            style={tw`flex-1 border-2 border-black/15 rounded-xl py-3 items-center`}
+            onPress={() => {
+              trigger("impactLight");
+              dismiss();
+            }}
           >
-            <Text style={tw`font-gabarito font-bold text-charcoal`}>
-              Cancel
-            </Text>
+            <Text style={tw`font-gabarito font-bold text-black`}>Cancel</Text>
           </Pressable>
           <Pressable
-            style={tw`flex-1 bg-charcoal rounded-xl py-3 items-center`}
-            onPress={() => { trigger("success"); handleDone(); }}
+            style={tw`flex-1 bg-black rounded-xl py-3 items-center`}
+            onPress={() => {
+              trigger("success");
+              handleDone();
+            }}
           >
             <Text style={tw`font-gabarito font-bold text-white`}>Done</Text>
           </Pressable>
