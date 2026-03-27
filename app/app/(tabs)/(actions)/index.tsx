@@ -12,7 +12,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 function AnimatedCard({ delay, children }: { delay: number; children: React.ReactNode }) {
   const anim = useMountAnimation({ fromOpacity: 0, fromTranslateY: 10, duration: 280, delay });
-  useFocusEffect(useCallback(() => { anim.trigger(); }, []));
   return <Animated.View style={anim.animatedStyle}>{children}</Animated.View>;
 }
 
@@ -27,8 +26,6 @@ export default function ActionsScreen() {
   useFocusEffect(
     useCallback(() => {
       trackEvent("screen_viewed", { screen_name: "Actions" });
-      titleAnim.trigger();
-      subtitleAnim.trigger();
     }, []),
   );
 

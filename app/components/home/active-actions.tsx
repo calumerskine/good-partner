@@ -3,7 +3,7 @@ import { UserAction, useCompleteAction, useDeactivateAction } from "@/lib/api";
 import { ActionTypes } from "@/lib/state/actions.model";
 import { env } from "@/lib/env";
 import tw from "@/lib/tw";
-import { Link, router, useFocusEffect } from "expo-router";
+import { Link, router } from "expo-router";
 import { useCallback } from "react";
 import { Animated, ScrollView, Text, View } from "react-native";
 import { format, isBefore, isToday, isTomorrow } from "date-fns";
@@ -147,13 +147,6 @@ export default function ActiveActions({
   const cardsAnim = useMountAnimation({ fromOpacity: 0, fromTranslateY: 8, duration: 250, delay: 80 });
   const buttonsAnim = useMountAnimation({ fromOpacity: 0, fromTranslateY: 8, duration: 250, delay: 160 });
 
-  useFocusEffect(
-    useCallback(() => {
-      headingAnim.trigger();
-      cardsAnim.trigger();
-      buttonsAnim.trigger();
-    }, []),
-  );
 
   return (
     <View style={tw`flex-1 flex-col`}>

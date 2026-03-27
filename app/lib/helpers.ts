@@ -8,10 +8,17 @@ export const resetRootTabListener = ({
   route: RouteProp<ParamListBase, string>;
 }) => ({
   tabPress: (e: EventArg<"tabPress", true, undefined>) => {
-    e.preventDefault();
-    navigation.reset({
-      index: 0,
-      routes: [{ name: route.name }],
-    });
+    const tabRoute = navigation
+      .getState()
+      .routes.find((r: any) => r.name === route.name);
+    const isNested = tabRoute?.state && tabRoute.state.index > 0;
+
+    if (isNested) {
+      e.preventDefault();
+      navigation.reset({
+        index: 0,
+        routes: [{ name: route.name }],
+      });
+    }
   },
 });

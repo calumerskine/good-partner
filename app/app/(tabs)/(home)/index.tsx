@@ -34,8 +34,6 @@ export default function HomeScreen() {
   useFocusEffect(
     useCallback(() => {
       trackEvent("screen_viewed", { screen_name: "Home" });
-      headerAnim.trigger();
-      headlineAnim.trigger();
     }, []),
   );
 

@@ -47,8 +47,11 @@ export default function SettingsScreen() {
   const { data: reminderConfig } = useGetReminderConfig(user?.id);
   const { mutateAsync: updateReminderConfig, isPending: isUpdatingReminders } =
     useUpdateReminderConfig();
-  const { data: actionNotificationsEnabled } = useGetActionNotificationsEnabled(user?.id);
-  const { mutateAsync: toggleActionNotifications } = useToggleActionNotificationsEnabled();
+  const { data: actionNotificationsEnabled } = useGetActionNotificationsEnabled(
+    user?.id,
+  );
+  const { mutateAsync: toggleActionNotifications } =
+    useToggleActionNotificationsEnabled();
   const [activePicker, setActivePicker] = useState<
     "morning" | "evening" | null
   >(null);
@@ -100,13 +103,6 @@ export default function SettingsScreen() {
   useFocusEffect(
     useCallback(() => {
       trackEvent("screen_viewed", { screen_name: "Settings" });
-      titleAnim.trigger();
-      userAnim.trigger();
-      focusAnim.trigger();
-      hapticsAnim.trigger();
-      remindersAnim.trigger();
-      actionNotifAnim.trigger();
-      debugAnim.trigger();
     }, []),
   );
 
@@ -118,7 +114,7 @@ export default function SettingsScreen() {
       if (!granted) return;
     }
 
-    await toggleNotifications({ userId: user!.id, enabled: shouldEnable });
+    await toggleNotifications({ userId: user?.id!, enabled: shouldEnable });
     trackEvent("settings_notifications_toggled", { enabled: shouldEnable });
   }, 500);
 
@@ -130,8 +126,13 @@ export default function SettingsScreen() {
       if (!granted) return;
     }
 
-    await toggleActionNotifications({ userId: user!.id, enabled: shouldEnable });
-    trackEvent("settings_action_notifications_toggled", { enabled: shouldEnable });
+    await toggleActionNotifications({
+      userId: user?.id!,
+      enabled: shouldEnable,
+    });
+    trackEvent("settings_action_notifications_toggled", {
+      enabled: shouldEnable,
+    });
   }, 500);
 
   if (!user) return null;
@@ -351,8 +352,11 @@ export default function SettingsScreen() {
                   trackColor={{ false: "#767577", true: "#8E97FD" }}
                 />
               </View>
-              <Text style={tw`font-gabarito text-sm text-ink/80 leading-relaxed`}>
-                Get a notification while your action is in progress to help you remember to complete it.
+              <Text
+                style={tw`font-gabarito text-sm text-ink/80 leading-relaxed`}
+              >
+                Get a notification while your action is in progress to help you
+                remember to complete it.
               </Text>
             </View>
           </Animated.View>

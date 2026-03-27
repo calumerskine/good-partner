@@ -7,7 +7,13 @@ import { useGetAllUserActions } from "@/lib/api";
 import tw from "@/lib/tw";
 import { Link, useFocusEffect } from "expo-router";
 import { useCallback, useMemo } from "react";
-import { ActivityIndicator, Animated, ScrollView, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  Animated,
+  ScrollView,
+  Text,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 type CategoryCompletion = {
@@ -20,14 +26,22 @@ export default function ProgressScreen() {
   const { user } = useAuth();
   const { data: userActions = [], isLoading } = useGetAllUserActions(user?.id);
 
-  const titleAnim   = useMountAnimation({ fromOpacity: 0, fromTranslateY: 10, duration: 280, delay: 0 });
-  const contentAnim = useMountAnimation({ fromOpacity: 0, fromTranslateY: 10, duration: 280, delay: 80 });
+  const titleAnim = useMountAnimation({
+    fromOpacity: 0,
+    fromTranslateY: 10,
+    duration: 280,
+    delay: 0,
+  });
+  const contentAnim = useMountAnimation({
+    fromOpacity: 0,
+    fromTranslateY: 10,
+    duration: 280,
+    delay: 80,
+  });
 
   useFocusEffect(
     useCallback(() => {
       trackEvent("screen_viewed", { screen_name: "Progress" });
-      titleAnim.trigger();
-      contentAnim.trigger();
     }, []),
   );
 
