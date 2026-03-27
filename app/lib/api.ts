@@ -22,6 +22,8 @@ const queryKeys = {
   suggestedActions: () => ["suggestedActions"] as const,
   dailyContent: (dayNumber: number) => ["dailyContent", dayNumber] as const,
   reminderConfig: (userId: string) => ["reminderConfig", userId] as const,
+  actionNotificationsEnabled: (userId: string) =>
+    ["actionNotificationsEnabled", userId] as const,
 };
 
 const mutationKeys = {
@@ -37,6 +39,7 @@ const mutationKeys = {
   updateReminderConfig: ["updateReminderConfig"] as const,
   setActionReminder: ["setActionReminder"] as const,
   clearActionReminder: ["clearActionReminder"] as const,
+  actionNotifications: ["actionNotifications"] as const,
 };
 
 type OnboardForm = {
@@ -1578,6 +1581,71 @@ async function submitFeedback(input: FeedbackInput) {
   if (error) {
     throw error;
   }
+}
+
+// ============================================================
+// ACTION NOTIFICATIONS API
+// ============================================================
+
+export function useGetActionNotificationsEnabled(userId?: string) {
+  return useQuery({
+    queryKey: queryKeys.actionNotificationsEnabled(userId!),
+    queryFn: () => getActionNotificationsEnabled(userId!),
+    enabled: !!userId,
+  });
+}
+
+async function getActionNotificationsEnabled(userId: string): Promise<boolean | null> {
+  const { data, error } = await supabase
+    .from("user_profiles")
+    .select("action_notifications_enabled")
+    .eq("user_id", userId)
+    .single();
+
+  if (error || !data) return null;
+  return data.action_notifications_enabled;
+}
+
+export function useToggleActionNotificationsEnabled() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationKey: mutationKeys.actionNotifications,
+    mutationFn: ({ userId, enabled }: { userId: string; enabled: boolean }) =>
+      toggleActionNotificationsEnabled(userId, enabled),
+    onMutate: async ({ userId, enabled }) => {
+      await queryClient.cancelQueries({
+        queryKey: queryKeys.actionNotificationsEnabled(userId),
+      });
+      const previousValue = queryClient.getQueryData<boolean>(
+        queryKeys.actionNotificationsEnabled(userId),
+      );
+      queryClient.setQueryData(queryKeys.actionNotificationsEnabled(userId), enabled);
+      return { previousValue, userId };
+    },
+    onError: (_error, _variables, context) => {
+      if (context) {
+        queryClient.setQueryData(
+          queryKeys.actionNotificationsEnabled(context.userId),
+          context.previousValue,
+        );
+      }
+    },
+    onSettled: (_data, _error, { userId }) => {
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.actionNotificationsEnabled(userId),
+      });
+    },
+  });
+}
+
+async function toggleActionNotificationsEnabled(userId: string, enabled: boolean) {
+  const { error } = await supabase
+    .from("user_profiles")
+    .update({ action_notifications_enabled: enabled })
+    .eq("user_id", userId);
+
+  if (error) throw error;
 }
 
 // ============================================================
