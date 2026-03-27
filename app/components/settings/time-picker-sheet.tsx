@@ -1,3 +1,4 @@
+import { useHaptics } from "@/hooks/use-haptics";
 import tw from "@/lib/tw";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { fromZonedTime, toZonedTime } from "date-fns-tz";
@@ -39,6 +40,7 @@ export default function TimePickerSheet({
   onSave,
   onClose,
 }: TimePickerSheetProps) {
+  const { trigger } = useHaptics();
   const [pendingDate, setPendingDate] = useState(() =>
     utcTimeStrToLocalDate(currentUtcTime),
   );
@@ -107,7 +109,7 @@ export default function TimePickerSheet({
         <View style={tw`flex-row gap-3 mt-2`}>
           <Pressable
             style={tw`flex-1 border-2 border-charcoal/15 rounded-xl py-3 items-center`}
-            onPress={dismiss}
+            onPress={() => { trigger("impactLight"); dismiss(); }}
           >
             <Text style={tw`font-gabarito font-bold text-charcoal`}>
               Cancel
@@ -115,7 +117,7 @@ export default function TimePickerSheet({
           </Pressable>
           <Pressable
             style={tw`flex-1 bg-charcoal rounded-xl py-3 items-center`}
-            onPress={handleDone}
+            onPress={() => { trigger("success"); handleDone(); }}
           >
             <Text style={tw`font-gabarito font-bold text-white`}>Done</Text>
           </Pressable>
