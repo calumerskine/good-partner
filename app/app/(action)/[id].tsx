@@ -252,11 +252,7 @@ export default function ActionDetailScreen() {
                   disabled={activateAction.isPending}
                   color={categoryInfo.color}
                 >
-                  {activateAction.isPending
-                    ? "Activating..."
-                    : completionCount > 0
-                      ? "Activate Again"
-                      : "Activate This Action"}
+                  {activateAction.isPending ? "Activating..." : "I'm on it"}
                 </Button>
               )
             ) : isActive ? (
@@ -300,9 +296,7 @@ export default function ActionDetailScreen() {
                 disabled={activateAction.isPending}
               >
                 <Text>
-                  {activateAction.isPending
-                    ? "Activating..."
-                    : "Activate Again"}
+                  {activateAction.isPending ? "Activating..." : "I'm on it"}
                 </Text>
               </Button>
             )}

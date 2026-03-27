@@ -251,7 +251,7 @@ export default function SettingsScreen() {
               {/* Master toggle */}
               <View style={tw`flex-row items-center justify-between mb-3`}>
                 <Text style={tw`text-ink font-gabarito font-bold text-lg`}>
-                  Daily reminders
+                  Daily check-in
                 </Text>
                 <Switch
                   value={notificationsEnabled ?? false}

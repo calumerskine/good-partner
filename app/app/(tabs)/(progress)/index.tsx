@@ -95,7 +95,7 @@ export default function ProgressScreen() {
           ) : (
             <View style={tw`flex-1 items-center justify-center px-6`}>
               <Text style={tw`text-base text-ink/70 font-gabarito text-center`}>
-                Complete actions to see your progress here.
+                Nothing here yet — but that's about to change.
               </Text>
               <View style={tw`mt-12`}>
                 <Link href={"/(home)"} asChild>

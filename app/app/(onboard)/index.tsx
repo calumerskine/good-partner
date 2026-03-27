@@ -29,7 +29,7 @@ export default function OnboardIndexScreen() {
           <Text
             style={tw`text-5xl text-charcoal font-gabarito font-black text-center leading-tight`}
           >
-            Welcome to{"\n"}Wingman
+            Welcome to{"\n"}The Good Partner
           </Text>
           <Text
             style={tw`text-xl text-charcoal/80 font-gabarito text-center leading-relaxed px-6`}
