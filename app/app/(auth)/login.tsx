@@ -242,7 +242,9 @@ export default function LoginScreen() {
                   : "Already have an account?"}
               </Text>
               <TouchableOpacity onPress={toggleMode} disabled={isLoading}>
-                <Text style={tw`text-grape font-gabarito font-bold text-base`}>
+                <Text
+                  style={tw`text-indigo-400 font-gabarito font-bold text-base`}
+                >
                   {mode === "login" ? "Sign Up" : "Sign In"}
                 </Text>
               </TouchableOpacity>
