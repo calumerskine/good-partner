@@ -118,7 +118,7 @@ export default function SettingsScreen() {
       if (!granted) return;
     }
 
-    await toggleNotifications({ userId: user?.id!, enabled: shouldEnable });
+    await toggleNotifications({ userId: user!.id, enabled: shouldEnable });
     trackEvent("settings_notifications_toggled", { enabled: shouldEnable });
   }, 500);
 
@@ -130,7 +130,7 @@ export default function SettingsScreen() {
       if (!granted) return;
     }
 
-    await toggleActionNotifications({ userId: user?.id!, enabled: shouldEnable });
+    await toggleActionNotifications({ userId: user!.id, enabled: shouldEnable });
     trackEvent("settings_action_notifications_toggled", { enabled: shouldEnable });
   }, 500);
 

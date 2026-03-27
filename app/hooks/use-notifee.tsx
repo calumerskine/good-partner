@@ -8,8 +8,9 @@ import { useEffect, useRef } from "react";
 
 export function useNotifee() {
   const { user } = useAuth();
-  const { data: activeActions } = useGetActiveActions(user?.id);
-  const { data: actionNotificationsEnabled } = useGetActionNotificationsEnabled(user?.id);
+  const userId = env.flags.useActionNotifications ? user?.id : undefined;
+  const { data: activeActions } = useGetActiveActions(userId);
+  const { data: actionNotificationsEnabled } = useGetActionNotificationsEnabled(userId);
   const prevActiveActionId = useRef<string | null>(null);
 
   // Navigate to action on notification press (foreground)
