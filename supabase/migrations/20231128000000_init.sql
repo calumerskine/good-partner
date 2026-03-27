@@ -16,6 +16,7 @@ CREATE TABLE user_profiles (
   created_at TIMESTAMPTZ DEFAULT NOW(),
   has_completed_onboarding BOOLEAN DEFAULT FALSE,
   notifications_enabled BOOLEAN DEFAULT FALSE,
+  action_notifications_enabled BOOLEAN DEFAULT FALSE,
   current_streak_days INTEGER DEFAULT 0,
   last_completion_date DATE,
   total_days_active INTEGER DEFAULT 0,
