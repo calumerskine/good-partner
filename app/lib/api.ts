@@ -1168,14 +1168,30 @@ export function useDeactivateAction() {
   return useMutation({
     mutationKey: mutationKeys.deactivateAction,
     mutationFn: (userActionId: string) => deactivateAction(userActionId),
-    onSuccess: () => {
-      // Invalidate all active actions queries and suggested actions queries
+    onSuccess: (data) => {
       queryClient.invalidateQueries({
         queryKey: queryKeys.allActiveActions(),
       });
-      queryClient.invalidateQueries({
-        queryKey: queryKeys.suggestedActions(),
-      });
+      // Re-insert the deactivated action at the front of suggestions synchronously
+      // to avoid a flash caused by an async refetch swapping the displayed card.
+      const allActions = queryClient.getQueryData<CatalogAction[]>(
+        queryKeys.actionsCatalog(),
+      );
+      const action = allActions?.find((a) => a.id === data.action_id);
+      if (action) {
+        queryClient.setQueryData<CatalogAction[]>(
+          queryKeys.suggestedActions(),
+          (old) => {
+            if (!old) return [action];
+            if (old.some((a) => a.id === action.id)) return old;
+            return [action, ...old];
+          },
+        );
+      } else {
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.suggestedActions(),
+        });
+      }
     },
   });
 }
