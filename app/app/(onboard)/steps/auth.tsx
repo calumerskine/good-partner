@@ -39,6 +39,7 @@ export function AuthStep({ onComplete }: Props) {
   });
 
   const handleSocialAuth = async (provider: "google" | "apple") => {
+    if (isLoading) return;
     setIsLoading(true);
     setError(null);
     trackEvent("auth_signup_initiated", { provider });
