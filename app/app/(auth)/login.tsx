@@ -177,19 +177,24 @@ export default function LoginScreen() {
 
           <View style={tw`w-full gap-4 mb-6`}>
             {Platform.OS === "ios" && (
-              <AppleAuthentication.AppleAuthenticationButton
-                buttonType={
-                  mode === "signup"
-                    ? AppleAuthentication.AppleAuthenticationButtonType.SIGN_UP
-                    : AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN
-                }
-                buttonStyle={
-                  AppleAuthentication.AppleAuthenticationButtonStyle.BLACK
-                }
-                cornerRadius={100}
-                style={{ height: 56 }}
-                onPress={() => handleSocialSignIn("apple")}
-              />
+              <View
+                style={isLoading ? tw`opacity-50` : undefined}
+                pointerEvents={isLoading ? "none" : "auto"}
+              >
+                <AppleAuthentication.AppleAuthenticationButton
+                  buttonType={
+                    mode === "signup"
+                      ? AppleAuthentication.AppleAuthenticationButtonType.SIGN_UP
+                      : AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN
+                  }
+                  buttonStyle={
+                    AppleAuthentication.AppleAuthenticationButtonStyle.BLACK
+                  }
+                  cornerRadius={100}
+                  style={{ height: 56 }}
+                  onPress={() => handleSocialSignIn("apple")}
+                />
+              </View>
             )}
             <TouchableOpacity
               style={tw`w-full h-14 flex-row items-center justify-center border-2 border-ink/15 rounded-full gap-3`}
