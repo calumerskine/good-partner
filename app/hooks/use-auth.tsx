@@ -6,6 +6,11 @@ import { Session, User } from "@supabase/supabase-js";
 import * as AppleAuthentication from "expo-apple-authentication";
 import React, { createContext, useContext, useEffect, useState } from "react";
 
+GoogleSignin.configure({
+  webClientId: env.google.webClientId,
+  iosClientId: env.google.iosClientId,
+});
+
 type AuthEvent =
   | "INITIAL_SESSION"
   | "SIGNED_IN"
@@ -56,13 +61,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     initialiseAnalytics(userId, data?.user_tier ?? "free");
   }
-
-  useEffect(() => {
-    GoogleSignin.configure({
-      webClientId: env.google.webClientId,
-      iosClientId: env.google.iosClientId,
-    });
-  }, []);
 
   useEffect(() => {
     let mounted = true;
