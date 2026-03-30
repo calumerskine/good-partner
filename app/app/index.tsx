@@ -13,8 +13,7 @@ export default function Index() {
     user?.id,
   );
 
-  // Show loading spinner while checking authentication state
-  if (isLoading || isProfileLoading) {
+  if (isLoading || (user && isProfileLoading)) {
     return (
       <View style={tw`flex-1 items-center justify-center bg-white`}>
         <ActivityIndicator size="large" color="#2E3130" />
@@ -22,13 +21,10 @@ export default function Index() {
     );
   }
 
-  // Redirect based on authentication status
   if (!user) {
-    // No authenticated user - go to login
-    return <Redirect href="/(auth)/login" />;
+    return <Redirect href="/(onboard)" />;
   }
 
-  // User is authenticated - check if they've completed onboarding
   if (!profile?.hasCompletedOnboarding) {
     return <Redirect href="/(onboard)" />;
   }
