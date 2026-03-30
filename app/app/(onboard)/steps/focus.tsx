@@ -1,9 +1,8 @@
 import { CategoryButton } from "@/components/category-button";
 import Button from "@/components/ui/button";
-import { useGetCategories } from "@/lib/api";
 import { ActionTypes } from "@/lib/state/actions.model";
 import tw from "@/lib/tw";
-import { ActivityIndicator, ScrollView, Text, View } from "react-native";
+import { ScrollView, Text, View } from "react-native";
 
 const FOCUS_OPTIONS = {
   ATTENTION: {
@@ -35,16 +34,6 @@ type Props = {
 };
 
 export function FocusStep({ selected, onToggle, onNext }: Props) {
-  const { isLoading } = useGetCategories();
-
-  if (isLoading) {
-    return (
-      <View style={tw`flex-1 items-center justify-center`}>
-        <ActivityIndicator size="large" color="#2E3130" />
-      </View>
-    );
-  }
-
   return (
     <View style={tw`flex-1`}>
       <ScrollView

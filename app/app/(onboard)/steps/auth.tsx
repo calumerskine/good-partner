@@ -10,7 +10,6 @@ import {
   Text,
   View,
 } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 type FormValues = {
   email: string;
@@ -22,7 +21,6 @@ type Props = {
 };
 
 export function AuthStep({ onSignup }: Props) {
-  const insets = useSafeAreaInsets();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -53,10 +51,7 @@ export function AuthStep({ onSignup }: Props) {
     >
       <ScrollView
         style={tw`flex-1`}
-        contentContainerStyle={[
-          tw`flex-grow px-6 justify-center`,
-          { paddingBottom: insets.bottom + 16 },
-        ]}
+        contentContainerStyle={tw`flex-grow px-6 justify-center pb-4`}
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode="on-drag"
         showsVerticalScrollIndicator={false}

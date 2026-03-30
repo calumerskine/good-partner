@@ -45,11 +45,14 @@ export default function OnboardWizard() {
 
   // Resolve initial step once auth state is known
   useEffect(() => {
-    if (!authLoading) {
+    if (!authLoading && displayStep === null) {
       trackEvent("screen_viewed", { screen_name: "Onboarding" });
+      if (user) {
+        trackEvent("onboarding_started");
+      }
       setDisplayStep(user ? 2 : 0);
     }
-  }, [authLoading]);
+  }, [authLoading, user, displayStep]);
 
   const animateToStep = (nextStep: number, direction: "forward" | "back") => {
     const outValue = direction === "forward" ? -width : width;
@@ -81,7 +84,14 @@ export default function OnboardWizard() {
       },
       {} as Record<string, string>,
     );
-    return keys.map((k) => nameToId[k]).filter(Boolean);
+    return keys
+      .map((k) => {
+        if (!nameToId[k]) {
+          console.warn(`[onboarding] category key "${k}" not found in DB`);
+        }
+        return nameToId[k];
+      })
+      .filter((id): id is string => Boolean(id));
   };
 
   const submitProfile = async (userId: string) => {
@@ -160,7 +170,12 @@ export default function OnboardWizard() {
         style={[tw`flex-1`, { transform: [{ translateX }] }]}
       >
         {displayStep === 0 && (
-          <WelcomeStep onNext={() => goForward(1)} />
+          <WelcomeStep
+            onNext={() => {
+              trackEvent("onboarding_started");
+              goForward(1);
+            }}
+          />
         )}
         {displayStep === 1 && (
           <TransitionStep onNext={() => goForward(2)} />
