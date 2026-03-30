@@ -17,7 +17,9 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.pearprogramming.wingmanapp",
       "infoPlist": {
-        "UIBackgroundModes": ["remote-notification"]
+        "UIBackgroundModes": [
+          "remote-notification"
+        ]
       },
       "entitlements": {
         "aps-environment": "development",
@@ -48,7 +50,8 @@
         }
       ],
       "expo-router",
-      "expo-font"
+      "expo-font",
+      "@react-native-google-signin/google-signin"
     ],
     "experiments": {
       "typedRoutes": true
