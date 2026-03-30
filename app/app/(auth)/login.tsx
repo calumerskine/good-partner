@@ -3,6 +3,8 @@ import Input from "@/components/ui/input";
 import { useAuth } from "@/hooks/use-auth";
 import { trackEvent } from "@/lib/analytics";
 import tw from "@/lib/tw";
+import { FontAwesome } from "@expo/vector-icons";
+import * as AppleAuthentication from "expo-apple-authentication";
 import { Redirect } from "expo-router";
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -56,6 +58,8 @@ export default function LoginScreen() {
     isLoading: authLoading,
     signUpWithEmail,
     signInWithEmail,
+    signInWithGoogle,
+    signInWithApple,
   } = useAuth();
 
   const {
@@ -102,6 +106,31 @@ export default function LoginScreen() {
     setMode((prev) => (prev === "login" ? "signup" : "login"));
   };
 
+  const handleSocialSignIn = async (provider: "google" | "apple") => {
+    if (isLoading) return;
+    setIsLoading(true);
+    setError(null);
+    const eventPrefix = mode === "signup" ? "auth_signup" : "auth_login";
+    trackEvent(`${eventPrefix}_initiated`);
+    try {
+      const user =
+        provider === "google"
+          ? await signInWithGoogle()
+          : await signInWithApple();
+      if (!user) return; // user cancelled
+      trackEvent(`${eventPrefix}_succeeded`);
+    } catch (err) {
+      trackEvent(`${eventPrefix}_failed`, {
+        error: err instanceof Error ? err.message : "unknown",
+      });
+      setError(
+        err instanceof Error ? err.message : "An unknown error occurred",
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   // If user is already authenticated, redirect to root which will handle the navigation
   if (user && !authLoading) {
     return <Redirect href="/" />;
@@ -144,6 +173,40 @@ export default function LoginScreen() {
                 ? "Sign in to continue your journey"
                 : "Start building meaningful connections"}
             </Text>
+          </View>
+
+          <View style={tw`w-full gap-4 mb-6`}>
+            {Platform.OS === "ios" && (
+              <AppleAuthentication.AppleAuthenticationButton
+                buttonType={
+                  mode === "signup"
+                    ? AppleAuthentication.AppleAuthenticationButtonType.SIGN_UP
+                    : AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN
+                }
+                buttonStyle={
+                  AppleAuthentication.AppleAuthenticationButtonStyle.BLACK
+                }
+                cornerRadius={100}
+                style={{ height: 56 }}
+                onPress={() => handleSocialSignIn("apple")}
+              />
+            )}
+            <TouchableOpacity
+              style={tw`w-full h-14 flex-row items-center justify-center border-2 border-ink/15 rounded-full gap-3`}
+              onPress={() => handleSocialSignIn("google")}
+              disabled={isLoading}
+            >
+              <FontAwesome name="google" size={20} color="#2E3130" />
+              <Text style={tw`text-ink font-gabarito font-bold text-base`}>
+                {mode === "signup" ? "Sign up with Google" : "Sign in with Google"}
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={tw`flex-row items-center gap-3 w-full mb-6`}>
+            <View style={tw`flex-1 h-px bg-ink/10`} />
+            <Text style={tw`text-ink/40 font-gabarito text-sm`}>or</Text>
+            <View style={tw`flex-1 h-px bg-ink/10`} />
           </View>
 
           <View style={tw`w-full gap-5 mb-6`}>
