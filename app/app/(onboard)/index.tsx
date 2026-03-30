@@ -1,4 +1,3 @@
-import Button from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
 import { trackEvent } from "@/lib/analytics";
 import { useCreateUserProfile, useGetCategories } from "@/lib/api";
