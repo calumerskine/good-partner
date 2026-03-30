@@ -28,7 +28,7 @@ export type OnboardingData = {
 };
 
 export default function OnboardWizard() {
-  const { user, isLoading: authLoading, signUpWithEmail } = useAuth();
+  const { user, isLoading: authLoading } = useAuth();
   const router = useRouter();
   const { width } = useWindowDimensions();
   const createProfileMutation = useCreateUserProfile();
@@ -115,16 +115,8 @@ export default function OnboardWizard() {
     }
   };
 
-  const handleSignup = async (email: string, password: string) => {
-    trackEvent("auth_signup_initiated");
-    const signedUpUser = await signUpWithEmail(email, password);
-    if (!signedUpUser) {
-      throw new Error(
-        "Please check your email to confirm your account, then sign in.",
-      );
-    }
-    trackEvent("auth_signup_succeeded");
-    await submitProfile(signedUpUser.id);
+  const handleComplete = async (userId: string) => {
+    await submitProfile(userId);
   };
 
   if (authLoading || displayStep === null) {
@@ -212,7 +204,7 @@ export default function OnboardWizard() {
           />
         )}
         {displayStep === 5 && (
-          <AuthStep onSignup={handleSignup} />
+          <AuthStep onComplete={handleComplete} />
         )}
       </Animated.View>
     </SafeAreaView>
