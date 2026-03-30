@@ -70,14 +70,10 @@ export const CategoryButton = ({
         trigger("impactMedium");
       }}
       selected={selected ?? false}
-      color="white"
-      showColor={false}
       shade={300}
       deepFactor={1}
     >
-      <Animated.View
-        style={[tw`p-6 border-2 rounded-2xl`, animatedBorderStyle]}
-      >
+      <Animated.View style={[tw`p-6 border rounded-2xl`, animatedBorderStyle]}>
         {/* <View
           style={tw`bg-${color}-300 rounded-lg flex flex-row items-center px-3 py-1`}
         >

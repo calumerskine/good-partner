@@ -38,8 +38,8 @@ export function RelationshipStep({ selected, onSelect, onNext }: Props) {
               key={option.value}
               selected={selected === option.value}
               onPress={() => onSelect(option.value)}
+              colorMode="selected"
               color="indigo"
-              showColor
               shade={100}
             >
               <View style={tw`p-5`}>

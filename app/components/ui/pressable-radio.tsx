@@ -15,12 +15,14 @@ const DEEP_FACTOR = 1.2;
 const PRESS_IN_MS = 300;
 const PRESS_OUT_MS = 300;
 
+type ColorMode = "never" | "selected" | "always";
+
 type PressableRadioProps = {
   children: React.ReactNode;
   selected: boolean;
   onPress: () => void;
   color?: string;
-  showColor?: boolean;
+  colorMode?: ColorMode;
   shade?: number;
   pressDepth?: number;
   deepFactor?: number;
@@ -34,15 +36,20 @@ function clampShade(shade: number): number {
   return Math.max(100, Math.min(800, shade));
 }
 
-function getColorClasses(color: string, shade: number) {
-  if (color === "white") {
-    return { faceClass: "bg-white", shadowClass: "bg-gray-200" };
+function getStateClasses(color: string, shade: number, isColored: boolean) {
+  if (!isColored) {
+    return {
+      faceClass: "bg-gray-50",
+      shadowClass: "bg-gray-200",
+      faceBorderClass: "rounded-2xl border border-gray-200",
+    };
   }
   const s = clampShade(shade);
   const shadowShade = Math.min(s + 100, 900);
   return {
     faceClass: `bg-${color}-${s}`,
     shadowClass: `bg-${color}-${shadowShade}`,
+    faceBorderClass: `rounded-2xl border border-${color}-${shadowShade}`,
   };
 }
 
@@ -51,7 +58,7 @@ export default function PressableRadio({
   selected,
   onPress,
   color = "indigo",
-  showColor = false,
+  colorMode = "never",
   shade = 400,
   pressDepth = PRESS_DEPTH,
   deepFactor = DEEP_FACTOR,
@@ -64,7 +71,7 @@ export default function PressableRadio({
   const translateY = useRef(
     new Animated.Value(selected ? pressDepth : 0),
   ).current;
-  const [pressing, setPressing] = useState(false);
+  const [forceSync, setForceSync] = useState(0);
 
   // Always-current ref so gesture callbacks read the live selected value
   const selectedRef = useRef(selected);
@@ -72,10 +79,8 @@ export default function PressableRadio({
 
   // Captured at press-in so callbacks always know the starting state
   const selectedAtPressStart = useRef(selected);
-  // Set by onPress; tells the deferred snap-back in onPressOut to do nothing
+  // Set by onPress; tells the snap-back in onPressOut to do nothing
   const wasValidPress = useRef(false);
-  // Prevents the external-sync effect from conflicting with an active gesture
-  const isGestureActive = useRef(false);
 
   const animateTo = (toValue: number, duration: number) => {
     Animated.timing(translateY, {
@@ -86,19 +91,17 @@ export default function PressableRadio({
     }).start();
   };
 
-  // Sync resting position when selected changes externally (e.g. controlled reset)
+  // Sync resting position whenever selected or pressDepth changes, or after a
+  // press completes (forceSync). Nothing touches selected/forceSync during an
+  // active gesture, so no isGestureActive guard is needed.
   useEffect(() => {
-    if (!isGestureActive.current) {
-      animateTo(selected ? pressDepth : 0, PRESS_OUT_MS);
-    }
-  }, [selected, pressDepth]);
+    animateTo(selected ? pressDepth : 0, PRESS_OUT_MS);
+  }, [selected, pressDepth, forceSync]);
 
   const handlePressIn = () => {
     if (disabled) return;
-    isGestureActive.current = true;
     wasValidPress.current = false;
     selectedAtPressStart.current = selectedRef.current;
-    setPressing(true);
     trigger("impactLight");
     animateTo(
       selectedRef.current ? pressDepth * deepFactor : pressDepth,
@@ -106,20 +109,17 @@ export default function PressableRadio({
     );
   };
 
-  // onPress only fires on a confirmed tap — not when the gesture becomes a scroll.
-  // In RN, onPressOut fires before onPress in the same JS tick, so we handle the
-  // toggle here and let the deferred snap-back in onPressOut become a no-op.
+  // onPress only fires on a confirmed tap. setForceSync is called inline (not
+  // deferred) so it batches with the parent's setState from onPress() — the
+  // useEffect always runs with the final settled selected value.
   const handlePress = () => {
     wasValidPress.current = true;
-    const nextSelected = !selectedAtPressStart.current;
-    animateTo(nextSelected ? pressDepth : 0, PRESS_OUT_MS);
     onPress();
+    setForceSync((n) => n + 1);
   };
 
   const handlePressOut = () => {
     if (disabled) return;
-    isGestureActive.current = false;
-    setPressing(false);
     // Defer so onPress (which fires in the same JS tick) can set wasValidPress first.
     // If no onPress fires (scroll/cancel), snap back to the starting position.
     setTimeout(() => {
@@ -129,11 +129,15 @@ export default function PressableRadio({
     }, 0);
   };
 
-  const shouldShowColor = showColor ? selected || pressing : false;
-  const { faceClass, shadowClass } = getColorClasses(color, shade);
+  const isColored =
+    colorMode === "always" || (colorMode === "selected" && selected);
 
-  const activeFaceClass = shouldShowColor ? faceClass : "bg-white";
-  const activeShadowClass = shouldShowColor ? shadowClass : "bg-gray-200";
+  const { faceClass, shadowClass, faceBorderClass } = getStateClasses(
+    color,
+    shade,
+    isColored,
+  );
+
   const maxDepth = pressDepth * deepFactor;
 
   return (
@@ -141,7 +145,7 @@ export default function PressableRadio({
       {/* Shadow */}
       <Animated.View
         style={[
-          tw.style(activeShadowClass, `rounded-2xl absolute inset-0`),
+          tw.style(shadowClass, `rounded-2xl absolute inset-0`),
           { top: maxDepth },
         ]}
       />
@@ -151,7 +155,7 @@ export default function PressableRadio({
           fillHeight
             ? [{ transform: [{ translateY }] }, { flex: 1 }]
             : { transform: [{ translateY }] },
-          tw.style(),
+          tw.style(faceBorderClass),
         ]}
       >
         <Pressable
@@ -165,10 +169,10 @@ export default function PressableRadio({
           style={
             fillHeight
               ? [
-                  tw.style(`rounded-2xl overflow-hidden`, activeFaceClass),
+                  tw.style(`rounded-2xl overflow-hidden`, faceClass),
                   { flex: 1 },
                 ]
-              : tw.style(`rounded-2xl overflow-hidden`, activeFaceClass)
+              : tw.style(`rounded-2xl overflow-hidden`, faceClass)
           }
         >
           {children}

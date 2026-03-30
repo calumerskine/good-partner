@@ -17,7 +17,12 @@ type Props = {
   isSubmitting?: boolean;
 };
 
-export function GenderStep({ selected, onSelect, onNext, isSubmitting }: Props) {
+export function GenderStep({
+  selected,
+  onSelect,
+  onNext,
+  isSubmitting,
+}: Props) {
   return (
     <View style={tw`flex-1`}>
       <ScrollView
@@ -31,7 +36,9 @@ export function GenderStep({ selected, onSelect, onNext, isSubmitting }: Props) 
           >
             About you
           </Text>
-          <Text style={tw`text-lg text-charcoal/80 font-gabarito leading-relaxed`}>
+          <Text
+            style={tw`text-lg text-charcoal/80 font-gabarito leading-relaxed`}
+          >
             This helps us tailor suggestions for you.
           </Text>
         </View>
@@ -43,7 +50,7 @@ export function GenderStep({ selected, onSelect, onNext, isSubmitting }: Props) 
               selected={selected === option.value}
               onPress={() => onSelect(option.value)}
               color="indigo"
-              showColor
+              colorMode="selected"
               shade={100}
             >
               <View style={tw`p-5`}>
