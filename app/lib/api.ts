@@ -298,10 +298,14 @@ export function useUpdateReminderConfig() {
       }>;
     }) => {
       const dbConfig: Record<string, unknown> = {};
-      if (config.morningReminderEnabled !== undefined) dbConfig.morning_reminder_enabled = config.morningReminderEnabled;
-      if (config.eveningReminderEnabled !== undefined) dbConfig.evening_reminder_enabled = config.eveningReminderEnabled;
-      if (config.morningReminderTime !== undefined) dbConfig.morning_reminder_time = config.morningReminderTime;
-      if (config.eveningReminderTime !== undefined) dbConfig.evening_reminder_time = config.eveningReminderTime;
+      if (config.morningReminderEnabled !== undefined)
+        dbConfig.morning_reminder_enabled = config.morningReminderEnabled;
+      if (config.eveningReminderEnabled !== undefined)
+        dbConfig.evening_reminder_enabled = config.eveningReminderEnabled;
+      if (config.morningReminderTime !== undefined)
+        dbConfig.morning_reminder_time = config.morningReminderTime;
+      if (config.eveningReminderTime !== undefined)
+        dbConfig.evening_reminder_time = config.eveningReminderTime;
       const { error } = await supabase
         .from("user_profiles")
         .update(dbConfig)
@@ -1065,12 +1069,18 @@ async function completeAction(userActionId: string) {
     .single();
 
   if (userActionError) {
-    console.error("Error fetching user action for XP increment:", userActionError);
+    console.error(
+      "Error fetching user action for XP increment:",
+      userActionError,
+    );
   } else {
-    const { data: xpResult, error: xpError } = await supabase.rpc("increment_xp", {
-      p_user_id: userAction.user_id,
-      p_amount: XP_PER_COMPLETION,
-    });
+    const { data: xpResult, error: xpError } = await supabase.rpc(
+      "increment_xp",
+      {
+        p_user_id: userAction.user_id,
+        p_amount: XP_PER_COMPLETION,
+      },
+    );
 
     if (xpError) {
       console.error("Error incrementing XP:", xpError);
@@ -1324,6 +1334,8 @@ export type UserProfile = {
   categories: Category[];
   createdAt: Date;
   hasCompletedOnboarding: boolean;
+  relationshipStatus: string;
+  gender: string;
   totalXp: number;
   currentStreakDays: number;
   totalDaysActive: number;
@@ -1372,7 +1384,9 @@ async function getUserProfile(userId: string): Promise<UserProfile | null> {
   // First get the user profile
   const { data: profile, error: profileError } = await supabase
     .from("user_profiles")
-    .select("id, user_id, user_tier, created_at, has_completed_onboarding, total_xp, current_streak_days, total_days_active, morning_reminder_enabled, evening_reminder_enabled, morning_reminder_time, evening_reminder_time")
+    .select(
+      "id, user_id, user_tier, created_at, has_completed_onboarding, total_xp, current_streak_days, total_days_active, morning_reminder_enabled, evening_reminder_enabled, morning_reminder_time, evening_reminder_time, relationship_status, gender",
+    )
     .eq("user_id", userId)
     .single();
 
@@ -1416,10 +1430,12 @@ async function getUserProfile(userId: string): Promise<UserProfile | null> {
     totalXp: profile.total_xp ?? 0,
     currentStreakDays: profile.current_streak_days ?? 0,
     totalDaysActive: profile.total_days_active ?? 0,
+    relationshipStatus: profile.relationship_status,
+    gender: profile.gender,
     morningReminderEnabled: profile.morning_reminder_enabled ?? true,
     eveningReminderEnabled: profile.evening_reminder_enabled ?? true,
-    morningReminderTime: profile.morning_reminder_time ?? '10:00',
-    eveningReminderTime: profile.evening_reminder_time ?? '19:00',
+    morningReminderTime: profile.morning_reminder_time ?? "10:00",
+    eveningReminderTime: profile.evening_reminder_time ?? "19:00",
   };
 }
 
@@ -1625,7 +1641,9 @@ export function useGetActionNotificationsEnabled(userId?: string) {
   });
 }
 
-async function getActionNotificationsEnabled(userId: string): Promise<boolean | null> {
+async function getActionNotificationsEnabled(
+  userId: string,
+): Promise<boolean | null> {
   const { data, error } = await supabase
     .from("user_profiles")
     .select("action_notifications_enabled")
@@ -1650,7 +1668,10 @@ export function useToggleActionNotificationsEnabled() {
       const previousValue = queryClient.getQueryData<boolean>(
         queryKeys.actionNotificationsEnabled(userId),
       );
-      queryClient.setQueryData(queryKeys.actionNotificationsEnabled(userId), enabled);
+      queryClient.setQueryData(
+        queryKeys.actionNotificationsEnabled(userId),
+        enabled,
+      );
       return { previousValue, userId };
     },
     onError: (_error, _variables, context) => {
@@ -1669,7 +1690,10 @@ export function useToggleActionNotificationsEnabled() {
   });
 }
 
-async function toggleActionNotificationsEnabled(userId: string, enabled: boolean) {
+async function toggleActionNotificationsEnabled(
+  userId: string,
+  enabled: boolean,
+) {
   const { error } = await supabase
     .from("user_profiles")
     .update({ action_notifications_enabled: enabled })
@@ -1698,7 +1722,9 @@ export function useGetDailyContent(dayNumber: number | undefined) {
   });
 }
 
-async function getDailyContent(dayNumber: number): Promise<DailyContent | null> {
+async function getDailyContent(
+  dayNumber: number,
+): Promise<DailyContent | null> {
   // Fetch the closest content entry with day_number <= dayNumber, returning null if none exists
   const { data, error } = await supabase
     .from("daily_content")
