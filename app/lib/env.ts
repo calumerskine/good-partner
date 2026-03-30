@@ -18,6 +18,10 @@ export const env = z
       url: z.string(),
       anonKey: z.string(),
     }),
+    google: z.object({
+      iosClientId: z.string(),
+      webClientId: z.string(),
+    }),
   })
   .parse({
     environment: process.env.EXPO_PUBLIC_ENV ?? "development",
@@ -35,5 +39,9 @@ export const env = z
     supabase: {
       url: process.env.EXPO_PUBLIC_SUPABASE_URL,
       anonKey: process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY,
+    },
+    google: {
+      iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
+      webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
     },
   });
