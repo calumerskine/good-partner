@@ -112,17 +112,22 @@ export function AuthStep({ onComplete }: Props) {
 
         <View style={tw`gap-4 mb-6`}>
           {Platform.OS === "ios" && (
-            <AppleAuthentication.AppleAuthenticationButton
-              buttonType={
-                AppleAuthentication.AppleAuthenticationButtonType.SIGN_UP
-              }
-              buttonStyle={
-                AppleAuthentication.AppleAuthenticationButtonStyle.BLACK
-              }
-              cornerRadius={100}
-              style={{ height: 56 }}
-              onPress={() => handleSocialAuth("apple")}
-            />
+            <View
+              style={isLoading ? tw`opacity-50` : undefined}
+              pointerEvents={isLoading ? "none" : "auto"}
+            >
+              <AppleAuthentication.AppleAuthenticationButton
+                buttonType={
+                  AppleAuthentication.AppleAuthenticationButtonType.SIGN_UP
+                }
+                buttonStyle={
+                  AppleAuthentication.AppleAuthenticationButtonStyle.BLACK
+                }
+                cornerRadius={100}
+                style={{ height: 56 }}
+                onPress={() => handleSocialAuth("apple")}
+              />
+            </View>
           )}
           <TouchableOpacity
             style={tw`w-full h-14 flex-row items-center justify-center border-2 border-ink/15 rounded-full gap-3`}
