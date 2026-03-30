@@ -1435,13 +1435,23 @@ export function useCreateUserProfile() {
       userId,
       categoryIds,
       hasCompletedOnboarding,
+      relationshipStatus,
+      gender,
     }: {
       userId: string;
       categoryIds: string[];
       hasCompletedOnboarding: boolean;
-    }) => createUserProfile(userId, categoryIds, hasCompletedOnboarding),
+      relationshipStatus: string | null;
+      gender: string | null;
+    }) =>
+      createUserProfile(
+        userId,
+        categoryIds,
+        hasCompletedOnboarding,
+        relationshipStatus,
+        gender,
+      ),
     onSuccess: (data, { userId }) => {
-      // Invalidate the user profile query so it refetches
       queryClient.invalidateQueries({
         queryKey: queryKeys.userProfile(userId),
       });
@@ -1453,6 +1463,8 @@ async function createUserProfile(
   userId: string,
   categoryIds: string[],
   hasCompletedOnboarding: boolean,
+  relationshipStatus: string | null,
+  gender: string | null,
 ): Promise<UserProfile> {
   // Create the user profile first
   const { data: profile, error: profileError } = await supabase
@@ -1460,6 +1472,8 @@ async function createUserProfile(
     .insert({
       user_id: userId,
       has_completed_onboarding: hasCompletedOnboarding,
+      relationship_status: relationshipStatus,
+      gender: gender,
     })
     .select("id, user_id, created_at")
     .single();
