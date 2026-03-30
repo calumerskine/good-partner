@@ -1,6 +1,10 @@
 import Button from "@/components/ui/button";
 import Input from "@/components/ui/input";
+import { useAuth } from "@/hooks/use-auth";
+import { trackEvent } from "@/lib/analytics";
 import tw from "@/lib/tw";
+import { FontAwesome } from "@expo/vector-icons";
+import * as AppleAuthentication from "expo-apple-authentication";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
@@ -8,6 +12,7 @@ import {
   Platform,
   ScrollView,
   Text,
+  TouchableOpacity,
   View,
 } from "react-native";
 
@@ -17,12 +22,13 @@ type FormValues = {
 };
 
 type Props = {
-  onSignup: (email: string, password: string) => Promise<void>;
+  onComplete: (userId: string) => Promise<void>;
 };
 
-export function AuthStep({ onSignup }: Props) {
+export function AuthStep({ onComplete }: Props) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { signUpWithEmail, signInWithGoogle, signInWithApple } = useAuth();
 
   const {
     control,
@@ -32,13 +38,52 @@ export function AuthStep({ onSignup }: Props) {
     defaultValues: { email: "", password: "" },
   });
 
+  const handleSocialAuth = async (provider: "google" | "apple") => {
+    setIsLoading(true);
+    setError(null);
+    trackEvent("auth_signup_initiated", { provider });
+    try {
+      const user =
+        provider === "google"
+          ? await signInWithGoogle()
+          : await signInWithApple();
+      if (!user) return; // user cancelled
+      trackEvent("auth_signup_succeeded", { provider });
+      await onComplete(user.id);
+    } catch (err) {
+      trackEvent("auth_signup_failed", {
+        provider,
+        error: err instanceof Error ? err.message : "unknown",
+      });
+      setError(
+        err instanceof Error ? err.message : "An unknown error occurred",
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const onSubmit = async ({ email, password }: FormValues) => {
     setIsLoading(true);
     setError(null);
+    trackEvent("auth_signup_initiated", { provider: "email" });
     try {
-      await onSignup(email, password);
+      const user = await signUpWithEmail(email, password);
+      if (!user) {
+        throw new Error(
+          "Please check your email to confirm your account, then sign in.",
+        );
+      }
+      trackEvent("auth_signup_succeeded", { provider: "email" });
+      await onComplete(user.id);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An unknown error occurred");
+      trackEvent("auth_signup_failed", {
+        provider: "email",
+        error: err instanceof Error ? err.message : "unknown",
+      });
+      setError(
+        err instanceof Error ? err.message : "An unknown error occurred",
+      );
     } finally {
       setIsLoading(false);
     }
@@ -64,6 +109,38 @@ export function AuthStep({ onSignup }: Props) {
           </Text>
         </View>
 
+        <View style={tw`gap-4 mb-6`}>
+          {Platform.OS === "ios" && (
+            <AppleAuthentication.AppleAuthenticationButton
+              buttonType={
+                AppleAuthentication.AppleAuthenticationButtonType.SIGN_UP
+              }
+              buttonStyle={
+                AppleAuthentication.AppleAuthenticationButtonStyle.BLACK
+              }
+              cornerRadius={100}
+              style={{ height: 56 }}
+              onPress={() => handleSocialAuth("apple")}
+            />
+          )}
+          <TouchableOpacity
+            style={tw`w-full h-14 flex-row items-center justify-center border-2 border-ink/15 rounded-full gap-3`}
+            onPress={() => handleSocialAuth("google")}
+            disabled={isLoading}
+          >
+            <FontAwesome name="google" size={20} color="#2E3130" />
+            <Text style={tw`text-ink font-gabarito font-bold text-base`}>
+              Continue with Google
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={tw`flex-row items-center gap-3 mb-6`}>
+          <View style={tw`flex-1 h-px bg-ink/10`} />
+          <Text style={tw`text-ink/40 font-gabarito text-sm`}>or</Text>
+          <View style={tw`flex-1 h-px bg-ink/10`} />
+        </View>
+
         <View style={tw`gap-5 mb-6`}>
           <Controller
             control={control}
@@ -86,7 +163,9 @@ export function AuthStep({ onSignup }: Props) {
                   keyboardType="email-address"
                 />
                 {errors.email && (
-                  <Text style={tw`text-red-600 text-sm mt-2 ml-4 font-gabarito`}>
+                  <Text
+                    style={tw`text-red-600 text-sm mt-2 ml-4 font-gabarito`}
+                  >
                     {errors.email.message}
                   </Text>
                 )}
@@ -116,7 +195,9 @@ export function AuthStep({ onSignup }: Props) {
                   autoComplete="new-password"
                 />
                 {errors.password && (
-                  <Text style={tw`text-red-600 text-sm mt-2 ml-4 font-gabarito`}>
+                  <Text
+                    style={tw`text-red-600 text-sm mt-2 ml-4 font-gabarito`}
+                  >
                     {errors.password.message}
                   </Text>
                 )}
@@ -130,14 +211,16 @@ export function AuthStep({ onSignup }: Props) {
           <View
             style={tw`p-5 bg-red-600/10 rounded-2xl border-2 border-red-600/30 mb-6`}
           >
-            <Text style={tw`text-red-600 font-gabarito text-base leading-relaxed`}>
+            <Text
+              style={tw`text-red-600 font-gabarito text-base leading-relaxed`}
+            >
               {error}
             </Text>
           </View>
         )}
 
         <Button disabled={isLoading} onPress={handleSubmit(onSubmit)}>
-          {isLoading ? "Creating account..." : "Let's go →"}
+          {isLoading ? "Creating account..." : "Continue with email →"}
         </Button>
       </ScrollView>
     </KeyboardAvoidingView>
