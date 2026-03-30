@@ -15,6 +15,8 @@ CREATE TABLE user_profiles (
   user_tier TEXT NOT NULL DEFAULT 'free',
   created_at TIMESTAMPTZ DEFAULT NOW(),
   has_completed_onboarding BOOLEAN DEFAULT FALSE,
+  relationship_status TEXT,
+  gender TEXT,
   notifications_enabled BOOLEAN DEFAULT FALSE,
   action_notifications_enabled BOOLEAN DEFAULT FALSE,
   current_streak_days INTEGER DEFAULT 0,
