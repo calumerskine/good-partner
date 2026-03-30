@@ -51,7 +51,13 @@
       ],
       "expo-router",
       "expo-font",
-      "@react-native-google-signin/google-signin"
+      "expo-apple-authentication",
+      [
+        "@react-native-google-signin/google-signin",
+        {
+          "iosUrlScheme": "com.googleusercontent.apps.YOUR_REVERSED_IOS_CLIENT_ID"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true
