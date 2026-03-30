@@ -1,6 +1,9 @@
 import { initialiseAnalytics } from "@/lib/analytics";
+import { env } from "@/lib/env";
 import { supabase } from "@/lib/supabase";
+import { GoogleSignin, statusCodes } from "@react-native-google-signin/google-signin";
 import { Session, User } from "@supabase/supabase-js";
+import * as AppleAuthentication from "expo-apple-authentication";
 import React, { createContext, useContext, useEffect, useState } from "react";
 
 type AuthEvent =
@@ -19,6 +22,8 @@ type AuthContextType = {
   lastEvent: AuthEvent | null;
   signUpWithEmail: (email: string, password: string) => Promise<User | null>;
   signInWithEmail: (email: string, password: string) => Promise<User>;
+  signInWithGoogle: () => Promise<User | null>;
+  signInWithApple: () => Promise<User | null>;
 };
 
 const AuthContext = createContext<AuthContextType>({
@@ -29,6 +34,8 @@ const AuthContext = createContext<AuthContextType>({
   lastEvent: null,
   signUpWithEmail: async () => null as unknown as User,
   signInWithEmail: async () => null as unknown as User,
+  signInWithGoogle: async () => null,
+  signInWithApple: async () => null,
 });
 
 export function useAuth() {
@@ -51,6 +58,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   useEffect(() => {
+    GoogleSignin.configure({
+      webClientId: env.google.webClientId,
+      iosClientId: env.google.iosClientId,
+    });
+  }, []);
+
+  useEffect(() => {
     let mounted = true;
 
     async function initialise() {
@@ -61,7 +75,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         if (!mounted) return;
 
-        // Always set loading to false after checking, even if no session
         setSession(currentSession);
         if (currentSession?.user.id) {
           identifyAuthUser(currentSession.user.id);
@@ -77,7 +90,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     initialise();
 
-    // Listen for auth changes
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, newSession) => {
@@ -92,7 +104,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         identifyAuthUser(newSession.user.id);
       }
 
-      // Loading should be false after any auth event
       setIsLoading(false);
     });
 
@@ -128,6 +139,51 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return data.user;
   };
 
+  const signInWithGoogle = async (): Promise<User | null> => {
+    try {
+      await GoogleSignin.hasPlayServices();
+      const response = await GoogleSignin.signIn();
+      const idToken = response.data?.idToken;
+      if (!idToken) throw new Error("No ID token returned from Google");
+
+      const { data, error } = await supabase.auth.signInWithIdToken({
+        provider: "google",
+        token: idToken,
+      });
+      if (error) throw error;
+      if (!data.user) throw new Error("No user returned from Supabase");
+      return data.user;
+    } catch (error: any) {
+      if (error.code === statusCodes.SIGN_IN_CANCELLED) return null;
+      throw error;
+    }
+  };
+
+  const signInWithApple = async (): Promise<User | null> => {
+    try {
+      const credential = await AppleAuthentication.signInAsync({
+        requestedScopes: [
+          AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
+          AppleAuthentication.AppleAuthenticationScope.EMAIL,
+        ],
+      });
+      if (!credential.identityToken) {
+        throw new Error("No identity token from Apple");
+      }
+
+      const { data, error } = await supabase.auth.signInWithIdToken({
+        provider: "apple",
+        token: credential.identityToken,
+      });
+      if (error) throw error;
+      if (!data.user) throw new Error("No user returned from Supabase");
+      return data.user;
+    } catch (error: any) {
+      if (error.code === "ERR_REQUEST_CANCELED") return null;
+      throw error;
+    }
+  };
+
   const signOut = async () => {
     await supabase.auth.signOut();
   };
@@ -144,6 +200,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         lastEvent,
         signUpWithEmail,
         signInWithEmail,
+        signInWithGoogle,
+        signInWithApple,
       }}
     >
       {children}
