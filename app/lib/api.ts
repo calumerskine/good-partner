@@ -1035,43 +1035,49 @@ async function getTodayCompletedAction(
   const userActionIds = userActionData?.map((ua) => ua.id) ?? [];
   if (userActionIds.length === 0) return null;
 
-  // Step 2: Get most recent completion today for those actions, with full action details
-  const { data, error } = await supabase
+  // Step 2: Find the most recent completion today (flat query, no joins)
+  const { data: completion, error: completionError } = await supabase
     .from("completions")
-    .select(
-      `
-      user_action_id,
-      user_actions (
-        id,
-        action_id,
-        user_id,
-        activated_at,
-        is_active,
-        reminder_at,
-        actions (
-          id,
-          title,
-          description,
-          reasoning,
-          action_categories (
-            name
-          )
-        )
-      )
-    `,
-    )
+    .select("user_action_id")
     .in("user_action_id", userActionIds)
     .gte("created_at", dayStart.toISOString())
     .order("created_at", { ascending: false })
     .limit(1)
     .maybeSingle();
 
-  if (error) throw error;
+  if (completionError) throw completionError;
+  if (!completion) return null;
 
-  if (!data) return null;
+  // Step 3: Fetch full action details — same join pattern as getActiveActions
+  const { data: userAction, error: userActionDetailError } = await supabase
+    .from("user_actions")
+    .select(
+      `
+      id,
+      action_id,
+      user_id,
+      activated_at,
+      is_active,
+      reminder_at,
+      actions (
+        id,
+        title,
+        description,
+        reasoning,
+        action_categories (
+          name
+        )
+      )
+    `,
+    )
+    .eq("id", completion.user_action_id)
+    .single();
 
-  const ua = (data as any).user_actions;
-  if (!ua || !ua.actions) return null;
+  if (userActionDetailError) throw userActionDetailError;
+  if (!userAction) return null;
+
+  const ua = userAction as any;
+  if (!ua.actions) return null;
 
   return {
     id: ua.id,
