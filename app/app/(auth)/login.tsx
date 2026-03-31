@@ -1,4 +1,5 @@
 import Button from "@/components/ui/button";
+import { FormScrollView } from "@/components/ui/form-scroll-view";
 import Input from "@/components/ui/input";
 import { useAuth } from "@/hooks/use-auth";
 import { trackEvent } from "@/lib/analytics";
@@ -10,9 +11,7 @@ import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
   ActivityIndicator,
-  KeyboardAvoidingView,
   Platform,
-  ScrollView,
   Text,
   TouchableOpacity,
   View,
@@ -146,22 +145,15 @@ export default function LoginScreen() {
   }
 
   return (
-    <KeyboardAvoidingView
-      style={tw`flex-1 bg-white`}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
+    <FormScrollView
+      style={tw`bg-white`}
+      contentContainerStyle={[
+        tw`flex-grow items-center justify-center px-6`,
+        { paddingTop: insets.top + 16, paddingBottom: insets.bottom + 16 },
+      ]}
     >
       {/* Form content — hidden until form reveal animation */}
-      <ScrollView
-        style={tw`flex-1`}
-        contentContainerStyle={[
-          tw`flex-grow items-center justify-center px-6`,
-          { paddingTop: insets.top + 16, paddingBottom: insets.bottom + 16 },
-        ]}
-        keyboardShouldPersistTaps="handled"
-        keyboardDismissMode="on-drag"
-        showsVerticalScrollIndicator={false}
-      >
-        <Animated.View style={[tw`w-full max-w-md`, formAnimatedStyle]}>
+      <Animated.View style={[tw`w-full max-w-md`, formAnimatedStyle]}>
           <View style={tw`mb-12`}>
             <Text
               style={tw`text-4xl text-ink text-center font-gabarito font-black mb-3`}
@@ -322,8 +314,7 @@ export default function LoginScreen() {
               </TouchableOpacity>
             </View>
           </View>
-        </Animated.View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+      </Animated.View>
+    </FormScrollView>
   );
 }

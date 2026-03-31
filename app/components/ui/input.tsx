@@ -1,6 +1,13 @@
+import { useFormScrollContext } from "@/components/ui/form-scroll-view";
 import tw from "@/lib/tw";
-import { useState } from "react";
-import { TextInput, TextInputProps, TextStyle } from "react-native";
+import { useRef, useState } from "react";
+import {
+  NativeSyntheticEvent,
+  TextInput,
+  TextInputFocusEventData,
+  TextInputProps,
+  TextStyle,
+} from "react-native";
 
 type InputProps = {
   name: string;
@@ -18,20 +25,36 @@ export default function Input({
   onChangeText,
   style,
   variant = "default",
+  onFocus: externalOnFocus,
+  onBlur: externalOnBlur,
   ...rest
 }: InputProps) {
   const [isFocused, setIsFocused] = useState(false);
+  const inputRef = useRef<TextInput>(null);
+  const formScroll = useFormScrollContext();
+
+  const handleFocus = (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
+    setIsFocused(true);
+    formScroll?.setFocusedInput(inputRef.current);
+    externalOnFocus?.(e);
+  };
+
+  const handleBlur = (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
+    setIsFocused(false);
+    externalOnBlur?.(e);
+  };
 
   if (variant === "outlined") {
     return (
       <TextInput
+        ref={inputRef}
         id={name}
         value={value}
         onChangeText={onChangeText}
         placeholder={placeholder}
         placeholderTextColor="rgba(255,255,255,0.4)"
-        onFocus={() => setIsFocused(true)}
-        onBlur={() => setIsFocused(false)}
+        onFocus={handleFocus}
+        onBlur={handleBlur}
         style={[
           tw.style(
             `text-white font-gabarito text-lg px-6 py-4 w-full rounded-2xl border-2`,
@@ -46,13 +69,14 @@ export default function Input({
 
   return (
     <TextInput
+      ref={inputRef}
       id={name}
       value={value}
       onChangeText={onChangeText}
       placeholder={placeholder}
       placeholderTextColor="rgba(0,0,0,0.4)"
-      onFocus={() => setIsFocused(true)}
-      onBlur={() => setIsFocused(false)}
+      onFocus={handleFocus}
+      onBlur={handleBlur}
       style={[
         tw.style(
           `text-black font-gabarito text-xl px-6 py-4 w-full rounded-xl`,

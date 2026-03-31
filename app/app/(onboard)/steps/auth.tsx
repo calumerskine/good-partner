@@ -1,4 +1,5 @@
 import Button from "@/components/ui/button";
+import { FormScrollView } from "@/components/ui/form-scroll-view";
 import Input from "@/components/ui/input";
 import { useAuth } from "@/hooks/use-auth";
 import { trackEvent } from "@/lib/analytics";
@@ -7,14 +8,7 @@ import { FontAwesome } from "@expo/vector-icons";
 import * as AppleAuthentication from "expo-apple-authentication";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import {
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Platform, Text, TouchableOpacity, View } from "react-native";
 
 type FormValues = {
   email: string;
@@ -91,17 +85,7 @@ export function AuthStep({ onComplete }: Props) {
   };
 
   return (
-    <KeyboardAvoidingView
-      style={tw`flex-1`}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-    >
-      <ScrollView
-        style={tw`flex-1`}
-        contentContainerStyle={tw`flex-grow px-6 justify-center pb-4`}
-        keyboardShouldPersistTaps="handled"
-        keyboardDismissMode="on-drag"
-        showsVerticalScrollIndicator={false}
-      >
+    <FormScrollView contentContainerStyle={tw`flex-grow px-6 justify-center pb-4`}>
         <View style={tw`mb-10`}>
           <Text
             style={tw`text-4xl text-charcoal font-gabarito font-black mb-3 leading-tight`}
@@ -228,7 +212,6 @@ export function AuthStep({ onComplete }: Props) {
         <Button disabled={isLoading} onPress={handleSubmit(onSubmit)}>
           {isLoading ? "Creating account..." : "Continue with email →"}
         </Button>
-      </ScrollView>
-    </KeyboardAvoidingView>
+    </FormScrollView>
   );
 }
