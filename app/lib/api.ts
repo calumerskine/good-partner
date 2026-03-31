@@ -1106,6 +1106,9 @@ export function useCompleteAction() {
       queryClient.invalidateQueries({
         queryKey: queryKeys.suggestedActions(),
       });
+      queryClient.invalidateQueries({
+        queryKey: ["todayCompletedAction"],
+      });
       // Invalidate all user profile queries to refresh XP on progress screen.
       // Uses prefix matching: ["userProfile"] matches ["userProfile", userId]
       queryClient.invalidateQueries({
