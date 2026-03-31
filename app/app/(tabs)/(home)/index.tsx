@@ -42,7 +42,7 @@ export default function HomeScreen() {
     }, []),
   );
 
-  if (isLoading || isProfileLoading) {
+  if (isLoading || isProfileLoading || (isTodayLoading && userActions.length === 0)) {
     return (
       <View style={tw`flex-1 items-center justify-center bg-white`}>
         <ActivityIndicator size="large" color="#2E3130" />
