@@ -1,5 +1,6 @@
 import ActiveActions from "@/components/home/active-actions";
 import HomeHeader from "@/components/home/home-header";
+import CompletedAction from "@/components/home/completed-action";
 import SuggestedActions from "@/components/home/suggested-actions";
 import ActionReminderSheet from "@/components/reminders/action-reminder-sheet";
 import { useAuth } from "@/hooks/use-auth";
@@ -7,6 +8,7 @@ import { trackEvent } from "@/lib/analytics";
 import {
   useGetActiveActions,
   useGetDailyContent,
+  useGetTodayCompletedAction,
   useGetUserProfile,
 } from "@/lib/api";
 import tw from "@/lib/tw";
@@ -24,6 +26,9 @@ export default function HomeScreen() {
   );
   const [reminderSheetActionId, setReminderSheetActionId] = useState<string | null>(null);
   const reminderSheetAction = userActions.find((a) => a.id === reminderSheetActionId) ?? null;
+  const { data: todayCompletedAction = null, isLoading: isTodayLoading } =
+    useGetTodayCompletedAction(user?.id);
+  const [showSuggestedFlow, setShowSuggestedFlow] = useState(false);
 
   const dayNumber = profile ? (profile.totalDaysActive ?? 1) : undefined;
   const { data: dailyContent } = useGetDailyContent(dayNumber);
@@ -37,7 +42,7 @@ export default function HomeScreen() {
     }, []),
   );
 
-  if (isLoading || isProfileLoading) {
+  if (isLoading || isProfileLoading || isTodayLoading) {
     return (
       <View style={tw`flex-1 items-center justify-center bg-white`}>
         <ActivityIndicator size="large" color="#2E3130" />
@@ -59,11 +64,23 @@ export default function HomeScreen() {
           {dailyContent?.headlineMessage ?? "Everyone starts here"}
         </Text>
       </Animated.View>
-      {userActions.length > 0 ? (
+      {showSuggestedFlow ? (
+        <SuggestedActions
+          user={user}
+          profile={profile}
+          isLoading={isLoading}
+        />
+      ) : userActions.length > 0 ? (
         <ActiveActions
           isLoading={isLoading}
           userActions={userActions}
           onRemind={setReminderSheetActionId}
+        />
+      ) : todayCompletedAction ? (
+        <CompletedAction
+          action={todayCompletedAction}
+          streakDays={profile?.currentStreakDays ?? 0}
+          onDoAnother={() => setShowSuggestedFlow(true)}
         />
       ) : (
         <SuggestedActions
