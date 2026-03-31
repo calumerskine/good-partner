@@ -24,6 +24,8 @@ const queryKeys = {
   reminderConfig: (userId: string) => ["reminderConfig", userId] as const,
   actionNotificationsEnabled: (userId: string) =>
     ["actionNotificationsEnabled", userId] as const,
+  todayCompletedAction: (userId: string) =>
+    ["todayCompletedAction", userId] as const,
 };
 
 const mutationKeys = {
@@ -1000,6 +1002,88 @@ async function getAllUserActions(userId: string): Promise<UserAction[]> {
   });
 
   return Array.from(deduplicatedMap.values());
+}
+
+/**
+ * Get the most recent action completed today (since midnight local time).
+ * Returns null if no action was completed today.
+ */
+export function useGetTodayCompletedAction(userId?: string) {
+  return useQuery({
+    queryKey: queryKeys.todayCompletedAction(userId!),
+    queryFn: () => getTodayCompletedAction(userId!),
+    enabled: !!userId,
+  });
+}
+
+async function getTodayCompletedAction(
+  userId: string,
+): Promise<UserAction | null> {
+  const dayStart = new Date();
+  dayStart.setHours(0, 0, 0, 0);
+
+  const { data, error } = await supabase
+    .from("completions")
+    .select(
+      `
+      id,
+      created_at,
+      user_action_id,
+      user_actions!inner (
+        id,
+        action_id,
+        user_id,
+        activated_at,
+        is_active,
+        reminder_at,
+        actions (
+          id,
+          title,
+          description,
+          reasoning,
+          action_categories (
+            name
+          )
+        )
+      )
+    `,
+    )
+    .eq("user_actions.user_id", userId)
+    .gte("created_at", dayStart.toISOString())
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (error) {
+    throw error;
+  }
+
+  if (!data || !(data as any).user_actions) {
+    return null;
+  }
+
+  const ua = (data as any).user_actions;
+
+  if (!ua.actions) {
+    return null;
+  }
+
+  return {
+    id: ua.id,
+    actionId: ua.action_id,
+    userId: ua.user_id,
+    activatedAt: new Date(ua.activated_at),
+    isActive: ua.is_active,
+    completionCount: 1,
+    reminderAt: ua.reminder_at ? new Date(ua.reminder_at) : null,
+    action: {
+      id: ua.actions.id,
+      category: ua.actions.action_categories?.name || "",
+      title: ua.actions.title,
+      description: ua.actions.description,
+      reasoning: ua.actions.reasoning,
+    },
+  };
 }
 
 /**
