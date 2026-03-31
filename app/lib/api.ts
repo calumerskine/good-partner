@@ -1040,8 +1040,8 @@ async function getTodayCompletedAction(
     .from("completions")
     .select("user_action_id")
     .in("user_action_id", userActionIds)
-    .gte("created_at", dayStart.toISOString())
-    .order("created_at", { ascending: false })
+    .gte("completed_at", dayStart.toISOString())
+    .order("completed_at", { ascending: false })
     .limit(1)
     .maybeSingle();
 
