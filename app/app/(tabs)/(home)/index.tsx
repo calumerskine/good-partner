@@ -64,29 +64,23 @@ export default function HomeScreen() {
           {dailyContent?.headlineMessage ?? "Everyone starts here"}
         </Text>
       </Animated.View>
-      {showSuggestedFlow ? (
-        <SuggestedActions
-          user={user}
-          profile={profile}
-          isLoading={isLoading}
-        />
-      ) : userActions.length > 0 ? (
+      {userActions.length > 0 ? (
         <ActiveActions
           isLoading={isLoading}
           userActions={userActions}
           onRemind={setReminderSheetActionId}
         />
-      ) : todayCompletedAction ? (
-        <CompletedAction
-          action={todayCompletedAction}
-          streakDays={profile?.currentStreakDays ?? 0}
-          onDoAnother={() => setShowSuggestedFlow(true)}
-        />
-      ) : (
+      ) : showSuggestedFlow || !todayCompletedAction ? (
         <SuggestedActions
           user={user}
           profile={profile}
           isLoading={isLoading}
+        />
+      ) : (
+        <CompletedAction
+          action={todayCompletedAction}
+          streakDays={profile?.currentStreakDays ?? 0}
+          onDoAnother={() => setShowSuggestedFlow(true)}
         />
       )}
       {reminderSheetAction && (
