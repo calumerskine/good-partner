@@ -184,8 +184,10 @@ export default function LoginScreen() {
                 <AppleAuthentication.AppleAuthenticationButton
                   buttonType={
                     mode === "signup"
-                      ? AppleAuthentication.AppleAuthenticationButtonType.SIGN_UP
-                      : AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN
+                      ? AppleAuthentication.AppleAuthenticationButtonType
+                          .SIGN_UP
+                      : AppleAuthentication.AppleAuthenticationButtonType
+                          .SIGN_IN
                   }
                   buttonStyle={
                     AppleAuthentication.AppleAuthenticationButtonStyle.BLACK
@@ -197,13 +199,15 @@ export default function LoginScreen() {
               </View>
             )}
             <TouchableOpacity
-              style={tw`w-full h-14 flex-row items-center justify-center border-2 border-ink/15 rounded-full gap-3`}
+              style={tw`w-full h-14 flex-row items-center justify-center border-2 border-ink/15 rounded-full gap-1.5`}
               onPress={() => handleSocialSignIn("google")}
               disabled={isLoading}
             >
-              <FontAwesome name="google" size={20} color="#2E3130" />
-              <Text style={tw`text-ink font-gabarito font-bold text-base`}>
-                {mode === "signup" ? "Sign up with Google" : "Sign in with Google"}
+              <FontAwesome name="google" size={16} color={tw.color("ink")} />
+              <Text style={tw`text-ink font-gabarito font-bold text-xl`}>
+                {mode === "signup"
+                  ? "Sign up with Google"
+                  : "Sign in with Google"}
               </Text>
             </TouchableOpacity>
           </View>
