@@ -7,10 +7,17 @@ import { Link, router } from "expo-router";
 import { useCallback } from "react";
 import { Animated, Text, View } from "react-native";
 import { format, isBefore, isToday, isTomorrow } from "date-fns";
+import { Check } from "lucide-react-native";
 import Button from "../ui/button";
 import PressableCard from "../ui/pressable-card";
 
-function ActionCard({ item }: { item: UserAction }) {
+export function ActionCard({
+  item,
+  completed = false,
+}: {
+  item: UserAction;
+  completed?: boolean;
+}) {
   const categoryInfo =
     ActionTypes[item.action.category as keyof typeof ActionTypes];
 
@@ -35,10 +42,19 @@ function ActionCard({ item }: { item: UserAction }) {
           style={tw`flex flex-row justify-between items-baseline w-full pb-4`}
         >
           <View style={tw`flex flex-row items-center gap-2`}>
-            <Text style={tw`font-bold`}>In Progress</Text>
-            <View
-              style={tw`bg-green-400 border-green-500 border w-3 h-3 rounded-full`}
-            />
+            {completed ? (
+              <>
+                <Text style={tw`font-bold`}>Completed</Text>
+                <Check size={14} color="#16a34a" strokeWidth={3} />
+              </>
+            ) : (
+              <>
+                <Text style={tw`font-bold`}>In Progress</Text>
+                <View
+                  style={tw`bg-green-400 border-green-500 border w-3 h-3 rounded-full`}
+                />
+              </>
+            )}
           </View>
           <View
             style={tw`bg-${categoryInfo.color}-300 rounded-lg flex flex-row items-center px-3 py-1`}
@@ -65,6 +81,13 @@ function ActionCard({ item }: { item: UserAction }) {
             {firstSentence}
           </Text>
         </View>
+        {completed && (
+          <View
+            style={tw`absolute bottom-4 left-4 w-8 h-8 rounded-full bg-green-500 items-center justify-center`}
+          >
+            <Check size={16} color="white" strokeWidth={3} />
+          </View>
+        )}
       </View>
     </PressableCard>
   );
