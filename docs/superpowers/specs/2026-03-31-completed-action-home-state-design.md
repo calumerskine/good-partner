@@ -47,9 +47,12 @@ No schema changes required — `completions.created_at` is auto-populated by Sup
 ```ts
 {
   action: UserAction;
+  streakDays: number;
   onDoAnother: () => void;
 }
 ```
+
+**Heading:** `<Check icon> Done for today.` (replaces "Your move for today:" used in active/suggested states)
 
 **Card visual** (reuses extracted `ActionCard` from `active-actions.tsx`):
 - Header row: **"Completed"** + `Check` icon from `lucide-react-native` (replaces "In Progress" + green dot)
@@ -58,9 +61,11 @@ No schema changes required — `completions.created_at` is auto-populated by Sup
 - Bottom-left corner: absolutely positioned green badge — small `bg-green-500` circle with a `Check` icon overlay
 
 **CTAs** (below card):
-- Primary: `<Button color="green">Do another action</Button>` → calls `onDoAnother()`
+- Primary → navigates to progress tab (`router.push("/(tabs)/(progress)")`):
+  - `streakDays >= 3`: `<Button color="green">🔥 You're on a {streakDays}-day streak</Button>`
+  - `streakDays < 3`: `<Button color="green">See your progress</Button>`
+- Secondary: `<Button color="ghost" size="sm">Do Another</Button>` → calls `onDoAnother()`
   - `onDoAnother` sets `showSuggestedFlow = true` in home screen — immediately renders `SuggestedActions`, user will not see the completed card again this session
-- Secondary: `<Button color="ghost" size="sm">View progress</Button>` → `router.push("/(tabs)/(progress)")`
 
 **Animations:** Same staggered mount pattern as `active-actions.tsx` — heading at 0ms, card at 80ms, buttons at 160ms.
 
