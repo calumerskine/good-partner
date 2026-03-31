@@ -26,6 +26,7 @@ const queryKeys = {
     ["actionNotificationsEnabled", userId] as const,
   todayCompletedAction: (userId: string) =>
     ["todayCompletedAction", userId] as const,
+  allTodayCompletedActions: () => ["todayCompletedAction"] as const,
 };
 
 const mutationKeys = {
@@ -1013,6 +1014,7 @@ export function useGetTodayCompletedAction(userId?: string) {
     queryKey: queryKeys.todayCompletedAction(userId!),
     queryFn: () => getTodayCompletedAction(userId!),
     enabled: !!userId,
+    staleTime: 5 * 60 * 1000, // 5 minutes — invalidated explicitly by useCompleteAction
   });
 }
 
@@ -1022,14 +1024,24 @@ async function getTodayCompletedAction(
   const dayStart = new Date();
   dayStart.setHours(0, 0, 0, 0);
 
+  // Step 1: Get this user's user_action IDs
+  const { data: userActionData, error: userActionError } = await supabase
+    .from("user_actions")
+    .select("id")
+    .eq("user_id", userId);
+
+  if (userActionError) throw userActionError;
+
+  const userActionIds = userActionData?.map((ua) => ua.id) ?? [];
+  if (userActionIds.length === 0) return null;
+
+  // Step 2: Get most recent completion today for those actions, with full action details
   const { data, error } = await supabase
     .from("completions")
     .select(
       `
-      id,
-      created_at,
       user_action_id,
-      user_actions!inner (
+      user_actions (
         id,
         action_id,
         user_id,
@@ -1048,25 +1060,18 @@ async function getTodayCompletedAction(
       )
     `,
     )
-    .eq("user_actions.user_id", userId)
+    .in("user_action_id", userActionIds)
     .gte("created_at", dayStart.toISOString())
     .order("created_at", { ascending: false })
     .limit(1)
     .maybeSingle();
 
-  if (error) {
-    throw error;
-  }
+  if (error) throw error;
 
-  if (!data || !(data as any).user_actions) {
-    return null;
-  }
+  if (!data) return null;
 
   const ua = (data as any).user_actions;
-
-  if (!ua.actions) {
-    return null;
-  }
+  if (!ua || !ua.actions) return null;
 
   return {
     id: ua.id,
@@ -1107,7 +1112,7 @@ export function useCompleteAction() {
         queryKey: queryKeys.suggestedActions(),
       });
       queryClient.invalidateQueries({
-        queryKey: ["todayCompletedAction"],
+        queryKey: queryKeys.allTodayCompletedActions(),
       });
       // Invalidate all user profile queries to refresh XP on progress screen.
       // Uses prefix matching: ["userProfile"] matches ["userProfile", userId]
