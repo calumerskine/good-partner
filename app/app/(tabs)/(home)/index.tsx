@@ -67,7 +67,7 @@ export default function HomeScreen() {
       {userActions.length > 0 ? (
         <ActiveActions
           isLoading={isLoading}
-          userActions={userActions}
+          userActions={userActions.slice(0, 1)}
           onRemind={setReminderSheetActionId}
         />
       ) : showSuggestedFlow || !todayCompletedAction ? (
