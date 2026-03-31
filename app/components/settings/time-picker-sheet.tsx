@@ -100,6 +100,7 @@ export default function TimePickerSheet({
           value={pendingDate}
           mode="time"
           display="spinner"
+          textColor="#000000"
           onValueChange={(_, date) => {
             if (date) setPendingDate(date);
           }}

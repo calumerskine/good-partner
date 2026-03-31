@@ -177,6 +177,7 @@ export default function ActionReminderSheet({
                 value={new Date()}
                 mode="datetime"
                 minimumDate={new Date()}
+                textColor="#000000"
                 onChange={(event, date) => {
                   if (event.type === "dismissed" || event.type === "set") {
                     setShowCustomPicker(false);
