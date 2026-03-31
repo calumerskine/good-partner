@@ -1045,7 +1045,10 @@ async function getTodayCompletedAction(
     .limit(1)
     .maybeSingle();
 
-  if (completionError) throw completionError;
+  if (completionError) {
+    console.error("[getTodayCompletedAction] Step 2 error:", completionError);
+    throw completionError;
+  }
   if (!completion) return null;
 
   // Step 3: Fetch full action details — same join pattern as getActiveActions
