@@ -317,10 +317,9 @@ export default function SuccessScreen({
   const isLevelUp = prevLevel.level !== newLevel.level;
   const [showLevelUp, setShowLevelUp] = useState(false);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     trigger("success");
-  }, []);
+  }, [trigger]);
 
   // useEffect(() => {
   //   if (isLevelUp) {
