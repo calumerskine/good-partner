@@ -315,13 +315,29 @@ export function useUpdateReminderConfig() {
         .eq("user_id", userId);
       if (error) throw error;
     },
+    onMutate: async ({ userId, config }) => {
+      const key = queryKeys.reminderConfig(userId);
+      await queryClient.cancelQueries({ queryKey: key });
+      const previous = queryClient.getQueryData(key);
+      queryClient.setQueryData(key, (old: ReturnType<typeof getReminderConfig> extends Promise<infer T> ? T : never) =>
+        old ? { ...old, ...config } : old,
+      );
+      return { previous };
+    },
+    onError: (_, { userId }, context) => {
+      if (context?.previous !== undefined) {
+        queryClient.setQueryData(queryKeys.reminderConfig(userId), context.previous);
+      }
+    },
     onSuccess: (_, { userId }) => {
-      queryClient.invalidateQueries({
-        queryKey: queryKeys.reminderConfig(userId),
-      });
       // Also invalidate userProfile so settings screen reflects changes
       queryClient.invalidateQueries({
         queryKey: queryKeys.userProfile(userId),
+      });
+    },
+    onSettled: (_, __, { userId }) => {
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.reminderConfig(userId),
       });
     },
   });
