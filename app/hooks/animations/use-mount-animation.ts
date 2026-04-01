@@ -1,5 +1,5 @@
 // hooks/animations/use-mount-animation.ts
-import { useEffect, useRef } from "react";
+import { useLayoutEffect, useRef } from "react";
 import { Animated } from "react-native";
 
 export type MountAnimationConfig = {
@@ -51,7 +51,7 @@ export function useMountAnimation({
     ]).start();
   };
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     trigger();
   }, []);
 
