@@ -6,6 +6,7 @@ function twColor(name: string): string {
   return tw.color(name) ?? fallbackColor;
 }
 import { getLevelForXp } from "@/lib/xp";
+import { useHaptics } from "@/hooks/use-haptics";
 import { MotiView } from "moti";
 import { useEffect, useState } from "react";
 import { Text, View } from "react-native";
@@ -309,11 +310,16 @@ export default function SuccessScreen({
   newXp: number;
   onNext: () => void;
 }) {
+  const { trigger } = useHaptics();
   const [showConfetti, setShowConfetti] = useState(true);
   const prevLevel = getLevelForXp(previousXp);
   const newLevel = getLevelForXp(newXp);
   const isLevelUp = prevLevel.level !== newLevel.level;
   const [showLevelUp, setShowLevelUp] = useState(false);
+
+  useEffect(() => {
+    trigger("success");
+  }, []);
 
   // useEffect(() => {
   //   if (isLevelUp) {
