@@ -4,12 +4,15 @@ import { ActionTypes } from "@/lib/state/actions.model";
 import { env } from "@/lib/env";
 import tw from "@/lib/tw";
 import { Link, router } from "expo-router";
-import { useCallback } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { Animated, Text, View } from "react-native";
 import { format, isBefore, isToday, isTomorrow } from "date-fns";
-import { Check } from "lucide-react-native";
 import Button from "../ui/button";
 import PressableCard from "../ui/pressable-card";
+import Svg, { Path } from "react-native-svg";
+import { Check } from "lucide-react-native";
+import { Image } from "expo-image";
+import { useAssets } from "expo-asset";
 
 export function ActionCard({
   item,
@@ -18,6 +21,20 @@ export function ActionCard({
   item: UserAction;
   completed?: boolean;
 }) {
+  const [starImage] = useAssets([require("../../assets/images/star.png")]);
+
+  const starScale = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.spring(starScale, {
+      toValue: 1,
+      delay: 300,
+      useNativeDriver: true,
+      tension: 80,
+      friction: 7,
+    }).start();
+  }, []);
+
   const categoryInfo =
     ActionTypes[item.action.category as keyof typeof ActionTypes];
 
@@ -29,67 +46,81 @@ export function ActionCard({
     : "";
 
   return (
-    <PressableCard
-      color={categoryInfo.color}
-      shade={200}
-      showShadow
-      fillHeight
-      style={tw`h-76`}
-      onPress={() => router.push(`/(action)/${item.id}` as any)}
-    >
-      <View style={tw`p-6 items-start flex-1`}>
-        <View
-          style={tw`flex flex-row justify-between items-baseline w-full pb-4`}
-        >
-          <View style={tw`flex flex-row items-center gap-2`}>
-            {completed ? (
-              <>
-                <Text style={tw`font-bold`}>Completed</Text>
-                <Check size={14} color="#16a34a" strokeWidth={3} />
-              </>
-            ) : (
-              <>
-                <Text style={tw`font-bold`}>In Progress</Text>
-                <View
-                  style={tw`bg-green-400 border-green-500 border w-3 h-3 rounded-full`}
-                />
-              </>
-            )}
-          </View>
+    <View style={tw`relative`}>
+      <PressableCard
+        color={categoryInfo.color}
+        shade={200}
+        showShadow
+        fillHeight
+        style={tw`h-76`}
+        onPress={() => router.push(`/(action)/${item.id}` as any)}
+      >
+        <View style={tw`p-6 items-start flex-1`}>
           <View
-            style={tw`bg-${categoryInfo.color}-300 rounded-lg flex flex-row items-center px-3 py-1`}
+            style={tw`flex flex-row justify-between items-baseline w-full pb-4`}
           >
-            <Text style={tw`uppercase font-gabarito font-medium mr-2 text-sm`}>
-              {categoryInfo.title}
+            <View style={tw`flex flex-row items-center gap-2`}>
+              {completed ? (
+                <>
+                  <Text style={tw`font-bold`}>Completed</Text>
+                  <View
+                    style={tw`absolute left-20 mb-2 ml-1 w-8 h-8 rounded-full bg-green-500 items-center justify-center`}
+                  >
+                    <Check size={18} color="white" strokeWidth={3} />
+                  </View>
+                </>
+              ) : (
+                <>
+                  <Text style={tw`font-bold`}>In Progress</Text>
+                  <View
+                    style={tw`bg-green-400 border-green-500 border w-3 h-3 rounded-full`}
+                  />
+                </>
+              )}
+            </View>
+            <View
+              style={tw`bg-${categoryInfo.color}-300 rounded-lg flex flex-row items-center px-3 py-1`}
+            >
+              <Text
+                style={tw`uppercase font-gabarito font-medium mr-2 text-sm`}
+              >
+                {categoryInfo.title}
+              </Text>
+              {categoryInfo.icon()}
+            </View>
+          </View>
+          <View style={tw`flex-1 mt-2`}>
+            <Text
+              style={tw`text-2xl font-gabarito font-bold text-black`}
+              numberOfLines={2}
+              ellipsizeMode="tail"
+            >
+              {item.action.title}
             </Text>
-            {categoryInfo.icon()}
+            <Text
+              style={tw`text-lg text-black font-gabarito leading-relaxed mt-3`}
+              numberOfLines={4}
+              ellipsizeMode="tail"
+            >
+              {firstSentence}
+            </Text>
           </View>
         </View>
-        <View style={tw`flex-1 mt-2`}>
-          <Text
-            style={tw`text-2xl font-gabarito font-bold text-black`}
-            numberOfLines={2}
-            ellipsizeMode="tail"
-          >
-            {item.action.title}
-          </Text>
-          <Text
-            style={tw`text-lg text-black font-gabarito leading-relaxed mt-3`}
-            numberOfLines={4}
-            ellipsizeMode="tail"
-          >
-            {firstSentence}
-          </Text>
-        </View>
-        {completed && (
-          <View
-            style={tw`absolute bottom-4 left-4 w-8 h-8 rounded-full bg-green-500 items-center justify-center`}
-          >
-            <Check size={16} color="white" strokeWidth={3} />
-          </View>
-        )}
-      </View>
-    </PressableCard>
+      </PressableCard>
+      {completed && starImage?.[0]?.localUri && (
+        <Animated.View
+          style={[
+            tw`absolute w-20 h-20`,
+            { bottom: -12, right: -12, transform: [{ scale: starScale }] },
+          ]}
+        >
+          <Image
+            source={{ uri: starImage[0].localUri }}
+            style={tw`w-full h-full`}
+          />
+        </Animated.View>
+      )}
+    </View>
   );
 }
 
@@ -230,5 +261,20 @@ export default function ActiveActions({
         </View>
       )}
     </View>
+  );
+}
+
+function Star() {
+  return (
+    <Svg viewBox="0 0 24 24" style={tw`w-12 h-12`}>
+      <Path
+        fill={tw.color("yellow-400")}
+        stroke={tw.color("yellow-950")}
+        strokeWidth="0.6"
+        strokeLinejoin="round"
+        strokeLinecap="round"
+        d="M11.23 3.37l-2.07 4.88a1 1 0 01-.78.57l-5.28.45a1 1 0 00-.57 1.76l4.02 3.48a1 1 0 01.3 0.93l-1.2 5.14a1 1 0 001.48 1.08l4.59-2.77a1 1 0 011.06 0l4.59 2.77a1 1 0 001.48-1.08l-1.2-5.14a1 1 0 01.3-0.93l4.02-3.48a1 1 0 00-.57-1.76l-5.28-.45a1 1 0 01-.78-.57l-2.07-4.88a1 1 0 00-1.84 0z"
+      />
+    </Svg>
   );
 }
