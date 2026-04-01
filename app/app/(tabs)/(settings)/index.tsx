@@ -44,8 +44,7 @@ export default function SettingsScreen() {
   const { user, signOut } = useAuth();
   const { data: profile } = useGetUserProfile(user?.id);
   const { data: reminderConfig } = useGetReminderConfig(user?.id);
-  const { mutateAsync: updateReminderConfig, isPending: isUpdatingReminders } =
-    useUpdateReminderConfig();
+  const { mutateAsync: updateReminderConfig } = useUpdateReminderConfig();
   const { data: actionNotificationsEnabled } = useGetActionNotificationsEnabled(
     user?.id,
   );
@@ -269,7 +268,6 @@ export default function SettingsScreen() {
                     <View style={tw`flex-row items-center gap-2`}>
                       <Switch
                         value={reminderConfig.morningReminderEnabled}
-                        disabled={isUpdatingReminders}
                         trackColor={{ false: "#767577", true: "#8E97FD" }}
                         onValueChange={(val) =>
                           updateReminderConfig({
@@ -299,7 +297,6 @@ export default function SettingsScreen() {
                     <View style={tw`flex-row items-center gap-2`}>
                       <Switch
                         value={reminderConfig.eveningReminderEnabled}
-                        disabled={isUpdatingReminders}
                         trackColor={{ false: "#767577", true: "#8E97FD" }}
                         onValueChange={(val) =>
                           updateReminderConfig({
