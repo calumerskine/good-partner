@@ -1,5 +1,6 @@
 import { trackEvent } from "@/lib/analytics";
 import { useSubmitFeedback, type FeltValue } from "@/lib/api";
+import { useHaptics } from "@/hooks/use-haptics";
 import { type ActionType } from "@/lib/state/actions.model";
 import tw from "@/lib/tw";
 import { useState } from "react";
@@ -26,8 +27,13 @@ export default function FeedbackWizard({
   const [felt, setFelt] = useState<FeltValue | null>(null);
 
   const submitFeedback = useSubmitFeedback();
+  const { trigger } = useHaptics();
 
   const handleFeltSelect = async (value: FeltValue) => {
+    if (value === "neutral") trigger("impactLight");
+    else if (value === "good") trigger("impactMedium");
+    else if (value === "great") trigger("success");
+
     setFelt(value);
     trackEvent("feedback_felt_selected", { value });
     try {
