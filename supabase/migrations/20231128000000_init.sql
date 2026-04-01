@@ -22,8 +22,8 @@ CREATE TABLE user_profiles (
   current_streak_days INTEGER DEFAULT 0,
   last_completion_date DATE,
   total_days_active INTEGER DEFAULT 0,
-  morning_reminder_enabled BOOLEAN DEFAULT TRUE,
-  evening_reminder_enabled BOOLEAN DEFAULT TRUE,
+  morning_reminder_enabled BOOLEAN DEFAULT FALSE,
+  evening_reminder_enabled BOOLEAN DEFAULT FALSE,
   morning_reminder_time TIME DEFAULT '10:00',
   evening_reminder_time TIME DEFAULT '19:00'
 );
