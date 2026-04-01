@@ -106,6 +106,20 @@ export default function SettingsScreen() {
     }, []),
   );
 
+  const handleToggleDailyReminder = async (
+    field: "morningReminderEnabled" | "eveningReminderEnabled",
+    val: boolean,
+  ) => {
+    if (val) {
+      const granted = await oneSignalService.getPermission();
+      if (!granted) return;
+      if (!notificationsEnabled) {
+        await toggleNotifications({ userId: user?.id!, enabled: true });
+      }
+    }
+    await updateReminderConfig({ userId: user?.id!, config: { [field]: val } });
+  };
+
   const handleSetActionNotifications = useThrottle(async () => {
     const shouldEnable = !actionNotificationsEnabled;
 
@@ -270,10 +284,7 @@ export default function SettingsScreen() {
                         value={reminderConfig.morningReminderEnabled}
                         trackColor={{ false: "#767577", true: "#8E97FD" }}
                         onValueChange={(val) =>
-                          updateReminderConfig({
-                            userId: user.id,
-                            config: { morningReminderEnabled: val },
-                          })
+                          handleToggleDailyReminder("morningReminderEnabled", val)
                         }
                       />
                     </View>
@@ -299,10 +310,7 @@ export default function SettingsScreen() {
                         value={reminderConfig.eveningReminderEnabled}
                         trackColor={{ false: "#767577", true: "#8E97FD" }}
                         onValueChange={(val) =>
-                          updateReminderConfig({
-                            userId: user.id,
-                            config: { eveningReminderEnabled: val },
-                          })
+                          handleToggleDailyReminder("eveningReminderEnabled", val)
                         }
                       />
                     </View>

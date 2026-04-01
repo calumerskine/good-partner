@@ -4,6 +4,7 @@ import { trackEvent } from "@/lib/analytics";
 import {
   useToggleActionNotificationsEnabled,
   useToggleNotificationsEnabled,
+  useUpdateReminderConfig,
 } from "@/lib/api";
 import { env } from "@/lib/env";
 import { notifeeService } from "@/lib/notifee";
@@ -19,6 +20,7 @@ export default function RemindersPromptScreen() {
   const { mutateAsync: toggleNotifications } = useToggleNotificationsEnabled();
   const { mutateAsync: toggleActionNotifications } =
     useToggleActionNotificationsEnabled();
+  const { mutateAsync: updateReminderConfig } = useUpdateReminderConfig();
 
   useEffect(() => {
     trackEvent("screen_viewed", { screen_name: "Reminders Prompt" });
@@ -32,6 +34,10 @@ export default function RemindersPromptScreen() {
       const granted = await oneSignalService.getPermission();
       if (granted) {
         await toggleNotifications({ userId: user.id, enabled: true });
+        await updateReminderConfig({
+          userId: user.id,
+          config: { morningReminderEnabled: true, eveningReminderEnabled: true },
+        });
         if (env.flags.useActionNotifications) {
           await notifeeService.requestPermission();
           await toggleActionNotifications({ userId: user.id, enabled: true });
