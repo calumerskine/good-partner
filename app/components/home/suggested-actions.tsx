@@ -1,5 +1,6 @@
 import { useMountAnimation, useSwipeOut } from "@/hooks/animations";
 import { useReminderPrompt } from "@/hooks/use-reminder-prompt";
+import { trackEvent } from "@/lib/analytics";
 import {
   CatalogAction,
   useActivateAction,
@@ -64,6 +65,7 @@ export default function SuggestedActions({
     if (!user) return;
     try {
       await activateAction.mutateAsync({ userId: user.id, actionId });
+      trackEvent("suggestion_activated", { action_id: actionId, index: currentIndex });
       if (shouldPrompt) {
         markShown();
         router.replace(`/(action)/${actionId}/reminders` as any);
@@ -81,6 +83,7 @@ export default function SuggestedActions({
         new Promise<void>((resolve) => swipeOut.triggerExit(resolve)),
         skipAction.mutateAsync({ userId: user.id, actionId }),
       ]);
+      trackEvent("suggestion_skipped", { action_id: actionId, index: currentIndex });
       // Card is now opacity 0, off-screen left. Safe to swap content.
       if (nextIndex >= suggestedActions.length) {
         router.replace("/(tabs)/(actions)" as any);

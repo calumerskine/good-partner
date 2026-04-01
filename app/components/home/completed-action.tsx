@@ -1,5 +1,6 @@
 import { useMountAnimation } from "@/hooks/animations";
 import { UserAction } from "@/lib/api";
+import { trackEvent } from "@/lib/analytics";
 import tw from "@/lib/tw";
 import { router } from "expo-router";
 import { Check } from "lucide-react-native";
@@ -61,11 +62,11 @@ export default function CompletedAction({
         <Button
           color="indigo"
           style="min-w-full"
-          onPress={() => router.push("/(tabs)/(progress)" as any)}
+          onPress={() => { trackEvent("progress_viewed_from_completed"); router.push("/(tabs)/(progress)" as any); }}
         >
           {progressLabel}
         </Button>
-        <Button color="ghost" size="sm" onPress={onDoAnother}>
+        <Button color="ghost" size="sm" onPress={() => { trackEvent("do_another_tapped"); onDoAnother(); }}>
           Do Another
         </Button>
       </Animated.View>

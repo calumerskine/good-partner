@@ -1,5 +1,6 @@
 import { useAuth } from "@/hooks/use-auth";
 import { useClearActionReminder, useSetActionReminder } from "@/lib/api";
+import { trackEvent } from "@/lib/analytics";
 import tw from "@/lib/tw";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { addHours, format, isBefore, set } from "date-fns";
@@ -70,6 +71,7 @@ export default function ActionReminderSheet({
         userActionId,
         reminderAt: reminderAt.toISOString(),
       });
+      trackEvent("action_reminder_set", { user_action_id: userActionId });
       setConfirmation(`Reminder set for ${format(reminderAt, "EEE, h:mm a")}`);
       dismissTimerRef.current = setTimeout(() => dismiss(), 1400);
     } finally {
@@ -80,6 +82,7 @@ export default function ActionReminderSheet({
   const handleClear = async () => {
     if (!user) return;
     await clearReminder({ userId: user.id, userActionId });
+    trackEvent("action_reminder_cleared", { user_action_id: userActionId });
     dismiss();
   };
 
@@ -153,7 +156,10 @@ export default function ActionReminderSheet({
 
               <Pressable
                 style={tw`border-2 border-black/15 rounded-xl p-4`}
-                onPress={() => setShowCustomPicker(true)}
+                onPress={() => {
+                  trackEvent("action_reminder_custom_picker_opened", { user_action_id: userActionId });
+                  setShowCustomPicker(true);
+                }}
               >
                 <Text style={tw`font-gabarito font-bold text-black`}>
                   Custom

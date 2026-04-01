@@ -1,9 +1,10 @@
 import { useMountAnimation } from "@/hooks/animations";
 import { UserAction, useCompleteAction, useDeactivateAction } from "@/lib/api";
+import { trackEvent } from "@/lib/analytics";
 import { ActionTypes } from "@/lib/state/actions.model";
 import { env } from "@/lib/env";
 import tw from "@/lib/tw";
-import { Link, router } from "expo-router";
+import { router } from "expo-router";
 import { useCallback, useEffect, useRef } from "react";
 import { Animated, Text, View } from "react-native";
 import { format, isBefore, isToday, isTomorrow } from "date-fns";
@@ -139,6 +140,7 @@ function ActionCardButtons({
   const handleComplete = useCallback(async () => {
     try {
       const completion = await completeAction.mutateAsync(item.id);
+      trackEvent("action_completed_from_home", { action_id: item.id });
       router.replace(
         `/(action)/${item.id}/success?completionId=${completion.id}&categoryId=${item.action.category}&previousXp=${completion.previousXp}&newXp=${completion.newXp}` as any,
       );
@@ -150,6 +152,7 @@ function ActionCardButtons({
   const handleDeactivate = useCallback(async () => {
     try {
       await deactivateAction.mutateAsync(item.id);
+      trackEvent("action_deactivated_from_home", { action_id: item.id });
     } catch (error) {
       console.error("Error deactivating action:", error);
     }
@@ -166,7 +169,7 @@ function ActionCardButtons({
         {completeAction.isPending ? "Loading..." : "✓ I've done it!"}
       </Button>
       {env.flags.useReminders && (
-        <Button color="ghost" size="sm" onPress={onRemind}>
+        <Button color="ghost" size="sm" onPress={() => { trackEvent("action_remind_tapped", { action_id: item.id }); onRemind(); }}>
           {item.reminderAt && isBefore(new Date(), item.reminderAt)
             ? isToday(item.reminderAt)
               ? `Today, ${format(item.reminderAt, "h:mm a")}`
@@ -253,11 +256,9 @@ export default function ActiveActions({
             Choose an action to focus on today and start building meaningful
             habits
           </Text>
-          <Link href="/(tabs)/(actions)" asChild>
-            <Button>
-              <Text style={tw`text-black font-gabarito`}>Browse Actions</Text>
-            </Button>
-          </Link>
+          <Button onPress={() => { trackEvent("browse_actions_tapped"); router.push("/(tabs)/(actions)" as any); }}>
+            <Text style={tw`text-black font-gabarito`}>Browse Actions</Text>
+          </Button>
         </View>
       )}
     </View>

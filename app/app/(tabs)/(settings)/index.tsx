@@ -165,9 +165,10 @@ export default function SettingsScreen() {
               <Button
                 size="sm"
                 color="indigo"
-                onPress={() =>
-                  router.push("/(tabs)/(settings)/edit-focus-areas")
-                }
+                onPress={() => {
+                  trackEvent("settings_edit_focus_areas_tapped");
+                  router.push("/(tabs)/(settings)/edit-focus-areas");
+                }}
               >
                 Edit
               </Button>
@@ -211,7 +212,10 @@ export default function SettingsScreen() {
               {hapticsLoaded && (
                 <Switch
                   value={hapticsEnabled}
-                  onValueChange={toggleHaptics}
+                  onValueChange={(val) => {
+                    trackEvent("settings_haptics_toggled", { enabled: val });
+                    toggleHaptics();
+                  }}
                   trackColor={{ false: "#767577", true: "#8E97FD" }}
                 />
               )}
@@ -272,7 +276,10 @@ export default function SettingsScreen() {
                       <Button
                         size="sm"
                         color="ghost"
-                        onPress={() => setActivePicker("morning")}
+                        onPress={() => {
+                          trackEvent("settings_morning_time_picker_opened");
+                          setActivePicker("morning");
+                        }}
                       >
                         {formatTimeForDisplay(
                           reminderConfig.morningReminderTime,
@@ -283,9 +290,10 @@ export default function SettingsScreen() {
                       <Switch
                         value={reminderConfig.morningReminderEnabled}
                         trackColor={{ false: "#767577", true: "#8E97FD" }}
-                        onValueChange={(val) =>
-                          handleToggleDailyReminder("morningReminderEnabled", val)
-                        }
+                        onValueChange={(val) => {
+                          trackEvent("settings_morning_reminder_toggled", { enabled: val });
+                          handleToggleDailyReminder("morningReminderEnabled", val);
+                        }}
                       />
                     </View>
                   </View>
@@ -298,7 +306,10 @@ export default function SettingsScreen() {
                       <Button
                         size="sm"
                         color="ghost"
-                        onPress={() => setActivePicker("evening")}
+                        onPress={() => {
+                          trackEvent("settings_evening_time_picker_opened");
+                          setActivePicker("evening");
+                        }}
                       >
                         {formatTimeForDisplay(
                           reminderConfig.eveningReminderTime,
@@ -309,9 +320,10 @@ export default function SettingsScreen() {
                       <Switch
                         value={reminderConfig.eveningReminderEnabled}
                         trackColor={{ false: "#767577", true: "#8E97FD" }}
-                        onValueChange={(val) =>
-                          handleToggleDailyReminder("eveningReminderEnabled", val)
-                        }
+                        onValueChange={(val) => {
+                          trackEvent("settings_evening_reminder_toggled", { enabled: val });
+                          handleToggleDailyReminder("eveningReminderEnabled", val);
+                        }}
                       />
                     </View>
                   </View>
@@ -409,15 +421,16 @@ export default function SettingsScreen() {
               ? reminderConfig.morningReminderTime
               : reminderConfig.eveningReminderTime
           }
-          onSave={(utcTimeStr) =>
+          onSave={(utcTimeStr) => {
+            trackEvent("settings_reminder_time_saved", { period: activePicker });
             updateReminderConfig({
               userId: user.id,
               config:
                 activePicker === "morning"
                   ? { morningReminderTime: utcTimeStr }
                   : { eveningReminderTime: utcTimeStr },
-            })
-          }
+            });
+          }}
           onClose={() => setActivePicker(null)}
         />
       )}

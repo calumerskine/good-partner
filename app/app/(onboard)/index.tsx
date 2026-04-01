@@ -50,6 +50,7 @@ export default function OnboardWizard() {
       if (user) {
         trackEvent("onboarding_started");
       }
+      if (!user) trackEvent("onboarding_step_viewed", { step: "welcome" });
       setDisplayStep(user ? 2 : 0);
     }
   }, [authLoading, user, displayStep]);
@@ -74,7 +75,10 @@ export default function OnboardWizard() {
   };
 
   const goForward = (nextStep: number) => animateToStep(nextStep, "forward");
-  const goBack = () => animateToStep((displayStep ?? 2) - 1, "back");
+  const goBack = () => {
+    trackEvent("onboarding_back_tapped", { from_step: displayStep });
+    animateToStep((displayStep ?? 2) - 1, "back");
+  };
 
   const getCategoryIds = (keys: string[]): string[] => {
     const nameToId = categories.reduce(
@@ -175,30 +179,36 @@ export default function OnboardWizard() {
         {displayStep === 2 && (
           <RelationshipStep
             selected={data.relationshipStatus}
-            onSelect={(v) =>
-              setData((d) => ({ ...d, relationshipStatus: v }))
-            }
+            onSelect={(v) => {
+              trackEvent("onboarding_relationship_selected", { value: v });
+              setData((d) => ({ ...d, relationshipStatus: v }));
+            }}
             onNext={() => goForward(3)}
           />
         )}
         {displayStep === 3 && (
           <FocusStep
             selected={data.focusAreas}
-            onToggle={(key) =>
+            onToggle={(key) => {
+              const isRemoving = data.focusAreas.includes(key);
+              trackEvent("onboarding_focus_toggled", { category: key, selected: !isRemoving });
               setData((d) => ({
                 ...d,
                 focusAreas: d.focusAreas.includes(key)
                   ? d.focusAreas.filter((k) => k !== key)
                   : [...d.focusAreas, key],
-              }))
-            }
+              }));
+            }}
             onNext={() => goForward(4)}
           />
         )}
         {displayStep === 4 && (
           <GenderStep
             selected={data.gender}
-            onSelect={(v) => setData((d) => ({ ...d, gender: v }))}
+            onSelect={(v) => {
+              trackEvent("onboarding_gender_selected", { value: v });
+              setData((d) => ({ ...d, gender: v }));
+            }}
             onNext={handleStep4Next}
             isSubmitting={createProfileMutation.isPending}
           />
