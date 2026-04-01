@@ -58,6 +58,13 @@ export function RelationshipStep({ selected, onSelect, onNext }: Props) {
         <Button onPress={onNext} disabled={!selected}>
           Continue
         </Button>
+        <View style={tw`h-5 mt-2`}>
+          {!selected && (
+            <Text style={tw`text-charcoal/80 font-gabarito text-center`}>
+              Please select an option to continue
+            </Text>
+          )}
+        </View>
       </View>
     </View>
   );

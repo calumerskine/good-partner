@@ -69,6 +69,13 @@ export function GenderStep({
         <Button onPress={onNext} disabled={!selected || isSubmitting}>
           {isSubmitting ? "Setting up..." : "Continue"}
         </Button>
+        <View style={tw`h-5 mt-2`}>
+          {!selected && (
+            <Text style={tw`text-charcoal/80 font-gabarito text-center`}>
+              Please select an option to continue
+            </Text>
+          )}
+        </View>
       </View>
     </View>
   );
