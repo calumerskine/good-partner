@@ -1,4 +1,5 @@
 import { useMountAnimation } from "@/hooks/animations";
+import { useHaptics } from "@/hooks/use-haptics";
 import { UserAction, useCompleteAction, useDeactivateAction } from "@/lib/api";
 import { trackEvent } from "@/lib/analytics";
 import { ActionTypes } from "@/lib/state/actions.model";
@@ -136,10 +137,12 @@ function ActionCardButtons({
     ActionTypes[item.action.category as keyof typeof ActionTypes];
   const completeAction = useCompleteAction();
   const deactivateAction = useDeactivateAction();
+  const { trigger } = useHaptics();
 
   const handleComplete = useCallback(async () => {
     try {
       const completion = await completeAction.mutateAsync(item.id);
+      trigger("success");
       trackEvent("action_completed_from_home", { action_id: item.id });
       router.replace(
         `/(action)/${item.id}/success?completionId=${completion.id}&categoryId=${item.action.category}&previousXp=${completion.previousXp}&newXp=${completion.newXp}` as any,
@@ -147,7 +150,7 @@ function ActionCardButtons({
     } catch (error) {
       console.error("Error completing action:", error);
     }
-  }, [completeAction, item.id, item.action.category]);
+  }, [completeAction, item.id, item.action.category, trigger]);
 
   const handleDeactivate = useCallback(async () => {
     try {
