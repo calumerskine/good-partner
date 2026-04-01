@@ -9,7 +9,6 @@ import Animated, {
 } from "react-native-reanimated";
 import PressableRadio from "./ui/pressable-radio";
 import { Check } from "lucide-react-native";
-import { useHaptics } from "@/hooks/use-haptics";
 
 const fallbackColor = "#e5e7eb";
 
@@ -32,7 +31,6 @@ export const CategoryButton = ({
   onPress: (category: string) => void;
   selected?: boolean;
 }) => {
-  const { trigger } = useHaptics();
   const progress = useSharedValue(selected ? 1 : 0);
 
   const borderColorSelected = twColor(`${color}-300`);
@@ -67,7 +65,6 @@ export const CategoryButton = ({
     <PressableRadio
       onPress={() => {
         onPress(category);
-        trigger("impactMedium");
       }}
       selected={selected ?? false}
       shade={300}
