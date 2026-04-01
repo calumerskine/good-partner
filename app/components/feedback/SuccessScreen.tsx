@@ -1,6 +1,10 @@
-import { getHexColor } from "@/lib/colors";
 import { type ActionType } from "@/lib/state/actions.model";
 import tw from "@/lib/tw";
+
+const fallbackColor = "#8E97FD";
+function twColor(name: string): string {
+  return tw.color(name) ?? fallbackColor;
+}
 import { getLevelForXp } from "@/lib/xp";
 import { MotiView } from "moti";
 import { useEffect, useState } from "react";
@@ -92,12 +96,12 @@ function Sparkles({ color }: { color: string }) {
 
 function AnimatedProgressIcon({
   icon,
-  lightColor,
+  color,
 }: {
   icon: React.ReactComponent;
-  lightColor: string;
+  color: string;
 }) {
-  const hexColor = getHexColor(lightColor);
+  const hexColor = twColor(color);
   const progress = useSharedValue(0);
 
   useEffect(() => {
@@ -222,7 +226,7 @@ function AnimatedXPCounter({
         style={tw`text-charcoal/70 font-gabarito font-medium text-xl text-center`}
       >
         You earned{" "}
-        <Text style={{ color: getHexColor(color) }}>{displayValue}</Text> XP in{" "}
+        <Text style={{ color: twColor(color) }}>{displayValue}</Text> XP in{" "}
         {title}!
       </Text>
     </MotiView>
@@ -286,7 +290,7 @@ function LevelProgress({
           }}
           style={[
             tw`h-full rounded-full`,
-            { backgroundColor: getHexColor(color) },
+            { backgroundColor: twColor(color) },
           ]}
         />
       </View>
@@ -331,10 +335,10 @@ export default function SuccessScreen({
           fadeOut
           fallSpeed={3000}
           colors={[
-            getHexColor(category.color),
-            getHexColor(category.darkColor),
-            getHexColor(category.lightColor),
-            getHexColor(category.darkerColor),
+            twColor(`${category.color}-300`),
+            twColor(`${category.color}-400`),
+            twColor(`${category.color}-500`),
+            twColor(`${category.color}-600`),
           ]}
           onAnimationEnd={() => setShowConfetti(false)}
         />
@@ -343,7 +347,7 @@ export default function SuccessScreen({
       <View style={tw`items-center gap-6 px-4 mt-36`}>
         <AnimatedProgressIcon
           icon={category.icon}
-          lightColor={category.lightColor}
+          color={`${category.color}-400`}
         />
 
         <MotiView
@@ -365,13 +369,13 @@ export default function SuccessScreen({
         {/* <AnimatedXPCounter
           amount={XP_PER_COMPLETION}
           title={category.title}
-          color={category.darkColor}
+          color={`${category.color}-500`}
         /> */}
 
         {/* <LevelProgress
           previousXp={previousXp}
           newXp={newXp}
-          color={category.darkColor}
+          color={`${category.color}-500`}
         /> */}
       </View>
 
