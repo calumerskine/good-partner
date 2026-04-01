@@ -59,7 +59,7 @@ export default function CompletedAction({
 
       <Animated.View style={[tw`pb-2 gap-3`, buttonsAnim.animatedStyle]}>
         <Button
-          color="green"
+          color="indigo"
           style="min-w-full"
           onPress={() => router.push("/(tabs)/(progress)" as any)}
         >

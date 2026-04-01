@@ -51,13 +51,17 @@
       ],
       "expo-router",
       "expo-font",
+      ["expo-asset", {
+        "assets": ["./assets/images/star.png"]
+      }],
       "expo-apple-authentication",
       [
         "@react-native-google-signin/google-signin",
         {
           "iosUrlScheme": "com.googleusercontent.apps.5682679949-5re3mpoa581di3rf57mos5g1cmti3bil"
         }
-      ]
+      ],
+      "expo-asset"
     ],
     "experiments": {
       "typedRoutes": true

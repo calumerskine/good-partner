@@ -7,9 +7,12 @@ import { Link, router } from "expo-router";
 import { useCallback } from "react";
 import { Animated, Text, View } from "react-native";
 import { format, isBefore, isToday, isTomorrow } from "date-fns";
-import { Check } from "lucide-react-native";
 import Button from "../ui/button";
 import PressableCard from "../ui/pressable-card";
+import Svg, { Path } from "react-native-svg";
+import { Check } from "lucide-react-native";
+import { Image } from "expo-image";
+import { useAssets } from "expo-asset";
 
 export function ActionCard({
   item,
@@ -18,6 +21,12 @@ export function ActionCard({
   item: UserAction;
   completed?: boolean;
 }) {
+  const [starImage, error] = useAssets([
+    require("../../assets/images/star.png"),
+  ]);
+
+  console.log("image", starImage?.[0]);
+
   const categoryInfo =
     ActionTypes[item.action.category as keyof typeof ActionTypes];
 
@@ -45,7 +54,11 @@ export function ActionCard({
             {completed ? (
               <>
                 <Text style={tw`font-bold`}>Completed</Text>
-                <Check size={14} color="#16a34a" strokeWidth={3} />
+                <View
+                  style={tw`absolute left-20 mb-2 ml-1 w-8 h-8 rounded-full bg-green-500 items-center justify-center`}
+                >
+                  <Check size={18} color="white" strokeWidth={3} />
+                </View>
               </>
             ) : (
               <>
@@ -73,6 +86,7 @@ export function ActionCard({
           >
             {item.action.title}
           </Text>
+          <Image source={starImage?.[0].localUri} />
           <Text
             style={tw`text-lg text-black font-gabarito leading-relaxed mt-3`}
             numberOfLines={4}
@@ -83,9 +97,10 @@ export function ActionCard({
         </View>
         {completed && (
           <View
-            style={tw`absolute bottom-4 left-4 w-8 h-8 rounded-full bg-green-500 items-center justify-center`}
+            style={tw`w-20 h-20 rounded-full bg-transparent items-center justify-center pt-12`}
           >
-            <Check size={16} color="white" strokeWidth={3} />
+            {/* <Check size={16} color="white" strokeWidth={3} /> */}
+            {/* <Star /> */}
           </View>
         )}
       </View>
@@ -230,5 +245,20 @@ export default function ActiveActions({
         </View>
       )}
     </View>
+  );
+}
+
+function Star() {
+  return (
+    <Svg viewBox="0 0 24 24" style={tw`w-12 h-12`}>
+      <Path
+        fill={tw.color("yellow-400")}
+        stroke={tw.color("yellow-950")}
+        strokeWidth="0.6"
+        strokeLinejoin="round"
+        strokeLinecap="round"
+        d="M11.23 3.37l-2.07 4.88a1 1 0 01-.78.57l-5.28.45a1 1 0 00-.57 1.76l4.02 3.48a1 1 0 01.3 0.93l-1.2 5.14a1 1 0 001.48 1.08l4.59-2.77a1 1 0 011.06 0l4.59 2.77a1 1 0 001.48-1.08l-1.2-5.14a1 1 0 01.3-0.93l4.02-3.48a1 1 0 00-.57-1.76l-5.28-.45a1 1 0 01-.78-.57l-2.07-4.88a1 1 0 00-1.84 0z"
+      />
+    </Svg>
   );
 }
