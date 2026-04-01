@@ -142,18 +142,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       await GoogleSignin.hasPlayServices();
       const response = await GoogleSignin.signIn();
       const idToken = response.data?.idToken;
-      if (!idToken) throw new Error("No ID token returned from Google");
+      if (!idToken) throw new Error("Google sign-in failed. Please try again.");
 
       const { data, error } = await supabase.auth.signInWithIdToken({
         provider: "google",
         token: idToken,
       });
-      if (error) throw error;
-      if (!data.user) throw new Error("No user returned from Supabase");
+      if (error) throw new Error(error.message ?? "Sign-in failed. Please try again.");
+      if (!data.user) throw new Error("Sign-in failed. Please try again.");
       return data.user;
     } catch (error: any) {
       if (error.code === statusCodes.SIGN_IN_CANCELLED) return null;
-      throw error;
+      if (error.code === statusCodes.IN_PROGRESS)
+        throw new Error("Sign-in is already in progress. Please wait.");
+      if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE)
+        throw new Error("Google Play Services are not available on this device.");
+      // Re-throw already-friendly errors (from above), otherwise use a generic message
+      if (error.message && !error.code) throw error;
+      throw new Error("Something went wrong with Google sign-in. Please try again.");
     }
   };
 
@@ -166,19 +172,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         ],
       });
       if (!credential.identityToken) {
-        throw new Error("No identity token from Apple");
+        throw new Error("Apple sign-in failed. Please try again.");
       }
 
       const { data, error } = await supabase.auth.signInWithIdToken({
         provider: "apple",
         token: credential.identityToken,
       });
-      if (error) throw error;
-      if (!data.user) throw new Error("No user returned from Supabase");
+      if (error) throw new Error(error.message ?? "Sign-in failed. Please try again.");
+      if (!data.user) throw new Error("Sign-in failed. Please try again.");
       return data.user;
     } catch (error: any) {
       if (error.code === "ERR_REQUEST_CANCELED") return null;
-      throw error;
+      // Re-throw already-friendly errors (from above), otherwise use a generic message
+      if (error.message && !error.code) throw error;
+      throw new Error("Something went wrong with Apple sign-in. Please try again.");
     }
   };
 
