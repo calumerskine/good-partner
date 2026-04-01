@@ -2,6 +2,7 @@ import BackButton from "@/components/ui/back-button";
 import Button from "@/components/ui/button";
 import PressableCard from "@/components/ui/pressable-card";
 import { useAuth } from "@/hooks/use-auth";
+import { useHaptics } from "@/hooks/use-haptics";
 import { useReminderPrompt } from "@/hooks/use-reminder-prompt";
 import { trackEvent } from "@/lib/analytics";
 import {
@@ -27,6 +28,7 @@ export default function ActionDetailScreen() {
     catalog?: string;
   }>();
   const { user } = useAuth();
+  const { trigger } = useHaptics();
   const isCatalogView = catalog === "true";
 
   // Fetch either user action or catalog action based on context
@@ -109,6 +111,7 @@ export default function ActionDetailScreen() {
         userId: user.id,
         actionId: isCatalogView ? id : actionData.id,
       });
+      trigger("impactMedium");
       trackEvent("action_activated", { action_id: actionData.id });
 
       if (shouldPrompt) {
@@ -139,6 +142,7 @@ export default function ActionDetailScreen() {
 
     try {
       const completion = await completeAction.mutateAsync(id);
+      trigger("success");
       trackEvent("action_completed", { action_id: id });
       router.replace(
         `/(action)/${id}/success?completionId=${completion.id}&categoryId=${actionData.category}&previousXp=${completion.previousXp}&newXp=${completion.newXp}` as any,
