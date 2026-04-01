@@ -8,7 +8,7 @@ type Props = {
 
 export function TransitionStep({ onNext }: Props) {
   return (
-    <View style={tw`flex-1 items-center justify-between px-6 py-20`}>
+    <View style={tw`flex-1 items-center justify-between px-6 pt-20`}>
       <View style={tw`flex-1`} />
 
       <View style={tw`items-center gap-6 px-4`}>
@@ -27,7 +27,7 @@ export function TransitionStep({ onNext }: Props) {
 
       <View style={tw`flex-1`} />
 
-      <View style={tw`w-full`}>
+      <View style={tw`w-full pt-6 pb-2`}>
         <Button onPress={onNext}>Continue</Button>
       </View>
     </View>

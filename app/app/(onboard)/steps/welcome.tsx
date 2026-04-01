@@ -8,8 +8,8 @@ type Props = {
 
 export function WelcomeStep({ onNext }: Props) {
   return (
-    <View style={tw`flex-1 items-center justify-between px-6 py-20`}>
-      <View style={tw`flex-1`} />
+    <View style={tw`flex-1 items-center justify-between px-6 pt-20`}>
+      <View style={tw`flex-[0.3]`} />
 
       <View style={tw`items-center gap-8 px-4`}>
         <View
@@ -35,7 +35,7 @@ export function WelcomeStep({ onNext }: Props) {
 
       <View style={tw`flex-1`} />
 
-      <View style={tw`w-full gap-4`}>
+      <View style={tw`w-full gap-4 pt-6 pb-2`}>
         <Button onPress={onNext}>Get Started</Button>
       </View>
     </View>
