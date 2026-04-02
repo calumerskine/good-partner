@@ -80,24 +80,6 @@
                       "group.com.pearprogramming.wingmanapp.onesignal"
                     ]
                   }
-                },
-                {
-                  "targetName": "OneSignalNotificationServiceExtension",
-                  "bundleIdentifier": "com.pearprogramming.wingmanapp.OneSignalNotificationServiceExtension",
-                  "entitlements": {
-                    "com.apple.security.application-groups": [
-                      "group.com.pearprogramming.wingmanapp.onesignal"
-                    ]
-                  }
-                },
-                {
-                  "targetName": "OneSignalNotificationServiceExtension",
-                  "bundleIdentifier": "com.pearprogramming.wingmanapp.OneSignalNotificationServiceExtension",
-                  "entitlements": {
-                    "com.apple.security.application-groups": [
-                      "group.com.pearprogramming.wingmanapp.onesignal"
-                    ]
-                  }
                 }
               ]
             }
