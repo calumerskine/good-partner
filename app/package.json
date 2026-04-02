@@ -20,7 +20,6 @@
     "@react-native-community/datetimepicker": "^8.4.4",
     "@react-native-google-signin/google-signin": "^16.1.2",
     "@react-navigation/native": "^7.1.8",
-    "@shopify/react-native-skia": "^2.2.12",
     "@supabase/supabase-js": "^2.86.0",
     "@tanstack/react-query": "^5.90.12",
     "date-fns": "^4.1.0",
