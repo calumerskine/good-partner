@@ -78,19 +78,20 @@ export default function SuggestedActions({
   const handleSkip = async (actionId: string) => {
     if (!user) return;
     const nextIndex = currentIndex + 1;
+    const isLast = nextIndex >= suggestedActions.length;
     try {
+      if (isLast) {
+        router.replace("/(tabs)/(actions)" as any);
+        return;
+      }
       await Promise.all([
         new Promise<void>((resolve) => swipeOut.triggerExit(resolve)),
         skipAction.mutateAsync({ userId: user.id, actionId }),
       ]);
       trackEvent("suggestion_skipped", { action_id: actionId, index: currentIndex });
       // Card is now opacity 0, off-screen left. Safe to swap content.
-      if (nextIndex >= suggestedActions.length) {
-        router.replace("/(tabs)/(actions)" as any);
-      } else {
-        setCurrentIndex(nextIndex);
-        swipeOut.triggerEntrance();
-      }
+      setCurrentIndex(nextIndex);
+      swipeOut.triggerEntrance();
     } catch (error) {
       console.error("Error skipping action:", error);
       swipeOut.reset();
