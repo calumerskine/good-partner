@@ -101,7 +101,7 @@ export default function TimePickerSheet({
           mode="time"
           display="spinner"
           textColor="#000000"
-          onValueChange={(_, date) => {
+          onChange={(_, date) => {
             if (date) setPendingDate(date);
           }}
           style={tw`w-full`}
