@@ -339,30 +339,24 @@ export default function SettingsScreen() {
           </Text> */}
 
           <View style={tw`bg-white rounded-xl mb-3`}>
-            <View style={tw`flex-row justify-between mb-1`}>
-              <View>
-                <Text style={tw`text-ink font-gabarito font-bold text-lg mb-3`}>
-                  User
-                </Text>
-                <Text
-                  style={tw`text-ink/80 font-gabarito font-medium text-base`}
-                >
-                  {user.email}
-                </Text>
-              </View>
-              <View style={tw`pt-8`}>
-                <Button
-                  size="sm"
-                  color="muted"
-                  onPress={() => {
-                    trackEvent("auth_signout");
-                    signOut();
-                  }}
-                >
-                  Sign Out
-                </Button>
-              </View>
-            </View>
+            <Text style={tw`text-ink font-gabarito font-bold text-lg mb-3`}>
+              User
+            </Text>
+            <Text
+              style={tw`text-ink/80 font-gabarito font-medium text-base mb-4`}
+            >
+              {user.email}
+            </Text>
+            <Button
+              size="sm"
+              color="muted"
+              onPress={() => {
+                trackEvent("auth_signout");
+                signOut();
+              }}
+            >
+              Sign Out
+            </Button>
           </View>
         </Animated.View>
 

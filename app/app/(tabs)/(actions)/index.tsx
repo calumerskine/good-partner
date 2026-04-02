@@ -1,7 +1,7 @@
 import PressableCard from "@/components/ui/pressable-card";
 import { useAuth } from "@/hooks/use-auth";
 import { trackEvent } from "@/lib/analytics";
-import { useGetActiveActions, useGetUserProfile } from "@/lib/api";
+import { useGetActiveActions } from "@/lib/api";
 import { ActionTypes } from "@/lib/state/actions.model";
 import tw from "@/lib/tw";
 import { useFocusEffect } from "expo-router";
@@ -58,7 +58,7 @@ export default function ActionsScreen() {
                     >
                       {action.title}
                     </Text>
-                    {action.icon({ style: tw`text-ink/80` })}
+                    {action.icon({ style: tw`text-${action.color}-500` })}
                   </View>
                   <View style={tw`mt-2`}>
                     <Text

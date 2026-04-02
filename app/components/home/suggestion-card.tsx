@@ -37,7 +37,7 @@ export default function SuggestionCard({ action, forYou }: Props) {
             <Text style={tw`uppercase font-gabarito font-medium mr-2 text-sm`}>
               {categoryInfo.title}
             </Text>
-            {categoryInfo.icon()}
+            {categoryInfo.icon({ style: tw`text-${categoryInfo.color}-500` })}
           </View>
         </View>
         <View style={tw`flex-1 mt-2`}>

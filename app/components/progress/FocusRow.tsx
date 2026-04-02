@@ -65,7 +65,12 @@ export function FocusRow({ categories, vertical = false }: FocusRowProps) {
             <View
               style={tw`flex flex-row-reverse justify-between items-center`}
             >
-              <View>{category.icon({ size: 26 })}</View>
+              <View>
+                {category.icon({
+                  size: 26,
+                  style: tw`text-${category.color}-500`,
+                })}
+              </View>
               <Text style={tw`text-xl text-ink font-gabarito font-bold`}>
                 {actionType.title}
               </Text>

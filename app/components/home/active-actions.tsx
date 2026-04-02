@@ -88,7 +88,7 @@ export function ActionCard({
               >
                 {categoryInfo.title}
               </Text>
-              {categoryInfo.icon()}
+              {categoryInfo.icon({ style: tw`text-${categoryInfo.color}-500` })}
             </View>
           </View>
           <View style={tw`flex-1 mt-2`}>
@@ -172,7 +172,14 @@ function ActionCardButtons({
         {completeAction.isPending ? "Loading..." : "✓ I've done it!"}
       </Button>
       {env.flags.useReminders && (
-        <Button color="ghost" size="sm" onPress={() => { trackEvent("action_remind_tapped", { action_id: item.id }); onRemind(); }}>
+        <Button
+          color="ghost"
+          size="sm"
+          onPress={() => {
+            trackEvent("action_remind_tapped", { action_id: item.id });
+            onRemind();
+          }}
+        >
           {item.reminderAt && isBefore(new Date(), item.reminderAt)
             ? isToday(item.reminderAt)
               ? `Today, ${format(item.reminderAt, "h:mm a")}`
@@ -259,7 +266,12 @@ export default function ActiveActions({
             Choose an action to focus on today and start building meaningful
             habits
           </Text>
-          <Button onPress={() => { trackEvent("browse_actions_tapped"); router.push("/(tabs)/(actions)" as any); }}>
+          <Button
+            onPress={() => {
+              trackEvent("browse_actions_tapped");
+              router.push("/(tabs)/(actions)" as any);
+            }}
+          >
             <Text style={tw`text-black font-gabarito`}>Browse Actions</Text>
           </Button>
         </View>
