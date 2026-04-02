@@ -1,13 +1,16 @@
 import { initialiseAnalytics } from "@/lib/analytics";
 import { env } from "@/lib/env";
 import { supabase } from "@/lib/supabase";
-import { GoogleSignin, statusCodes } from "@react-native-google-signin/google-signin";
+import {
+  GoogleSignin,
+  statusCodes,
+} from "@react-native-google-signin/google-signin";
 import { Session, User } from "@supabase/supabase-js";
 import * as AppleAuthentication from "expo-apple-authentication";
 import React, { createContext, useContext, useEffect, useState } from "react";
 
 GoogleSignin.configure({
-  webClientId: env.google.webClientId,
+  // webClientId: env.google.webClientId,
   iosClientId: env.google.iosClientId,
 });
 
@@ -148,7 +151,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         provider: "google",
         token: idToken,
       });
-      if (error) throw new Error(error.message ?? "Sign-in failed. Please try again.");
+      if (error)
+        throw new Error(error.message ?? "Sign-in failed. Please try again.");
       if (!data.user) throw new Error("Sign-in failed. Please try again.");
       return data.user;
     } catch (error: any) {
@@ -156,10 +160,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (error.code === statusCodes.IN_PROGRESS)
         throw new Error("Sign-in is already in progress. Please wait.");
       if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE)
-        throw new Error("Google Play Services are not available on this device.");
+        throw new Error(
+          "Google Play Services are not available on this device.",
+        );
       // Re-throw already-friendly errors (from above), otherwise use a generic message
       if (error.message && !error.code) throw error;
-      throw new Error("Something went wrong with Google sign-in. Please try again.");
+      throw new Error(
+        "Something went wrong with Google sign-in. Please try again.",
+      );
     }
   };
 
@@ -179,14 +187,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         provider: "apple",
         token: credential.identityToken,
       });
-      if (error) throw new Error(error.message ?? "Sign-in failed. Please try again.");
+      if (error)
+        throw new Error(error.message ?? "Sign-in failed. Please try again.");
       if (!data.user) throw new Error("Sign-in failed. Please try again.");
       return data.user;
     } catch (error: any) {
       if (error.code === "ERR_REQUEST_CANCELED") return null;
       // Re-throw already-friendly errors (from above), otherwise use a generic message
       if (error.message && !error.code) throw error;
-      throw new Error("Something went wrong with Apple sign-in. Please try again.");
+      throw new Error(
+        "Something went wrong with Apple sign-in. Please try again.",
+      );
     }
   };
 

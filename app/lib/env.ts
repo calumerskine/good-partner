@@ -20,7 +20,7 @@ export const env = z
     }),
     google: z.object({
       iosClientId: z.string(),
-      webClientId: z.string(),
+      // webClientId: z.string(),
     }),
   })
   .parse({
@@ -28,7 +28,8 @@ export const env = z
     flags: {
       useAnalytics: process.env.EXPO_PUBLIC_ANALYTICS === "true",
       useReminders: process.env.EXPO_PUBLIC_REMINDERS === "true",
-      useActionNotifications: process.env.EXPO_PUBLIC_ACTION_NOTIFICATIONS === "true",
+      useActionNotifications:
+        process.env.EXPO_PUBLIC_ACTION_NOTIFICATIONS === "true",
     },
     onesignal: {
       appId: process.env.EXPO_PUBLIC_ONESIGNAL_APP_ID,
@@ -42,6 +43,6 @@ export const env = z
     },
     google: {
       iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
-      webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
+      // webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
     },
   });
