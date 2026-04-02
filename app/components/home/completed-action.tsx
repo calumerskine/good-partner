@@ -27,13 +27,13 @@ export default function CompletedAction({
     fromOpacity: 0,
     fromTranslateY: 8,
     duration: 250,
-    delay: 80,
+    delay: 0,
   });
   const buttonsAnim = useMountAnimation({
     fromOpacity: 0,
     fromTranslateY: 8,
     duration: 250,
-    delay: 160,
+    delay: 0,
   });
 
   const progressLabel =

@@ -1221,14 +1221,20 @@ export function useActivateAction() {
     mutationKey: mutationKeys.activateAction,
     mutationFn: ({ userId, actionId }: { userId: string; actionId: string }) =>
       activateAction(userId, actionId),
-    onSuccess: (data, { userId }) => {
-      // Invalidate active actions for this user
-      queryClient.invalidateQueries({
+    onSuccess: async (data, { userId, actionId }) => {
+      // Await only activeActions so mutateAsync resolves once the home screen
+      // is ready to switch away from SuggestedActions.
+      await queryClient.invalidateQueries({
         queryKey: queryKeys.activeActions(userId),
       });
-      queryClient.invalidateQueries({
-        queryKey: queryKeys.suggestedActions(),
-      });
+      // Remove the activated action from suggestions synchronously via setQueryData
+      // rather than invalidateQueries. Invalidating would trigger a background refetch
+      // while SuggestedActions is still mounted, causing the card to visually change
+      // before the screen switches to ActiveActions.
+      queryClient.setQueryData<CatalogAction[]>(
+        queryKeys.suggestedActions(),
+        (old) => old?.filter((a) => a.id !== actionId) ?? old,
+      );
     },
   });
 }
@@ -1295,29 +1301,39 @@ export function useDeactivateAction() {
   return useMutation({
     mutationKey: mutationKeys.deactivateAction,
     mutationFn: (userActionId: string) => deactivateAction(userActionId),
-    onSuccess: (data) => {
+    onSuccess: (data, userActionId) => {
+      // Look up the action details from the active actions cache before invalidating.
+      // actionsCatalog is never pre-fetched so getQueryData(actionsCatalog) is always
+      // undefined — using the active actions cache is more reliable.
+      const queriesData = queryClient.getQueriesData<UserAction[]>({
+        queryKey: queryKeys.allActiveActions(),
+      });
+      let catalogAction: CatalogAction | undefined;
+      for (const [, userActions] of queriesData) {
+        if (!userActions) continue;
+        const found = userActions.find((ua) => ua.id === userActionId);
+        if (found) {
+          catalogAction = found.action;
+          break;
+        }
+      }
+
       queryClient.invalidateQueries({
         queryKey: queryKeys.allActiveActions(),
       });
-      // Re-insert the deactivated action at the front of suggestions synchronously
-      // to avoid a flash caused by an async refetch swapping the displayed card.
-      const allActions = queryClient.getQueryData<CatalogAction[]>(
-        queryKeys.actionsCatalog(),
-      );
-      const action = allActions?.find((a) => a.id === data.action_id);
-      if (action) {
+
+      // Re-insert the deactivated action at the front of suggestions synchronously.
+      // Using setQueryData avoids an async refetch that would cause SuggestedActions
+      // to flash between the stale card and the updated card on remount.
+      if (catalogAction) {
         queryClient.setQueryData<CatalogAction[]>(
           queryKeys.suggestedActions(),
           (old) => {
-            if (!old) return [action];
-            if (old.some((a) => a.id === action.id)) return old;
-            return [action, ...old];
+            if (!old) return [catalogAction!];
+            if (old.some((a) => a.id === catalogAction!.id)) return old;
+            return [catalogAction!, ...old];
           },
         );
-      } else {
-        queryClient.invalidateQueries({
-          queryKey: queryKeys.suggestedActions(),
-        });
       }
     },
   });

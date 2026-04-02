@@ -168,7 +168,7 @@ function AnimatedProgressIcon({
         ]}
       >
         {/* <FontAwesome name={icon as any} size={42} color={lightColor} /> */}
-        {icon({ size: 40 })}
+        {icon({ size: 40, color: "#000000" })}
         {/* <Text style={tw`text-5xl`}>{icon}</Text> */}
       </MotiView>
     </View>

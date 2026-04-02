@@ -36,7 +36,7 @@ export default function ProgressScreen() {
     fromOpacity: 0,
     fromTranslateY: 10,
     duration: 280,
-    delay: 80,
+    delay: 0,
   });
 
   useFocusEffect(

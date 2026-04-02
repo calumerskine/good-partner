@@ -18,7 +18,7 @@ import { ActionTypes } from "@/lib/state/actions.model";
 import tw from "@/lib/tw";
 import { router, useLocalSearchParams } from "expo-router";
 import { Lightbulb } from "lucide-react-native";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { ActivityIndicator, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -46,15 +46,17 @@ export default function ActionDetailScreen() {
 
   const { shouldPrompt, markShown } = useReminderPrompt(user?.id);
   const { data: activeActions } = useGetActiveActions(user?.id);
+  const isActivatingRef = useRef(false);
 
   // If browsing a catalog action that the user already has active, redirect to
   // the user action page so active-state CTAs render correctly.
+  // Skip when we're mid-activation — handleActivate will navigate instead.
   const activeMatchForCatalog = isCatalogView
     ? activeActions?.find((a) => a.actionId === id)
     : undefined;
 
   useEffect(() => {
-    if (activeMatchForCatalog) {
+    if (activeMatchForCatalog && !isActivatingRef.current) {
       router.replace(`/(action)/${activeMatchForCatalog.id}` as any);
     }
   }, [activeMatchForCatalog]);
@@ -105,6 +107,7 @@ export default function ActionDetailScreen() {
 
   const handleActivate = async () => {
     if (!user || !actionData.id) return;
+    isActivatingRef.current = true;
 
     try {
       await activateAction.mutateAsync({
@@ -116,7 +119,7 @@ export default function ActionDetailScreen() {
 
       if (shouldPrompt) {
         markShown();
-        router.replace(`/(action)/${id}/reminders` as any);
+        router.push(`/(action)/${id}/reminders` as any);
       } else {
         router.replace("/(tabs)/(home)");
       }

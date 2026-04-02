@@ -34,7 +34,7 @@ export default function HomeScreen() {
   const { data: dailyContent } = useGetDailyContent(dayNumber);
 
   const headerAnim = useMountAnimation({ fromOpacity: 0, fromTranslateY: 8, duration: 250, delay: 0 });
-  const headlineAnim = useMountAnimation({ fromOpacity: 0, fromTranslateY: 8, duration: 250, delay: 80 });
+  const headlineAnim = useMountAnimation({ fromOpacity: 0, fromTranslateY: 8, duration: 250, delay: 0 });
 
   useFocusEffect(
     useCallback(() => {

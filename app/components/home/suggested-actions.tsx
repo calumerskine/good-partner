@@ -49,7 +49,7 @@ export default function SuggestedActions({
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const headingAnim = useMountAnimation({ fromOpacity: 0, fromTranslateY: 8, duration: 250, delay: 0 });
-  const buttonsAnim = useMountAnimation({ fromOpacity: 0, fromTranslateY: 8, duration: 250, delay: 160 });
+  const buttonsAnim = useMountAnimation({ fromOpacity: 0, fromTranslateY: 8, duration: 250, delay: 0 });
   const swipeOut = useSwipeOut();
 
   const { data: suggestedActions = [] } = useGetSuggestedActions(

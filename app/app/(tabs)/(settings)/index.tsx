@@ -67,37 +67,37 @@ export default function SettingsScreen() {
     fromOpacity: 0,
     fromTranslateY: 10,
     duration: 280,
-    delay: 80,
+    delay: 40,
   });
   const focusAnim = useMountAnimation({
     fromOpacity: 0,
     fromTranslateY: 10,
     duration: 280,
-    delay: 160,
+    delay: 80,
   });
   const hapticsAnim = useMountAnimation({
     fromOpacity: 0,
     fromTranslateY: 10,
     duration: 280,
-    delay: 240,
+    delay: 120,
   });
   const remindersAnim = useMountAnimation({
     fromOpacity: 0,
     fromTranslateY: 10,
     duration: 280,
-    delay: 320,
+    delay: 160,
   });
   const actionNotifAnim = useMountAnimation({
     fromOpacity: 0,
     fromTranslateY: 10,
     duration: 280,
-    delay: 400,
+    delay: 200,
   });
   const debugAnim = useMountAnimation({
     fromOpacity: 0,
     fromTranslateY: 10,
     duration: 280,
-    delay: 480,
+    delay: 240,
   });
 
   useFocusEffect(
