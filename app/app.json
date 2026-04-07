@@ -14,6 +14,7 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
+      "deploymentTarget": "16.0",
       "supportsTablet": true,
       "bundleIdentifier": "com.pearprogramming.wingmanapp",
       "usesAppleSignIn": true,
