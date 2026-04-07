@@ -24,10 +24,7 @@
         ]
       },
       "entitlements": {
-        "aps-environment": "development",
-        "com.apple.security.application-groups": [
-          "group.${ios.bundleIdentifier}.onesignal"
-        ]
+        "aps-environment": "development"
       }
     },
     "android": {
