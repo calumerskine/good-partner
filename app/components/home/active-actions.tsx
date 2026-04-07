@@ -54,7 +54,7 @@ export function ActionCard({
         shade={200}
         showShadow
         fillHeight
-        style={tw`h-76`}
+        style={tw`h-80`}
         onPress={() => router.push(`/(action)/${item.id}` as any)}
       >
         <View style={tw`p-6 items-start flex-1`}>
@@ -113,7 +113,11 @@ export function ActionCard({
         <Animated.View
           style={[
             tw`absolute w-20 h-20`,
-            { bottom: -12, right: -12, transform: [{ scale: starScale }] },
+            {
+              bottom: -28,
+              right: -15,
+              transform: [{ scale: starScale }],
+            },
           ]}
         >
           <Image
