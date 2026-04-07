@@ -1,10 +1,5 @@
 import { type ActionType } from "@/lib/state/actions.model";
 import tw from "@/lib/tw";
-
-const fallbackColor = "#8E97FD";
-function twColor(name: string): string {
-  return tw.color(name) ?? fallbackColor;
-}
 import { getLevelForXp } from "@/lib/xp";
 import { useHaptics } from "@/hooks/use-haptics";
 import { MotiView } from "moti";
@@ -20,6 +15,11 @@ import Animated, {
 } from "react-native-reanimated";
 import Svg, { Circle } from "react-native-svg";
 import Button from "../ui/button";
+
+const fallbackColor = "#8E97FD";
+function twColor(name: string): string {
+  return tw.color(name) ?? fallbackColor;
+}
 
 const CIRCLE_SIZE = 140;
 const CIRCLE_STROKE = 8;
@@ -54,7 +54,6 @@ const ANIMATION = {
 } as const;
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
-
 
 function Sparkles({ color }: { color: string }) {
   const positions = [
@@ -102,7 +101,7 @@ function AnimatedProgressIcon({
   icon: React.ReactComponent;
   color: string;
 }) {
-  const hexColor = twColor(color);
+  const hexColor = twColor(`bg-${color}-400`);
   const progress = useSharedValue(0);
 
   useEffect(() => {
@@ -168,136 +167,132 @@ function AnimatedProgressIcon({
         ]}
       >
         {/* <FontAwesome name={icon as any} size={42} color={lightColor} /> */}
-        {icon({ size: 40, color: "#000000" })}
+        {icon({ size: 40, style: tw`text-${color}-600` })}
         {/* <Text style={tw`text-5xl`}>{icon}</Text> */}
       </MotiView>
     </View>
   );
 }
 
-function AnimatedXPCounter({
-  amount,
-  title,
-  color,
-}: {
-  amount: number;
-  title: string;
-  color: string;
-}) {
-  const [displayValue, setDisplayValue] = useState(0);
-  const targetValue = amount;
+// function AnimatedXPCounter({
+//   amount,
+//   title,
+//   color,
+// }: {
+//   amount: number;
+//   title: string;
+//   color: string;
+// }) {
+//   const [displayValue, setDisplayValue] = useState(0);
+//   const targetValue = amount;
 
-  useEffect(() => {
-    const delayTimeout = setTimeout(() => {
-      const duration = ANIMATION.XP_ROLL_DURATION;
-      const startTime = Date.now();
-      const startValue = 0;
+//   useEffect(() => {
+//     const delayTimeout = setTimeout(() => {
+//       const duration = ANIMATION.XP_ROLL_DURATION;
+//       const startTime = Date.now();
+//       const startValue = 0;
 
-      const animate = () => {
-        const elapsed = Date.now() - startTime;
-        const progress = Math.min(elapsed / duration, 1);
-        const easedProgress = 1 - Math.pow(1 - progress, 3);
-        const currentValue = Math.round(
-          startValue + (targetValue - startValue) * easedProgress,
-        );
+//       const animate = () => {
+//         const elapsed = Date.now() - startTime;
+//         const progress = Math.min(elapsed / duration, 1);
+//         const easedProgress = 1 - Math.pow(1 - progress, 3);
+//         const currentValue = Math.round(
+//           startValue + (targetValue - startValue) * easedProgress,
+//         );
 
-        setDisplayValue(currentValue);
+//         setDisplayValue(currentValue);
 
-        if (progress < 1) {
-          requestAnimationFrame(animate);
-        }
-      };
+//         if (progress < 1) {
+//           requestAnimationFrame(animate);
+//         }
+//       };
 
-      requestAnimationFrame(animate);
-    }, ANIMATION.XP_ROLL_START_DELAY);
+//       requestAnimationFrame(animate);
+//     }, ANIMATION.XP_ROLL_START_DELAY);
 
-    return () => clearTimeout(delayTimeout);
-  }, [targetValue]);
+//     return () => clearTimeout(delayTimeout);
+//   }, [targetValue]);
 
-  return (
-    <MotiView
-      from={{ opacity: 0, translateY: 10 }}
-      animate={{ opacity: 1, translateY: 0 }}
-      transition={{
-        delay: ANIMATION.XP_ROLL_START_DELAY - 100,
-        duration: 200,
-      }}
-    >
-      <Text
-        style={tw`text-charcoal/70 font-gabarito font-medium text-xl text-center`}
-      >
-        You earned{" "}
-        <Text style={{ color: twColor(color) }}>{displayValue}</Text> XP in{" "}
-        {title}!
-      </Text>
-    </MotiView>
-  );
-}
+//   return (
+//     <MotiView
+//       from={{ opacity: 0, translateY: 10 }}
+//       animate={{ opacity: 1, translateY: 0 }}
+//       transition={{
+//         delay: ANIMATION.XP_ROLL_START_DELAY - 100,
+//         duration: 200,
+//       }}
+//     >
+//       <Text
+//         style={tw`text-charcoal/70 font-gabarito font-medium text-xl text-center`}
+//       >
+//         You earned <Text style={{ color: twColor(color) }}>{displayValue}</Text>{" "}
+//         XP in {title}!
+//       </Text>
+//     </MotiView>
+//   );
+// }
 
-function LevelProgress({
-  previousXp,
-  newXp,
-  color,
-}: {
-  previousXp: number;
-  newXp: number;
-  color: string;
-}) {
-  const prevLevel = getLevelForXp(previousXp);
-  const newLevel = getLevelForXp(newXp);
-  const isLevelUp = prevLevel.level !== newLevel.level;
+// function LevelProgress({
+//   previousXp,
+//   newXp,
+//   color,
+// }: {
+//   previousXp: number;
+//   newXp: number;
+//   color: string;
+// }) {
+//   const prevLevel = getLevelForXp(previousXp);
+//   const newLevel = getLevelForXp(newXp);
+//   const isLevelUp = prevLevel.level !== newLevel.level;
 
-  if (newLevel.isMaxLevel && prevLevel.isMaxLevel) {
-    return null;
-  }
+//   if (newLevel.isMaxLevel && prevLevel.isMaxLevel) {
+//     return null;
+//   }
 
-  // Show progress within the NEW level
-  const displayLevel = newLevel;
+//   // Show progress within the NEW level
+//   const displayLevel = newLevel;
 
-  return (
-    <MotiView
-      from={{ opacity: 0, translateY: 10 }}
-      animate={{ opacity: 1, translateY: 0 }}
-      transition={{ delay: ANIMATION.XP_TEXT_DELAY + 200, duration: 300 }}
-      style={tw`w-full px-4`}
-    >
-      <View style={tw`flex-row justify-between items-center mb-1.5`}>
-        <Text style={tw`text-charcoal/60 font-gabarito font-medium text-sm`}>
-          {displayLevel.title}{" "}
-        </Text>
-        <Text style={tw`text-charcoal/40 font-gabarito text-sm`}>
-          {displayLevel.isMaxLevel
-            ? "Max Level"
-            : `${displayLevel.currentLevelXp} / ${displayLevel.xpForNextLevel}`}
-        </Text>
-      </View>
-      <View
-        style={[
-          tw`rounded-full overflow-hidden`,
-          { height: 6, backgroundColor: "rgba(0,0,0,0.08)" },
-        ]}
-      >
-        <MotiView
-          from={{
-            width: isLevelUp
-              ? "0%"
-              : `${Math.round(prevLevel.progress * 100)}%`,
-          }}
-          animate={{ width: `${Math.round(displayLevel.progress * 100)}%` }}
-          transition={{
-            type: "timing",
-            duration: 800,
-            delay: ANIMATION.XP_TEXT_DELAY + 400,
-          }}
-          style={[
-            tw`h-full rounded-full`,
-            { backgroundColor: twColor(color) },
-          ]}
-        />
-      </View>
-    </MotiView>
-  );
-}
+//   return (
+//     <MotiView
+//       from={{ opacity: 0, translateY: 10 }}
+//       animate={{ opacity: 1, translateY: 0 }}
+//       transition={{ delay: ANIMATION.XP_TEXT_DELAY + 200, duration: 300 }}
+//       style={tw`w-full px-4`}
+//     >
+//       <View style={tw`flex-row justify-between items-center mb-1.5`}>
+//         <Text style={tw`text-charcoal/60 font-gabarito font-medium text-sm`}>
+//           {displayLevel.title}{" "}
+//         </Text>
+//         <Text style={tw`text-charcoal/40 font-gabarito text-sm`}>
+//           {displayLevel.isMaxLevel
+//             ? "Max Level"
+//             : `${displayLevel.currentLevelXp} / ${displayLevel.xpForNextLevel}`}
+//         </Text>
+//       </View>
+//       <View
+//         style={[
+//           tw`rounded-full overflow-hidden`,
+//           { height: 6, backgroundColor: "rgba(0,0,0,0.08)" },
+//         ]}
+//       >
+//         <MotiView
+//           from={{
+//             width: isLevelUp
+//               ? "0%"
+//               : `${Math.round(prevLevel.progress * 100)}%`,
+//           }}
+//           animate={{ width: `${Math.round(displayLevel.progress * 100)}%` }}
+//           transition={{
+//             type: "timing",
+//             duration: 800,
+//             delay: ANIMATION.XP_TEXT_DELAY + 400,
+//           }}
+//           style={[tw`h-full rounded-full`, { backgroundColor: twColor(color) }]}
+//         />
+//       </View>
+//     </MotiView>
+//   );
+// }
 
 export default function SuccessScreen({
   category,
@@ -353,7 +348,8 @@ export default function SuccessScreen({
       <View style={tw`items-center gap-6 px-4 mt-36`}>
         <AnimatedProgressIcon
           icon={category.icon}
-          color={`${category.color}-400`}
+          color={category.color}
+          // color={`${category.color}-400`}
         />
 
         <MotiView

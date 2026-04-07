@@ -88,7 +88,7 @@ export function ActionCard({
               >
                 {categoryInfo.title}
               </Text>
-              {categoryInfo.icon({ style: tw`text-${categoryInfo.color}-500` })}
+              {categoryInfo.icon({ style: tw`text-${categoryInfo.color}-600` })}
             </View>
           </View>
           <View style={tw`flex-1 mt-2`}>

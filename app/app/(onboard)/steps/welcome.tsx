@@ -8,24 +8,24 @@ type Props = {
 
 export function WelcomeStep({ onNext }: Props) {
   return (
-    <View style={tw`flex-1 items-center justify-between px-6 pt-20`}>
-      <View style={tw`flex-[0.3]`} />
+    <View style={tw`flex-1 items-center justify-between px-6 pt-12`}>
+      {/* <View style={tw`flex-1`} /> */}
 
       <View style={tw`items-center gap-8 px-4`}>
         <View
-          style={tw`w-32 h-32 rounded-full bg-grape/20 items-center justify-center mb-4`}
+          style={tw`w-32 h-32 rounded-full bg-indigo-100 items-center justify-center mb-4`}
         >
           <Text style={tw`text-6xl`}>✨</Text>
         </View>
 
         <View style={tw`items-center gap-4`}>
           <Text
-            style={tw`text-5xl text-charcoal font-gabarito font-black text-center leading-tight`}
+            style={tw`text-5xl text-ink font-gabarito font-black text-center leading-tight`}
           >
             Welcome to{"\n"}The Good Partner
           </Text>
           <Text
-            style={tw`text-xl text-charcoal/80 font-gabarito text-center leading-relaxed px-6`}
+            style={tw`text-xl text-ink/80 font-gabarito text-center leading-relaxed px-6`}
           >
             Your partner in building stronger relationships through thoughtful
             actions
@@ -33,7 +33,7 @@ export function WelcomeStep({ onNext }: Props) {
         </View>
       </View>
 
-      <View style={tw`flex-1`} />
+      {/* <View style={tw`flex-1`} /> */}
 
       <View style={tw`w-full gap-4 pt-6 pb-2`}>
         <Button onPress={onNext}>Get Started</Button>

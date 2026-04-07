@@ -58,7 +58,7 @@ export default function ActionsScreen() {
                     >
                       {action.title}
                     </Text>
-                    {action.icon({ style: tw`text-${action.color}-500` })}
+                    {action.icon({ style: tw`text-${action.color}-600` })}
                   </View>
                   <View style={tw`mt-2`}>
                     <Text

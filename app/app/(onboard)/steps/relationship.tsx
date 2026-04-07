@@ -1,7 +1,7 @@
 import PressableRadio from "@/components/ui/pressable-radio";
 import Button from "@/components/ui/button";
 import tw from "@/lib/tw";
-import { ScrollView, Text, View } from "react-native";
+import { Text, View } from "react-native";
 
 const OPTIONS = [
   { value: "great", label: "Really good, I just want to keep growing" },
@@ -18,19 +18,13 @@ type Props = {
 
 export function RelationshipStep({ selected, onSelect, onNext }: Props) {
   return (
-    <View style={tw`flex-1`}>
-      <ScrollView
-        style={tw`flex-1`}
-        contentContainerStyle={tw`px-6 pt-6 pb-4`}
-        showsVerticalScrollIndicator={false}
-      >
-        <View style={tw`mb-8`}>
-          <Text
-            style={tw`text-4xl text-charcoal font-gabarito font-black mb-3 leading-tight`}
-          >
-            How would you describe your relationship right now?
-          </Text>
-        </View>
+    <View style={tw`flex-1 items-center justify-between px-6 pt-3`}>
+      <View style={tw`items-center gap-3 flex-1`}>
+        <Text
+          style={tw`text-3xl text-ink font-gabarito font-bold mb-3 leading-tight text-center`}
+        >
+          How would you describe your relationship right now?
+        </Text>
 
         <View style={tw`gap-3`}>
           {OPTIONS.map((option) => (
@@ -39,28 +33,27 @@ export function RelationshipStep({ selected, onSelect, onNext }: Props) {
               selected={selected === option.value}
               onPress={() => onSelect(option.value)}
               colorMode="selected"
-              color="indigo"
-              shade={100}
+              color="green"
+              shade={300}
+              pressDepth={6}
             >
               <View style={tw`p-5`}>
-                <Text
-                  style={tw`font-gabarito text-lg text-charcoal font-medium`}
-                >
+                <Text style={tw`font-gabarito text-lg text-ink font-medium`}>
                   {option.label}
                 </Text>
               </View>
             </PressableRadio>
           ))}
         </View>
-      </ScrollView>
+      </View>
 
-      <View style={tw`p-6 pb-2`}>
+      <View style={tw`w-full pt-6 pb-2`}>
         <Button onPress={onNext} disabled={!selected}>
           Continue
         </Button>
         <View style={tw`h-5 mt-2`}>
           {!selected && (
-            <Text style={tw`text-charcoal/80 font-gabarito text-center`}>
+            <Text style={tw`text-ink/80 font-gabarito text-center`}>
               Please select an option to continue
             </Text>
           )}

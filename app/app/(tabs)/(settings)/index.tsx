@@ -291,8 +291,13 @@ export default function SettingsScreen() {
                         value={reminderConfig.morningReminderEnabled}
                         trackColor={{ false: "#767577", true: "#8E97FD" }}
                         onValueChange={(val) => {
-                          trackEvent("settings_morning_reminder_toggled", { enabled: val });
-                          handleToggleDailyReminder("morningReminderEnabled", val);
+                          trackEvent("settings_morning_reminder_toggled", {
+                            enabled: val,
+                          });
+                          handleToggleDailyReminder(
+                            "morningReminderEnabled",
+                            val,
+                          );
                         }}
                       />
                     </View>
@@ -321,8 +326,13 @@ export default function SettingsScreen() {
                         value={reminderConfig.eveningReminderEnabled}
                         trackColor={{ false: "#767577", true: "#8E97FD" }}
                         onValueChange={(val) => {
-                          trackEvent("settings_evening_reminder_toggled", { enabled: val });
-                          handleToggleDailyReminder("eveningReminderEnabled", val);
+                          trackEvent("settings_evening_reminder_toggled", {
+                            enabled: val,
+                          });
+                          handleToggleDailyReminder(
+                            "eveningReminderEnabled",
+                            val,
+                          );
                         }}
                       />
                     </View>
@@ -347,16 +357,18 @@ export default function SettingsScreen() {
             >
               {user.email}
             </Text>
-            <Button
-              size="sm"
-              color="muted"
-              onPress={() => {
-                trackEvent("auth_signout");
-                signOut();
-              }}
-            >
-              Sign Out
-            </Button>
+            <View style={tw`w-36`}>
+              <Button
+                size="sm"
+                color="muted"
+                onPress={() => {
+                  trackEvent("auth_signout");
+                  signOut();
+                }}
+              >
+                Sign Out
+              </Button>
+            </View>
           </View>
         </Animated.View>
 
@@ -416,7 +428,9 @@ export default function SettingsScreen() {
               : reminderConfig.eveningReminderTime
           }
           onSave={(utcTimeStr) => {
-            trackEvent("settings_reminder_time_saved", { period: activePicker });
+            trackEvent("settings_reminder_time_saved", {
+              period: activePicker,
+            });
             updateReminderConfig({
               userId: user.id,
               config:

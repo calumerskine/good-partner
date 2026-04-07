@@ -35,28 +35,21 @@ type Props = {
 
 export function FocusStep({ selected, onToggle, onNext }: Props) {
   return (
-    <View style={tw`flex-1`}>
-      <ScrollView
-        style={tw`flex-1`}
-        contentContainerStyle={tw`px-6 pt-6 pb-4`}
-        showsVerticalScrollIndicator={false}
-      >
-        <View style={tw`mb-8`}>
-          <Text
-            style={tw`text-4xl text-charcoal font-gabarito font-black mb-3`}
-          >
-            Choose Your Focus
-          </Text>
-          <Text
-            style={tw`text-lg text-charcoal/80 font-gabarito leading-relaxed`}
-          >
-            Select the areas you'd like to improve. You can choose multiple.
-          </Text>
-        </View>
-
-        <View style={tw`mb-6`}>
+    <View style={tw`flex-1 px-6 pt-3`}>
+      <View style={tw`mb-5 text-center`}>
+        <Text
+          style={tw`text-3xl text-ink font-gabarito font-bold text-center mb-2`}
+        >
+          What would you like to focus on?
+        </Text>
+        <Text style={tw`text-lg text-ink/80 font-gabarito text-center`}>
+          You can choose multiple.
+        </Text>
+      </View>
+      <ScrollView style={tw`flex-1`} showsVerticalScrollIndicator={false}>
+        <View style={tw`gap-2`}>
           {Object.entries(FOCUS_OPTIONS).map(([key, value]) => (
-            <View key={key} style={tw`mb-2`}>
+            <View key={key}>
               <CategoryButton
                 text={value.title}
                 description={value.description}
@@ -70,13 +63,13 @@ export function FocusStep({ selected, onToggle, onNext }: Props) {
         </View>
       </ScrollView>
 
-      <View style={tw`p-6 pb-2`}>
+      <View style={tw`w-full pt-6 pb-2`}>
         <Button onPress={onNext} disabled={selected.length === 0}>
           Continue
         </Button>
         <View style={tw`h-5 mt-2`}>
           {selected.length === 0 && (
-            <Text style={tw`text-charcoal/80 font-gabarito text-center`}>
+            <Text style={tw`text-ink/80 font-gabarito text-center`}>
               Please select at least one area to continue
             </Text>
           )}

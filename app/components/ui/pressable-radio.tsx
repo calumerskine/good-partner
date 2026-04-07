@@ -45,7 +45,7 @@ function getStateClasses(color: string, shade: number, isColored: boolean) {
     };
   }
   const s = clampShade(shade);
-  const shadowShade = Math.min(s + 100, 900);
+  const shadowShade = Math.min(s + 0, 900);
   return {
     faceClass: `bg-${color}-${s}`,
     shadowClass: `bg-${color}-${shadowShade}`,

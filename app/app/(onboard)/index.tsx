@@ -138,21 +138,21 @@ export default function OnboardWizard() {
   return (
     <SafeAreaView style={tw`flex-1 bg-white`}>
       {/* Header row: back + progress */}
-      <View style={tw`px-4 pt-2 pb-0 min-h-14 justify-center`}>
+      <View style={tw`px-4 pt-2 pb-4 min-h-14 justify-center`}>
         {showBack && (
           <TouchableOpacity onPress={goBack} style={tw`absolute left-4 p-2`}>
-            <ChevronLeft size={24} color="#2E3130" />
+            <ChevronLeft size={24} color={tw.color("ink")} />
           </TouchableOpacity>
         )}
         {showProgress && (
           <View style={tw`items-center`}>
-            <Text style={tw`text-charcoal/50 font-gabarito text-sm mb-1`}>
+            <Text style={tw`text-ink font-gabarito text-sm mb-2`}>
               Step {progressStep} of 3
             </Text>
-            <View style={tw`w-32 h-1 bg-gray-100 rounded-full`}>
+            <View style={tw`w-32 h-2 bg-gray-200 rounded-full`}>
               <View
                 style={[
-                  tw`h-1 bg-indigo-400 rounded-full`,
+                  tw`h-2 bg-indigo-400 rounded-full`,
                   { width: `${(progressStep / 3) * 100}%` },
                 ]}
               />
@@ -162,9 +162,7 @@ export default function OnboardWizard() {
       </View>
 
       {/* Animated step content */}
-      <Animated.View
-        style={[tw`flex-1`, { transform: [{ translateX }] }]}
-      >
+      <Animated.View style={[tw`flex-1`, { transform: [{ translateX }] }]}>
         {displayStep === 0 && (
           <WelcomeStep
             onNext={() => {
@@ -173,9 +171,7 @@ export default function OnboardWizard() {
             }}
           />
         )}
-        {displayStep === 1 && (
-          <TransitionStep onNext={() => goForward(2)} />
-        )}
+        {displayStep === 1 && <TransitionStep onNext={() => goForward(2)} />}
         {displayStep === 2 && (
           <RelationshipStep
             selected={data.relationshipStatus}
@@ -191,7 +187,10 @@ export default function OnboardWizard() {
             selected={data.focusAreas}
             onToggle={(key) => {
               const isRemoving = data.focusAreas.includes(key);
-              trackEvent("onboarding_focus_toggled", { category: key, selected: !isRemoving });
+              trackEvent("onboarding_focus_toggled", {
+                category: key,
+                selected: !isRemoving,
+              });
               setData((d) => ({
                 ...d,
                 focusAreas: d.focusAreas.includes(key)
@@ -213,9 +212,7 @@ export default function OnboardWizard() {
             isSubmitting={createProfileMutation.isPending}
           />
         )}
-        {displayStep === 5 && (
-          <AuthStep onComplete={handleComplete} />
-        )}
+        {displayStep === 5 && <AuthStep onComplete={handleComplete} />}
       </Animated.View>
     </SafeAreaView>
   );

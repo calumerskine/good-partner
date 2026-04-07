@@ -85,133 +85,131 @@ export function AuthStep({ onComplete }: Props) {
   };
 
   return (
-    <FormScrollView contentContainerStyle={tw`flex-grow px-6 justify-center pb-4`}>
-        <View style={tw`mb-10`}>
-          <Text
-            style={tw`text-4xl text-charcoal font-gabarito font-black mb-3 leading-tight`}
-          >
-            You're all set.{"\n"}Create your account to save your progress.
-          </Text>
-        </View>
+    <FormScrollView
+      contentContainerStyle={tw`flex-grow px-6 justify-center pb-4`}
+    >
+      <View style={tw`mb-10`}>
+        <Text
+          style={tw`text-4xl text-charcoal font-gabarito font-black mb-3 leading-tight`}
+        >
+          You're all set.{"\n"}Create your account to save your progress.
+        </Text>
+      </View>
 
-        <View style={tw`gap-4 mb-6`}>
-          {Platform.OS === "ios" && (
-            <View
-              style={isLoading ? tw`opacity-50` : undefined}
-              pointerEvents={isLoading ? "none" : "auto"}
-            >
-              <AppleAuthentication.AppleAuthenticationButton
-                buttonType={
-                  AppleAuthentication.AppleAuthenticationButtonType.SIGN_UP
-                }
-                buttonStyle={
-                  AppleAuthentication.AppleAuthenticationButtonStyle.BLACK
-                }
-                cornerRadius={100}
-                style={{ height: 56 }}
-                onPress={() => handleSocialAuth("apple")}
-              />
-            </View>
-          )}
-          <TouchableOpacity
-            style={tw`w-full h-14 flex-row items-center justify-center border-2 border-ink/15 rounded-full gap-3`}
-            onPress={() => handleSocialAuth("google")}
-            disabled={isLoading}
-          >
-            <FontAwesome name="google" size={20} color="#2E3130" />
-            <Text style={tw`text-ink font-gabarito font-bold text-base`}>
-              Continue with Google
-            </Text>
-          </TouchableOpacity>
-        </View>
-
-        <View style={tw`flex-row items-center gap-3 mb-6`}>
-          <View style={tw`flex-1 h-px bg-ink/10`} />
-          <Text style={tw`text-ink/40 font-gabarito text-sm`}>or</Text>
-          <View style={tw`flex-1 h-px bg-ink/10`} />
-        </View>
-
-        <View style={tw`gap-5 mb-6`}>
-          <Controller
-            control={control}
-            rules={{
-              required: "Email is required",
-              pattern: {
-                value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                message: "Invalid email address",
-              },
-            }}
-            render={({ field: { onChange, value } }) => (
-              <View>
-                <Input
-                  name="email"
-                  placeholder="Email address"
-                  value={value}
-                  onChangeText={onChange}
-                  autoCapitalize="none"
-                  autoComplete="email"
-                  keyboardType="email-address"
-                />
-                {errors.email && (
-                  <Text
-                    style={tw`text-red-600 text-sm mt-2 ml-4 font-gabarito`}
-                  >
-                    {errors.email.message}
-                  </Text>
-                )}
-              </View>
-            )}
-            name="email"
-          />
-
-          <Controller
-            control={control}
-            rules={{
-              required: "Password is required",
-              minLength: {
-                value: 6,
-                message: "Password must be at least 6 characters",
-              },
-            }}
-            render={({ field: { onChange, value } }) => (
-              <View>
-                <Input
-                  name="password"
-                  placeholder="Password"
-                  value={value}
-                  onChangeText={onChange}
-                  secureTextEntry
-                  autoCapitalize="none"
-                  autoComplete="new-password"
-                />
-                {errors.password && (
-                  <Text
-                    style={tw`text-red-600 text-sm mt-2 ml-4 font-gabarito`}
-                  >
-                    {errors.password.message}
-                  </Text>
-                )}
-              </View>
-            )}
-            name="password"
-          />
-        </View>
-
-        {error && (
+      <View style={tw`gap-4 mb-6`}>
+        {Platform.OS === "ios" && (
           <View
-            style={tw`p-5 bg-red-600/10 rounded-2xl border-2 border-red-600/30 mb-6`}
+            style={isLoading ? tw`opacity-50` : undefined}
+            pointerEvents={isLoading ? "none" : "auto"}
           >
-            <Text
-              style={tw`text-red-600 font-gabarito text-base leading-relaxed`}
-            >
-              {error}
-            </Text>
+            <AppleAuthentication.AppleAuthenticationButton
+              buttonType={
+                AppleAuthentication.AppleAuthenticationButtonType.SIGN_UP
+              }
+              buttonStyle={
+                AppleAuthentication.AppleAuthenticationButtonStyle.BLACK
+              }
+              cornerRadius={100}
+              style={{ height: 56 }}
+              onPress={() => handleSocialAuth("apple")}
+            />
           </View>
         )}
+        <TouchableOpacity
+          style={tw`w-full h-14 flex-row items-center justify-center border-2 border-ink/15 rounded-full gap-3`}
+          onPress={() => handleSocialAuth("google")}
+          disabled={isLoading}
+        >
+          <FontAwesome name="google" size={20} color="#2E3130" />
+          <Text style={tw`text-ink font-gabarito font-bold text-base`}>
+            Continue with Google
+          </Text>
+        </TouchableOpacity>
+      </View>
 
-        <Button disabled={isLoading} onPress={handleSubmit(onSubmit)}>
-          {isLoading ? "Creating account..." : "Continue with email →"}
-        </Button>
+      <View style={tw`flex-row items-center gap-3 mb-6`}>
+        <View style={tw`flex-1 h-px bg-ink/10`} />
+        <Text style={tw`text-ink/40 font-gabarito text-sm`}>or</Text>
+        <View style={tw`flex-1 h-px bg-ink/10`} />
+      </View>
+
+      <View style={tw`gap-5 mb-6`}>
+        <Controller
+          control={control}
+          rules={{
+            required: "Email is required",
+            pattern: {
+              value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+              message: "Invalid email address",
+            },
+          }}
+          render={({ field: { onChange, value } }) => (
+            <View>
+              <Input
+                name="email"
+                placeholder="Email address"
+                value={value}
+                onChangeText={onChange}
+                autoCapitalize="none"
+                autoComplete="email"
+                keyboardType="email-address"
+              />
+              {errors.email && (
+                <Text style={tw`text-red-600 text-sm mt-2 ml-4 font-gabarito`}>
+                  {errors.email.message}
+                </Text>
+              )}
+            </View>
+          )}
+          name="email"
+        />
+
+        <Controller
+          control={control}
+          rules={{
+            required: "Password is required",
+            minLength: {
+              value: 6,
+              message: "Password must be at least 6 characters",
+            },
+          }}
+          render={({ field: { onChange, value } }) => (
+            <View>
+              <Input
+                name="password"
+                placeholder="Password"
+                value={value}
+                onChangeText={onChange}
+                secureTextEntry
+                autoCapitalize="none"
+                autoComplete="new-password"
+              />
+              {errors.password && (
+                <Text style={tw`text-red-600 text-sm mt-2 ml-4 font-gabarito`}>
+                  {errors.password.message}
+                </Text>
+              )}
+            </View>
+          )}
+          name="password"
+        />
+      </View>
+
+      {error && (
+        <View
+          style={tw`p-5 bg-red-600/10 rounded-2xl border-2 border-red-600/30 mb-6`}
+        >
+          <Text
+            style={tw`text-red-600 font-gabarito text-base leading-relaxed`}
+          >
+            {error}
+          </Text>
+        </View>
+      )}
+
+      <Button disabled={isLoading} onPress={handleSubmit(onSubmit)}>
+        {isLoading ? "Creating account..." : "Continue with email"}
+      </Button>
     </FormScrollView>
   );
 }

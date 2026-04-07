@@ -33,8 +33,8 @@ export const CategoryButton = ({
 }) => {
   const progress = useSharedValue(selected ? 1 : 0);
 
-  const borderColorSelected = twColor(`${color}-300`);
-  const circleBgUnselected = twColor(`${color}-200`);
+  const borderColorSelected = twColor(`${color}-400`);
+  const circleBgUnselected = twColor(`${color}-300`);
   const circleBgSelected = twColor(`${color}-500`);
 
   useEffect(() => {
@@ -67,20 +67,18 @@ export const CategoryButton = ({
         onPress(category);
       }}
       selected={selected ?? false}
-      shade={300}
+      shade={200}
       deepFactor={1}
+      pressDepth={6}
+      colorMode="selected"
+      color={color}
     >
-      <Animated.View style={[tw`p-6 border rounded-2xl`, animatedBorderStyle]}>
-        {/* <View
-          style={tw`bg-${color}-300 rounded-lg flex flex-row items-center px-3 py-1`}
-        >
-          <Text style={tw`uppercase font-gabarito font-medium mr-2 text-sm`}>
-            {category}
-          </Text>
-        </View> */}
+      <Animated.View
+        style={[tw`p-6 border-0 rounded-2xl`, animatedBorderStyle]}
+      >
         <View style={tw`flex-row items-start justify-between`}>
           <View style={tw`flex-1 pr-4`}>
-            <Text style={tw`font-gabarito font-bold text-xl text-ink/70 mb-2`}>
+            <Text style={tw`font-gabarito font-bold text-xl text-ink mb-2`}>
               {text}
             </Text>
             <Text style={tw`font-gabarito text-base text-ink/80`}>
@@ -94,7 +92,7 @@ export const CategoryButton = ({
             ]}
           >
             <Animated.View style={animatedCheckStyle}>
-              <Check size={24} style={tw`text-${color}-100`} />
+              <Check size={24} style={tw`text-white`} />
             </Animated.View>
           </Animated.View>
         </View>

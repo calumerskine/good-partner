@@ -1,7 +1,7 @@
 import PressableRadio from "@/components/ui/pressable-radio";
 import Button from "@/components/ui/button";
 import tw from "@/lib/tw";
-import { ScrollView, Text, View } from "react-native";
+import { Text, View } from "react-native";
 
 const OPTIONS = [
   { value: "man", label: "Man" },
@@ -24,34 +24,29 @@ export function GenderStep({
   isSubmitting,
 }: Props) {
   return (
-    <View style={tw`flex-1`}>
-      <ScrollView
-        style={tw`flex-1`}
-        contentContainerStyle={tw`px-6 pt-6 pb-4`}
-        showsVerticalScrollIndicator={false}
-      >
-        <View style={tw`mb-8`}>
+    <View style={tw`flex-1 items-center justify-between px-6 pt-3`}>
+      <View style={tw`items-center gap-3 flex-1`}>
+        <View style={tw`mb-3`}>
           <Text
-            style={tw`text-4xl text-charcoal font-gabarito font-black mb-3 leading-tight`}
+            style={tw`text-3xl text-ink font-gabarito font-bold text-center mb-2`}
           >
             About you
           </Text>
-          <Text
-            style={tw`text-lg text-charcoal/80 font-gabarito leading-relaxed`}
-          >
+          <Text style={tw`text-lg text-ink/80 font-gabarito text-center`}>
             This helps us tailor suggestions for you.
           </Text>
         </View>
 
-        <View style={tw`gap-3`}>
+        <View style={tw`gap-3 min-w-full`}>
           {OPTIONS.map((option) => (
             <PressableRadio
               key={option.value}
               selected={selected === option.value}
               onPress={() => onSelect(option.value)}
-              color="indigo"
               colorMode="selected"
-              shade={100}
+              color="green"
+              shade={300}
+              pressDepth={6}
             >
               <View style={tw`p-5`}>
                 <Text
@@ -63,9 +58,9 @@ export function GenderStep({
             </PressableRadio>
           ))}
         </View>
-      </ScrollView>
+      </View>
 
-      <View style={tw`p-6 pb-2`}>
+      <View style={tw`w-full pt-6 pb-2`}>
         <Button onPress={onNext} disabled={!selected || isSubmitting}>
           {isSubmitting ? "Setting up..." : "Continue"}
         </Button>

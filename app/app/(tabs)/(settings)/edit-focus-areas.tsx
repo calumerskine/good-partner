@@ -138,10 +138,10 @@ export default function EditFocusAreasScreen() {
           </Text>
         </View>
 
-        <View style={tw`mb-6`}>
+        <View style={tw`mb-6 gap-2`}>
           {Object.entries(PAIN_POINTS).map(([key, value]) => {
             return (
-              <View key={key} style={tw`mb-2`}>
+              <View key={key}>
                 <CategoryButton
                   text={value.title}
                   description={value.description}
