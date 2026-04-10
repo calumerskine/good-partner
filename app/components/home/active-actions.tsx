@@ -54,7 +54,7 @@ export function ActionCard({
         shade={200}
         showShadow
         fillHeight
-        style={tw`h-80`}
+        style={tw.style(completed ? `h-80` : `h-75`)}
         onPress={() => router.push(`/(action)/${item.id}` as any)}
       >
         <View style={tw`p-6 items-start flex-1`}>
