@@ -6,7 +6,7 @@ import { trackEvent } from "@/lib/analytics";
 import tw from "@/lib/tw";
 import { FontAwesome } from "@expo/vector-icons";
 import * as AppleAuthentication from "expo-apple-authentication";
-import { Redirect } from "expo-router";
+import { Redirect, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
@@ -50,6 +50,7 @@ export default function LoginScreen() {
   const [mode, setMode] = useState<AuthMode>("login");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
   const {
     user,
     isLoading: authLoading,
@@ -116,6 +117,7 @@ export default function LoginScreen() {
           : await signInWithApple();
       if (!user) return; // user cancelled
       trackEvent(`${eventPrefix}_succeeded`);
+      router.replace("/");
     } catch (err) {
       trackEvent(`${eventPrefix}_failed`, {
         error: err instanceof Error ? err.message : "unknown",

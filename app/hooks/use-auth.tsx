@@ -151,20 +151,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         provider: "google",
         token: idToken,
       });
-      if (error)
+      if (error) {
+        console.error("Google sign-in Supabase error:", error);
         throw new Error(error.message ?? "Sign-in failed. Please try again.");
+      }
       if (!data.user) throw new Error("Sign-in failed. Please try again.");
       return data.user;
-    } catch (error: any) {
-      if (error.code === statusCodes.SIGN_IN_CANCELLED) return null;
-      if (error.code === statusCodes.IN_PROGRESS)
+    } catch (error: unknown) {
+      console.error("Google sign-in error:", error);
+      const err = error as Error & { code?: string };
+      if (err.code === statusCodes.SIGN_IN_CANCELLED) return null;
+      if (err.code === statusCodes.IN_PROGRESS)
         throw new Error("Sign-in is already in progress. Please wait.");
-      if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE)
+      if (err.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE)
         throw new Error(
           "Google Play Services are not available on this device.",
         );
-      // Re-throw already-friendly errors (from above), otherwise use a generic message
-      if (error.message && !error.code) throw error;
+      if (err.message && !err.code) throw err;
       throw new Error(
         "Something went wrong with Google sign-in. Please try again.",
       );
@@ -187,14 +190,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         provider: "apple",
         token: credential.identityToken,
       });
-      if (error)
+      if (error) {
+        console.error("Apple sign-in Supabase error:", error);
         throw new Error(error.message ?? "Sign-in failed. Please try again.");
+      }
       if (!data.user) throw new Error("Sign-in failed. Please try again.");
       return data.user;
-    } catch (error: any) {
-      if (error.code === "ERR_REQUEST_CANCELED") return null;
-      // Re-throw already-friendly errors (from above), otherwise use a generic message
-      if (error.message && !error.code) throw error;
+    } catch (error: unknown) {
+      console.error("Apple sign-in error:", error);
+      const err = error as Error & { code?: string };
+      if (err.code === "ERR_REQUEST_CANCELED") return null;
+      if (err.message && !err.code) throw err;
       throw new Error(
         "Something went wrong with Apple sign-in. Please try again.",
       );
