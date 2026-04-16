@@ -84,8 +84,8 @@ export function AuthStep({ onComplete }: Props) {
   };
 
   return (
-    <View style={tw`flex-1 items-center justify-between px-6 pt-3`}>
-      <View style={tw`gap-4`}>
+    <View style={tw`flex-1 px-6 pt-3`}>
+      <View style={tw`gap-4 mb-12`}>
         <Text style={tw`text-4xl text-ink font-gabarito font-bold text-center`}>
           You're all set.
         </Text>
@@ -95,7 +95,7 @@ export function AuthStep({ onComplete }: Props) {
           Create your account to save your progress.
         </Text>
       </View>
-      <View style={tw`flex-1 flex-grow justify-center pb-4`}>
+      <View style={tw`flex-1 justify-center pb-4`}>
         <View style={tw`gap-4`}>
           {Platform.OS === "ios" && (
             <View

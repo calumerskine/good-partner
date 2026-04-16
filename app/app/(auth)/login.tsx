@@ -11,6 +11,7 @@ import { Controller, useForm } from "react-hook-form";
 import {
   ActivityIndicator,
   Platform,
+  ScrollView,
   Text,
   TouchableOpacity,
   View,
@@ -144,7 +145,12 @@ export default function LoginScreen() {
   }
 
   return (
-    <View style={[tw`bg-white flex-grow items-center justify-center px-6`, ,]}>
+    <ScrollView
+      contentContainerStyle={[
+        tw`bg-white flex-grow items-center justify-center px-6 pt-12`,
+        ,
+      ]}
+    >
       {/* Form content — hidden until form reveal animation */}
       <Animated.View style={[tw`w-full max-w-md`, formAnimatedStyle]}>
         <View style={tw`mb-12 gap-4`}>
@@ -278,7 +284,7 @@ export default function LoginScreen() {
           </View>
         )}
 
-        <View style={tw`w-full gap-6 pt-6`}>
+        <View style={tw`w-full gap-6 pt-0`}>
           <Button disabled={isLoading} onPress={handleSubmit(onSubmit)}>
             {isLoading
               ? "Loading..."
@@ -303,6 +309,6 @@ export default function LoginScreen() {
           </View>
         </View>
       </Animated.View>
-    </View>
+    </ScrollView>
   );
 }
