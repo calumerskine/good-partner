@@ -24,8 +24,9 @@ CREATE TABLE user_profiles (
   total_days_active INTEGER DEFAULT 0,
   morning_reminder_enabled BOOLEAN DEFAULT FALSE,
   evening_reminder_enabled BOOLEAN DEFAULT FALSE,
-  morning_reminder_time TIME DEFAULT '10:00',
-  evening_reminder_time TIME DEFAULT '19:00'
+  morning_reminder_time TIME DEFAULT '9:00',
+  evening_reminder_time TIME DEFAULT '19:00',
+  timezone TEXT NOT NULL DEFAULT 'UTC'
 );
 
 -- user_categories table: many-to-many relationship between users and action categories
@@ -314,6 +315,7 @@ BEGIN
   eligible_users AS (
     SELECT
       up.user_id,
+      up.timezone,
       up.morning_reminder_enabled,
       up.evening_reminder_enabled,
       up.morning_reminder_time,
@@ -325,7 +327,7 @@ BEGIN
     WHERE
       up.has_completed_onboarding = true
   )
-  -- Morning reminders: all eligible users whose morning_reminder_time is now (+-2m30s)
+  -- Morning reminders: fire when the user's local time matches their stored morning time
   SELECT
     eu.user_id,
     'morning'::TEXT,
@@ -337,9 +339,9 @@ BEGIN
   FROM eligible_users eu
   WHERE
     eu.morning_reminder_enabled = true
-    AND (
-      DATE_TRUNC('day', NOW() AT TIME ZONE 'UTC') + eu.morning_reminder_time
-    ) BETWEEN (NOW() - INTERVAL '2 minutes 30 seconds') AND (NOW() + INTERVAL '2 minutes 30 seconds')
+    AND (NOW() AT TIME ZONE eu.timezone)::time
+      BETWEEN eu.morning_reminder_time - INTERVAL '2 minutes 30 seconds'
+          AND eu.morning_reminder_time + INTERVAL '2 minutes 30 seconds'
 
   UNION ALL
 
@@ -356,9 +358,9 @@ BEGIN
   WHERE
     eu.evening_reminder_enabled = true
     AND eu.has_outstanding = true
-    AND (
-      DATE_TRUNC('day', NOW() AT TIME ZONE 'UTC') + eu.evening_reminder_time
-    ) BETWEEN (NOW() - INTERVAL '2 minutes 30 seconds') AND (NOW() + INTERVAL '2 minutes 30 seconds')
+    AND (NOW() AT TIME ZONE eu.timezone)::time
+      BETWEEN eu.evening_reminder_time - INTERVAL '2 minutes 30 seconds'
+          AND eu.evening_reminder_time + INTERVAL '2 minutes 30 seconds'
 
   UNION ALL
 

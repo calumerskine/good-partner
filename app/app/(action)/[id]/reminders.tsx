@@ -36,7 +36,11 @@ export default function RemindersPromptScreen() {
         await toggleNotifications({ userId: user.id, enabled: true });
         await updateReminderConfig({
           userId: user.id,
-          config: { morningReminderEnabled: true, eveningReminderEnabled: true },
+          config: {
+            morningReminderEnabled: true,
+            eveningReminderEnabled: true,
+            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+          },
         });
         if (env.flags.useActionNotifications) {
           await notifeeService.requestPermission();

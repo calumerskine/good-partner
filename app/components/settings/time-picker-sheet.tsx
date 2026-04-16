@@ -1,7 +1,6 @@
 import { useHaptics } from "@/hooks/use-haptics";
 import tw from "@/lib/tw";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { fromZonedTime, toZonedTime } from "date-fns-tz";
 import { useEffect, useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import Animated, {
@@ -11,38 +10,35 @@ import Animated, {
 } from "react-native-reanimated";
 import { scheduleOnRN } from "react-native-worklets";
 
-const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-
-const utcTimeStrToLocalDate = (utcTimeStr: string): Date => {
-  const [hours, minutes] = utcTimeStr.split(":").map(Number);
+const timeStrToLocalDate = (timeStr: string): Date => {
+  const [hours, minutes] = timeStr.split(":").map(Number);
   const d = new Date();
-  d.setUTCHours(hours, minutes, 0, 0);
-  return toZonedTime(d, tz);
+  d.setHours(hours, minutes, 0, 0);
+  return d;
 };
 
-const localDateToUtcTimeStr = (date: Date): string => {
-  const utc = fromZonedTime(date, tz);
-  const h = utc.getUTCHours().toString().padStart(2, "0");
-  const m = utc.getUTCMinutes().toString().padStart(2, "0");
+const localDateToTimeStr = (date: Date): string => {
+  const h = date.getHours().toString().padStart(2, "0");
+  const m = date.getMinutes().toString().padStart(2, "0");
   return `${h}:${m}`;
 };
 
 interface TimePickerSheetProps {
   type: "morning" | "evening";
-  currentUtcTime: string;
-  onSave: (utcTimeStr: string) => void;
+  currentTime: string;
+  onSave: (timeStr: string) => void;
   onClose: () => void;
 }
 
 export default function TimePickerSheet({
   type,
-  currentUtcTime,
+  currentTime,
   onSave,
   onClose,
 }: TimePickerSheetProps) {
   const { trigger } = useHaptics();
   const [pendingDate, setPendingDate] = useState(() =>
-    utcTimeStrToLocalDate(currentUtcTime),
+    timeStrToLocalDate(currentTime),
   );
 
   const translateY = useSharedValue(500);
@@ -61,7 +57,7 @@ export default function TimePickerSheet({
   };
 
   const handleDone = () => {
-    onSave(localDateToUtcTimeStr(pendingDate));
+    onSave(localDateToTimeStr(pendingDate));
     dismiss();
   };
 

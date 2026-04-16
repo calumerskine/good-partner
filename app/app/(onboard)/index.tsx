@@ -105,6 +105,7 @@ export default function OnboardWizard() {
       hasCompletedOnboarding: true,
       relationshipStatus: data.relationshipStatus,
       gender: data.gender,
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     });
     trackEvent("onboarding_completed");
     router.replace("/(tabs)/(home)");

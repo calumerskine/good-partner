@@ -21,23 +21,17 @@ import { ActionTypes } from "@/lib/state/actions.model";
 import tw from "@/lib/tw";
 import { useFocusEffect, useRouter } from "expo-router";
 import { format } from "date-fns";
-import { toZonedTime } from "date-fns-tz";
 import { useCallback, useState } from "react";
 import { Animated, ScrollView, Text, View } from "react-native";
 import Switch from "@/components/ui/switch";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-
-const utcTimeStrToLocalDate = (utcTimeStr: string): Date => {
-  const [hours, minutes] = utcTimeStr.split(":").map(Number);
+const formatTimeForDisplay = (timeStr: string): string => {
+  const [hours, minutes] = timeStr.split(":").map(Number);
   const d = new Date();
-  d.setUTCHours(hours, minutes, 0, 0);
-  return toZonedTime(d, tz);
+  d.setHours(hours, minutes, 0, 0);
+  return format(d, "h:mm a");
 };
-
-const formatTimeForDisplay = (utcTimeStr: string): string =>
-  format(utcTimeStrToLocalDate(utcTimeStr), "h:mm a");
 
 export default function SettingsScreen() {
   const router = useRouter();
@@ -117,7 +111,10 @@ export default function SettingsScreen() {
         await toggleNotifications({ userId: user?.id!, enabled: true });
       }
     }
-    await updateReminderConfig({ userId: user?.id!, config: { [field]: val } });
+    await updateReminderConfig({
+      userId: user?.id!,
+      config: { [field]: val, timezone: Intl.DateTimeFormat().resolvedOptions().timeZone },
+    });
   };
 
   const handleSetActionNotifications = useThrottle(async () => {
@@ -422,21 +419,23 @@ export default function SettingsScreen() {
       {activePicker && reminderConfig && (
         <TimePickerSheet
           type={activePicker}
-          currentUtcTime={
+          currentTime={
             activePicker === "morning"
               ? reminderConfig.morningReminderTime
               : reminderConfig.eveningReminderTime
           }
-          onSave={(utcTimeStr) => {
+          onSave={(timeStr) => {
             trackEvent("settings_reminder_time_saved", {
               period: activePicker,
             });
             updateReminderConfig({
               userId: user.id,
-              config:
-                activePicker === "morning"
-                  ? { morningReminderTime: utcTimeStr }
-                  : { eveningReminderTime: utcTimeStr },
+              config: {
+                ...(activePicker === "morning"
+                  ? { morningReminderTime: timeStr }
+                  : { eveningReminderTime: timeStr }),
+                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+              },
             });
           }}
           onClose={() => setActivePicker(null)}

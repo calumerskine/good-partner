@@ -271,7 +271,7 @@ async function getReminderConfig(userId: string) {
   const { data, error } = await supabase
     .from("user_profiles")
     .select(
-      "morning_reminder_enabled, evening_reminder_enabled, morning_reminder_time, evening_reminder_time",
+      "morning_reminder_enabled, evening_reminder_enabled, morning_reminder_time, evening_reminder_time, timezone",
     )
     .eq("user_id", userId)
     .single();
@@ -281,6 +281,7 @@ async function getReminderConfig(userId: string) {
     eveningReminderEnabled: data.evening_reminder_enabled ?? true,
     morningReminderTime: data.morning_reminder_time ?? "10:00",
     eveningReminderTime: data.evening_reminder_time ?? "19:00",
+    timezone: data.timezone ?? "UTC",
   };
 }
 
@@ -298,6 +299,7 @@ export function useUpdateReminderConfig() {
         eveningReminderEnabled: boolean;
         morningReminderTime: string;
         eveningReminderTime: string;
+        timezone: string;
       }>;
     }) => {
       const dbConfig: Record<string, unknown> = {};
@@ -309,6 +311,8 @@ export function useUpdateReminderConfig() {
         dbConfig.morning_reminder_time = config.morningReminderTime;
       if (config.eveningReminderTime !== undefined)
         dbConfig.evening_reminder_time = config.eveningReminderTime;
+      if (config.timezone !== undefined)
+        dbConfig.timezone = config.timezone;
       const { error } = await supabase
         .from("user_profiles")
         .update(dbConfig)
@@ -1479,8 +1483,9 @@ export type UserProfile = {
   totalDaysActive: number;
   morningReminderEnabled: boolean;
   eveningReminderEnabled: boolean;
-  morningReminderTime: string; // 'HH:MM' UTC
-  eveningReminderTime: string; // 'HH:MM' UTC
+  morningReminderTime: string; // 'HH:MM' local time in user's timezone
+  eveningReminderTime: string; // 'HH:MM' local time in user's timezone
+  timezone: string; // IANA timezone, e.g. 'Europe/London'
 };
 
 /**
@@ -1523,7 +1528,7 @@ async function getUserProfile(userId: string): Promise<UserProfile | null> {
   const { data: profile, error: profileError } = await supabase
     .from("user_profiles")
     .select(
-      "id, user_id, user_tier, created_at, has_completed_onboarding, total_xp, current_streak_days, total_days_active, morning_reminder_enabled, evening_reminder_enabled, morning_reminder_time, evening_reminder_time, relationship_status, gender",
+      "id, user_id, user_tier, created_at, has_completed_onboarding, total_xp, current_streak_days, total_days_active, morning_reminder_enabled, evening_reminder_enabled, morning_reminder_time, evening_reminder_time, timezone, relationship_status, gender",
     )
     .eq("user_id", userId)
     .single();
@@ -1574,6 +1579,7 @@ async function getUserProfile(userId: string): Promise<UserProfile | null> {
     eveningReminderEnabled: profile.evening_reminder_enabled ?? true,
     morningReminderTime: profile.morning_reminder_time ?? "10:00",
     eveningReminderTime: profile.evening_reminder_time ?? "19:00",
+    timezone: profile.timezone ?? "UTC",
   };
 }
 
@@ -1591,12 +1597,14 @@ export function useCreateUserProfile() {
       hasCompletedOnboarding,
       relationshipStatus,
       gender,
+      timezone,
     }: {
       userId: string;
       categoryIds: string[];
       hasCompletedOnboarding: boolean;
       relationshipStatus: string | null;
       gender: string | null;
+      timezone: string;
     }) =>
       createUserProfile(
         userId,
@@ -1604,6 +1612,7 @@ export function useCreateUserProfile() {
         hasCompletedOnboarding,
         relationshipStatus,
         gender,
+        timezone,
       ),
     onSuccess: (data, { userId }) => {
       queryClient.invalidateQueries({
@@ -1619,6 +1628,7 @@ async function createUserProfile(
   hasCompletedOnboarding: boolean,
   relationshipStatus: string | null,
   gender: string | null,
+  timezone: string,
 ): Promise<UserProfile> {
   // Create the user profile first
   const { data: profile, error: profileError } = await supabase
@@ -1628,6 +1638,7 @@ async function createUserProfile(
       has_completed_onboarding: hasCompletedOnboarding,
       relationship_status: relationshipStatus,
       gender: gender,
+      timezone,
     })
     .select("id, user_id, created_at")
     .single();
