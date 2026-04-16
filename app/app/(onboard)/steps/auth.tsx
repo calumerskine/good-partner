@@ -46,13 +46,15 @@ export function AuthStep({ onComplete }: Props) {
       trackEvent("auth_signup_succeeded", { provider });
       await onComplete(user.id);
     } catch (err) {
+      const e = err as Error & { errorCode?: string; errorStage?: string; errorStatus?: number };
       trackEvent("auth_signup_failed", {
         provider,
-        error: err instanceof Error ? err.message : "unknown",
+        error: e instanceof Error ? e.message : "unknown",
+        error_code: e.errorCode,
+        error_stage: e.errorStage,
+        error_status: e.errorStatus,
       });
-      setError(
-        err instanceof Error ? err.message : "An unknown error occurred",
-      );
+      setError(e instanceof Error ? e.message : "An unknown error occurred");
     } finally {
       setIsLoading(false);
     }
@@ -72,13 +74,15 @@ export function AuthStep({ onComplete }: Props) {
       trackEvent("auth_signup_succeeded", { provider: "email" });
       await onComplete(user.id);
     } catch (err) {
+      const e = err as Error & { errorCode?: string; errorStage?: string; errorStatus?: number };
       trackEvent("auth_signup_failed", {
         provider: "email",
-        error: err instanceof Error ? err.message : "unknown",
+        error: e instanceof Error ? e.message : "unknown",
+        error_code: e.errorCode,
+        error_stage: e.errorStage,
+        error_status: e.errorStatus,
       });
-      setError(
-        err instanceof Error ? err.message : "An unknown error occurred",
-      );
+      setError(e instanceof Error ? e.message : "An unknown error occurred");
     } finally {
       setIsLoading(false);
     }

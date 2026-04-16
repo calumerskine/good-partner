@@ -80,21 +80,24 @@ export default function LoginScreen() {
     setIsLoading(true);
     setError(null);
     const eventPrefix = mode === "signup" ? "auth_signup" : "auth_login";
-    trackEvent(`${eventPrefix}_initiated`);
+    trackEvent(`${eventPrefix}_initiated`, { provider: "email" });
     try {
       if (mode === "signup") {
         await signUpWithEmail(data.email, data.password);
       } else {
         await signInWithEmail(data.email, data.password);
       }
-      trackEvent(`${eventPrefix}_succeeded`);
+      trackEvent(`${eventPrefix}_succeeded`, { provider: "email" });
     } catch (error) {
+      const e = error as Error & { errorCode?: string; errorStage?: string; errorStatus?: number };
       trackEvent(`${eventPrefix}_failed`, {
-        error: error instanceof Error ? error.message : "unknown",
+        provider: "email",
+        error: e instanceof Error ? e.message : "unknown",
+        error_code: e.errorCode,
+        error_stage: e.errorStage,
+        error_status: e.errorStatus,
       });
-      setError(
-        error instanceof Error ? error.message : "An unknown error occurred",
-      );
+      setError(e instanceof Error ? e.message : "An unknown error occurred");
     } finally {
       setIsLoading(false);
     }
@@ -109,22 +112,25 @@ export default function LoginScreen() {
     setIsLoading(true);
     setError(null);
     const eventPrefix = mode === "signup" ? "auth_signup" : "auth_login";
-    trackEvent(`${eventPrefix}_initiated`);
+    trackEvent(`${eventPrefix}_initiated`, { provider });
     try {
       const user =
         provider === "google"
           ? await signInWithGoogle()
           : await signInWithApple();
       if (!user) return; // user cancelled
-      trackEvent(`${eventPrefix}_succeeded`);
+      trackEvent(`${eventPrefix}_succeeded`, { provider });
       router.replace("/");
     } catch (err) {
+      const e = err as Error & { errorCode?: string; errorStage?: string; errorStatus?: number };
       trackEvent(`${eventPrefix}_failed`, {
-        error: err instanceof Error ? err.message : "unknown",
+        provider,
+        error: e instanceof Error ? e.message : "unknown",
+        error_code: e.errorCode,
+        error_stage: e.errorStage,
+        error_status: e.errorStatus,
       });
-      setError(
-        err instanceof Error ? err.message : "An unknown error occurred",
-      );
+      setError(e instanceof Error ? e.message : "An unknown error occurred");
     } finally {
       setIsLoading(false);
     }

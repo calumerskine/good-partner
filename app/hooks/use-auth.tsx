@@ -115,15 +115,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const signUpWithEmail = async (email: string, password: string) => {
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-    });
-
-    if (error) {
-      throw error;
-    }
-
+    const { data, error } = await supabase.auth.signUp({ email, password });
+    if (error)
+      throw Object.assign(new Error(error.message), {
+        errorCode: error.code,
+        errorStage: "supabase" as const,
+        errorStatus: error.status,
+      });
     return data.user;
   };
 
@@ -132,49 +130,59 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       email,
       password,
     });
-
-    if (error) {
-      throw error;
-    }
-
+    if (error)
+      throw Object.assign(new Error(error.message), {
+        errorCode: error.code,
+        errorStage: "supabase" as const,
+        errorStatus: error.status,
+      });
     return data.user;
   };
 
   const signInWithGoogle = async (): Promise<User | null> => {
+    let idToken: string;
     try {
       await GoogleSignin.hasPlayServices();
       const response = await GoogleSignin.signIn();
-      const idToken = response.data?.idToken;
-      if (!idToken) throw new Error("Google sign-in failed. Please try again.");
-
-      const { data, error } = await supabase.auth.signInWithIdToken({
-        provider: "google",
-        token: idToken,
-      });
-      if (error) {
-        console.error("Google sign-in Supabase error:", error);
-        throw new Error(error.message ?? "Sign-in failed. Please try again.");
-      }
-      if (!data.user) throw new Error("Sign-in failed. Please try again.");
-      return data.user;
+      if (response.type === "cancelled") return null;
+      if (!response.data?.idToken)
+        throw new Error("Google sign-in failed. Please try again.");
+      idToken = response.data.idToken;
     } catch (error: unknown) {
-      console.error("Google sign-in error:", error);
       const err = error as Error & { code?: string };
       if (err.code === statusCodes.SIGN_IN_CANCELLED) return null;
       if (err.code === statusCodes.IN_PROGRESS)
-        throw new Error("Sign-in is already in progress. Please wait.");
-      if (err.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE)
-        throw new Error(
-          "Google Play Services are not available on this device.",
+        throw Object.assign(
+          new Error("Sign-in is already in progress. Please wait."),
+          { errorCode: err.code, errorStage: "sdk" as const },
         );
-      if (err.message && !err.code) throw err;
-      throw new Error(
-        "Something went wrong with Google sign-in. Please try again.",
-      );
+      if (err.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE)
+        throw Object.assign(
+          new Error("Google Play Services are not available on this device."),
+          { errorCode: err.code, errorStage: "sdk" as const },
+        );
+      const base = err instanceof Error
+        ? err
+        : new Error(err.message ?? "Something went wrong with Google sign-in. Please try again.");
+      throw Object.assign(base, { errorCode: err.code, errorStage: "sdk" as const });
     }
+
+    const { data, error } = await supabase.auth.signInWithIdToken({
+      provider: "google",
+      token: idToken,
+    });
+    if (error)
+      throw Object.assign(new Error(error.message ?? "Sign-in failed. Please try again."), {
+        errorCode: error.code,
+        errorStage: "supabase" as const,
+        errorStatus: error.status,
+      });
+    if (!data.user) throw new Error("Sign-in failed. Please try again.");
+    return data.user;
   };
 
   const signInWithApple = async (): Promise<User | null> => {
+    let identityToken: string;
     try {
       const credential = await AppleAuthentication.signInAsync({
         requestedScopes: [
@@ -182,29 +190,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           AppleAuthentication.AppleAuthenticationScope.EMAIL,
         ],
       });
-      if (!credential.identityToken) {
+      if (!credential.identityToken)
         throw new Error("Apple sign-in failed. Please try again.");
-      }
-
-      const { data, error } = await supabase.auth.signInWithIdToken({
-        provider: "apple",
-        token: credential.identityToken,
-      });
-      if (error) {
-        console.error("Apple sign-in Supabase error:", error);
-        throw new Error(error.message ?? "Sign-in failed. Please try again.");
-      }
-      if (!data.user) throw new Error("Sign-in failed. Please try again.");
-      return data.user;
+      identityToken = credential.identityToken;
     } catch (error: unknown) {
-      console.error("Apple sign-in error:", error);
       const err = error as Error & { code?: string };
       if (err.code === "ERR_REQUEST_CANCELED") return null;
-      if (err.message && !err.code) throw err;
-      throw new Error(
-        "Something went wrong with Apple sign-in. Please try again.",
-      );
+      const base = err instanceof Error
+        ? err
+        : new Error(err.message ?? "Something went wrong with Apple sign-in. Please try again.");
+      throw Object.assign(base, { errorCode: err.code, errorStage: "sdk" as const });
     }
+
+    const { data, error } = await supabase.auth.signInWithIdToken({
+      provider: "apple",
+      token: identityToken,
+    });
+    if (error)
+      throw Object.assign(new Error(error.message ?? "Sign-in failed. Please try again."), {
+        errorCode: error.code,
+        errorStage: "supabase" as const,
+        errorStatus: error.status,
+      });
+    if (!data.user) throw new Error("Sign-in failed. Please try again.");
+    return data.user;
   };
 
   const signOut = async () => {
