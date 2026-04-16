@@ -156,6 +156,8 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS trigger_update_streak ON completions;
+
 CREATE TRIGGER trigger_update_streak
 AFTER INSERT ON completions
 FOR EACH ROW
