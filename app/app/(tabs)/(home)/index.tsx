@@ -14,12 +14,14 @@ import {
 import tw from "@/lib/tw";
 import { useMountAnimation } from "@/hooks/animations";
 import { useFocusEffect } from "expo-router";
+import { useQueryClient } from "@tanstack/react-query";
 import { useCallback, useState } from "react";
 import { ActivityIndicator, Animated, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function HomeScreen() {
   const { user } = useAuth();
+  const queryClient = useQueryClient();
   const { data: userActions = [], isLoading } = useGetActiveActions(user?.id);
   const { isLoading: isProfileLoading, data: profile } = useGetUserProfile(
     user?.id,
@@ -39,7 +41,12 @@ export default function HomeScreen() {
   useFocusEffect(
     useCallback(() => {
       trackEvent("screen_viewed", { screen_name: "Home" });
-    }, []),
+      // Invalidate today's completed action on every focus so stale data from
+      // a previous day never persists when the app is backgrounded overnight.
+      if (user?.id) {
+        queryClient.invalidateQueries({ queryKey: ["todayCompletedAction"] });
+      }
+    }, [queryClient, user?.id]),
   );
 
   if (isLoading || isProfileLoading || (isTodayLoading && userActions.length === 0)) {

@@ -788,6 +788,10 @@ export function useGetActiveActions(userId?: string) {
 }
 
 async function getActiveActions(userId: string): Promise<UserAction[]> {
+  // Only return actions activated today — active state should not persist across days
+  const todayStart = new Date();
+  todayStart.setHours(0, 0, 0, 0);
+
   // Get active user actions with their action details
   const { data: userActions, error } = await supabase
     .from("user_actions")
@@ -811,7 +815,8 @@ async function getActiveActions(userId: string): Promise<UserAction[]> {
     `,
     )
     .eq("user_id", userId)
-    .eq("is_active", true);
+    .eq("is_active", true)
+    .gte("activated_at", todayStart.toISOString());
 
   if (error) {
     throw error;
