@@ -1,4 +1,5 @@
 import Button from "@/components/ui/button";
+import { FormScrollView } from "@/components/ui/form-scroll-view";
 import Input from "@/components/ui/input";
 import { useAuth } from "@/hooks/use-auth";
 import { trackEvent } from "@/lib/analytics";
@@ -11,7 +12,6 @@ import { Controller, useForm } from "react-hook-form";
 import {
   ActivityIndicator,
   Platform,
-  ScrollView,
   Text,
   TouchableOpacity,
   View,
@@ -145,7 +145,7 @@ export default function LoginScreen() {
   }
 
   return (
-    <ScrollView
+    <FormScrollView
       contentContainerStyle={[
         tw`bg-white flex-grow items-center justify-center px-6 pt-12`,
         ,
@@ -309,6 +309,6 @@ export default function LoginScreen() {
           </View>
         </View>
       </Animated.View>
-    </ScrollView>
+    </FormScrollView>
   );
 }
