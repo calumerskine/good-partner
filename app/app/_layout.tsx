@@ -3,7 +3,8 @@ import { useFonts } from "@/hooks/use-fonts";
 import { useNotifee } from "@/hooks/use-notifee";
 import { useReminders } from "@/hooks/use-reminders";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { SplashScreen, Stack } from "expo-router";
+import { Stack } from "expo-router";
+import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 import "react-native-reanimated";
 import { SafeAreaProvider } from "react-native-safe-area-context";
@@ -15,6 +16,11 @@ const queryClient = new QueryClient();
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
+
+SplashScreen.setOptions({
+  duration: 1000,
+  fade: true,
+});
 
 export default function RootLayout() {
   useDeviceContext(tw);
