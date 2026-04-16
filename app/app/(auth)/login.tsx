@@ -1,5 +1,4 @@
 import Button from "@/components/ui/button";
-import { FormScrollView } from "@/components/ui/form-scroll-view";
 import Input from "@/components/ui/input";
 import { useAuth } from "@/hooks/use-auth";
 import { trackEvent } from "@/lib/analytics";
@@ -104,7 +103,7 @@ export default function LoginScreen() {
     setMode((prev) => (prev === "login" ? "signup" : "login"));
   };
 
-  const handleSocialSignIn = async (provider: "google" | "apple") => {
+  const handleSocialAuth = async (provider: "google" | "apple") => {
     if (isLoading) return;
     setIsLoading(true);
     setError(null);
@@ -145,29 +144,25 @@ export default function LoginScreen() {
   }
 
   return (
-    <FormScrollView
-      style={tw`bg-white`}
-      contentContainerStyle={[
-        tw`flex-grow items-center justify-center px-6`,
-        { paddingTop: insets.top + 16, paddingBottom: insets.bottom + 16 },
-      ]}
-    >
+    <View style={[tw`bg-white flex-grow items-center justify-center px-6`, ,]}>
       {/* Form content — hidden until form reveal animation */}
       <Animated.View style={[tw`w-full max-w-md`, formAnimatedStyle]}>
-        <View style={tw`mb-12`}>
+        <View style={tw`mb-12 gap-4`}>
           <Text
-            style={tw`text-4xl text-ink text-center font-gabarito font-black mb-3`}
+            style={tw`text-4xl text-ink font-gabarito font-bold text-center`}
           >
             {mode === "login" ? "Welcome Back" : "Create Account"}
           </Text>
-          <Text style={tw`text-xl text-ink/80 text-center font-gabarito`}>
+          <Text
+            style={tw`text-xl text-ink/80 font-gabarito text-center leading-relaxed`}
+          >
             {mode === "login"
               ? "Sign in to continue your journey"
               : "Start building meaningful connections"}
           </Text>
         </View>
 
-        <View style={tw`w-full gap-4 mb-6`}>
+        <View style={tw`gap-4`}>
           {Platform.OS === "ios" && (
             <View
               style={isLoading ? tw`opacity-50` : undefined}
@@ -175,34 +170,31 @@ export default function LoginScreen() {
             >
               <AppleAuthentication.AppleAuthenticationButton
                 buttonType={
-                  mode === "signup"
-                    ? AppleAuthentication.AppleAuthenticationButtonType.SIGN_UP
-                    : AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN
+                  AppleAuthentication.AppleAuthenticationButtonType.SIGN_UP
                 }
                 buttonStyle={
-                  AppleAuthentication.AppleAuthenticationButtonStyle.BLACK
+                  AppleAuthentication.AppleAuthenticationButtonStyle
+                    .WHITE_OUTLINE
                 }
-                cornerRadius={100}
+                cornerRadius={18}
                 style={{ height: 56 }}
-                onPress={() => handleSocialSignIn("apple")}
+                onPress={() => handleSocialAuth("apple")}
               />
             </View>
           )}
           <TouchableOpacity
-            style={tw`w-full h-14 flex-row items-center justify-center border-2 border-ink/15 rounded-full gap-1.5`}
-            onPress={() => handleSocialSignIn("google")}
+            style={tw`w-full h-14 flex-row items-center justify-center border border-ink rounded-2xl gap-3`}
+            onPress={() => handleSocialAuth("google")}
             disabled={isLoading}
           >
-            <FontAwesome name="google" size={16} color={tw.color("ink")} />
-            <Text style={tw`text-ink font-gabarito font-bold text-xl`}>
-              {mode === "signup"
-                ? "Sign up with Google"
-                : "Sign in with Google"}
+            <FontAwesome name="google" size={18} color="ink" />
+            <Text style={tw`text-ink font-gabarito font-light text-[22px]`}>
+              Sign up with Google
             </Text>
           </TouchableOpacity>
         </View>
 
-        <View style={tw`flex-row items-center gap-3 w-full mb-6`}>
+        <View style={tw`flex-row items-center gap-3 w-full my-8`}>
           <View style={tw`flex-1 h-px bg-ink/10`} />
           <Text style={tw`text-ink/40 font-gabarito text-sm`}>or</Text>
           <View style={tw`flex-1 h-px bg-ink/10`} />
@@ -286,7 +278,7 @@ export default function LoginScreen() {
           </View>
         )}
 
-        <View style={tw`w-full gap-6`}>
+        <View style={tw`w-full gap-6 pt-6`}>
           <Button disabled={isLoading} onPress={handleSubmit(onSubmit)}>
             {isLoading
               ? "Loading..."
@@ -311,6 +303,6 @@ export default function LoginScreen() {
           </View>
         </View>
       </Animated.View>
-    </FormScrollView>
+    </View>
   );
 }
