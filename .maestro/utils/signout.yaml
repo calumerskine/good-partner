@@ -1,0 +1,16 @@
+# .maestro/utils/signout.yaml
+# Navigates to Settings tab and taps Sign Out.
+# Uses optional: true so the flow doesn't fail if already signed out.
+appId: com.pearprogramming.wingmanapp
+---
+- tapOn:
+    text: "Settings"
+    optional: true
+- scrollUntilVisible:
+    element:
+      text: "Sign Out"
+    direction: DOWN
+    optional: true
+- tapOn:
+    text: "Sign Out"
+    optional: true

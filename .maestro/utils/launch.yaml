@@ -1,0 +1,5 @@
+# .maestro/utils/launch.yaml
+appId: com.pearprogramming.wingmanapp
+---
+- launchApp:
+    clearState: true
