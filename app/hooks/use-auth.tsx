@@ -140,6 +140,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signInWithGoogle = async (): Promise<User | null> => {
+    if (process.env.EXPO_PUBLIC_E2E === "true") {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: process.env.EXPO_PUBLIC_E2E_EMAIL!,
+        password: process.env.EXPO_PUBLIC_E2E_PASSWORD!,
+      });
+      if (error) throw Object.assign(new Error(error.message), { errorCode: error.code, errorStage: "supabase" as const, errorStatus: error.status });
+      return data.user;
+    }
     let idToken: string;
     try {
       await GoogleSignin.hasPlayServices();
@@ -182,6 +190,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signInWithApple = async (): Promise<User | null> => {
+    if (process.env.EXPO_PUBLIC_E2E === "true") {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: process.env.EXPO_PUBLIC_E2E_EMAIL!,
+        password: process.env.EXPO_PUBLIC_E2E_PASSWORD!,
+      });
+      if (error) throw Object.assign(new Error(error.message), { errorCode: error.code, errorStage: "supabase" as const, errorStatus: error.status });
+      return data.user;
+    }
     let identityToken: string;
     try {
       const credential = await AppleAuthentication.signInAsync({
