@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const env = z
   .object({
-    environment: z.enum(["development", "staging", "production"]),
+    environment: z.enum(["development", "preview", "production"]),
     flags: z.object({
       useAnalytics: z.boolean(),
       useReminders: z.boolean(),
