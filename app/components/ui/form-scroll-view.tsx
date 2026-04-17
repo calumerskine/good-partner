@@ -94,6 +94,7 @@ export function FormScrollView({ children, style, ...scrollProps }: Props) {
           keyboardShouldPersistTaps="handled"
           keyboardDismissMode="on-drag"
           showsVerticalScrollIndicator={false}
+          automaticallyAdjustKeyboardInsets={Platform.OS === "ios"}
           {...scrollProps}
         >
           {children}

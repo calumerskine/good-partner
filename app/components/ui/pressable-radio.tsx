@@ -30,6 +30,7 @@ type PressableRadioProps = {
   fillHeight?: boolean;
   disabled?: boolean;
   accessibilityLabel?: string;
+  testID?: string;
 };
 
 function clampShade(shade: number): number {
@@ -66,6 +67,7 @@ export default function PressableRadio({
   fillHeight = false,
   disabled = false,
   accessibilityLabel,
+  testID,
 }: PressableRadioProps) {
   const { trigger } = useHaptics();
   const translateY = useRef(
@@ -166,6 +168,7 @@ export default function PressableRadio({
           accessibilityLabel={accessibilityLabel}
           accessibilityRole="button"
           accessibilityState={{ selected }}
+          testID={testID}
           style={
             fillHeight
               ? [

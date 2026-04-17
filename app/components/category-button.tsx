@@ -23,6 +23,7 @@ export const CategoryButton = ({
   color,
   onPress,
   selected,
+  testID,
 }: {
   text: string;
   description: string;
@@ -30,6 +31,7 @@ export const CategoryButton = ({
   color: string;
   onPress: (category: string) => void;
   selected?: boolean;
+  testID?: string;
 }) => {
   const progress = useSharedValue(selected ? 1 : 0);
 
@@ -72,6 +74,8 @@ export const CategoryButton = ({
       pressDepth={6}
       colorMode="selected"
       color={color}
+      accessibilityLabel={text}
+      testID={testID}
     >
       <Animated.View
         style={[tw`p-6 border-0 rounded-2xl`, animatedBorderStyle]}

@@ -1,8 +1,7 @@
 # .maestro/flows/auth/02-signup-email.yaml
 # Requires: NEW_USER_EMAIL (unique per run) and NEW_USER_PASSWORD env vars
 # Run with: maestro test --env NEW_USER_EMAIL="e2e-$(date +%s)@yourdomain.com" --env NEW_USER_PASSWORD=testPass123 ...
-# Note: Supabase must have email confirmation disabled for the dev project,
-# otherwise the user is created but the session is not established.
+# Note: Supabase must have email confirmation disabled for the dev project.
 appId: com.pearprogramming.wingmanapp
 ---
 - runFlow: ../../utils/launch.yaml
@@ -27,5 +26,5 @@ appId: com.pearprogramming.wingmanapp
 # Sign up
 - tapOn: "Sign Up"
 
-# Should land on home (requires email confirmation disabled in Supabase)
-- assertVisible: "Day 1"
+# New user has no onboarding data, so they land on the welcome screen
+- assertVisible: "How would you describe your relationship right now?"

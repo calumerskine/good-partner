@@ -152,10 +152,7 @@ export default function LoginScreen() {
 
   return (
     <FormScrollView
-      contentContainerStyle={[
-        tw`bg-white flex-grow items-center justify-center px-6 pt-12`,
-        ,
-      ]}
+      contentContainerStyle={tw`bg-white min-h-full items-center justify-center px-6 pt-12`}
     >
       {/* Form content — hidden until form reveal animation */}
       <Animated.View style={[tw`w-full max-w-md`, formAnimatedStyle]}>
@@ -195,9 +192,11 @@ export default function LoginScreen() {
             </View>
           )}
           <TouchableOpacity
+            testID="google-sign-in"
             style={tw`w-full h-14 flex-row items-center justify-center border border-ink rounded-2xl gap-3`}
             onPress={() => handleSocialAuth("google")}
             disabled={isLoading}
+            accessibilityLabel="Sign up with Google"
           >
             <FontAwesome name="google" size={18} color="ink" />
             <Text style={tw`text-ink font-gabarito font-light text-[22px]`}>

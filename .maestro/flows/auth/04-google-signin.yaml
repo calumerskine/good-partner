@@ -9,7 +9,6 @@ appId: com.pearprogramming.wingmanapp
 - openLink: "wingmanapp://login"
 - assertVisible: "Welcome Back"
 
-# Tap Google button
 - tapOn: "Sign up with Google"
 
 # E2E bypass: resolves immediately using test account credentials

@@ -5,11 +5,11 @@ appId: com.pearprogramming.wingmanapp
 
 # Navigate to transition step
 - tapOn: "Get Started"
-- assertVisible: "Three quick questions"
-- assertVisible: "Takes less than a minute"
+- assertVisible: "Three quick questions to make this yours."
+- assertVisible: "Takes less than a minute. 👉"
 
 # Tap Continue to advance
 - tapOn: "Continue"
 
 # Should reach relationship step
-- assertVisible: "How would you describe your relationship"
+- assertVisible: "How would you describe your relationship right now?"

@@ -6,7 +6,7 @@ appId: com.pearprogramming.wingmanapp
 # Navigate through welcome and transition
 - tapOn: "Get Started"
 - tapOn: "Continue"
-- assertVisible: "How would you describe your relationship"
+- assertVisible: "How would you describe your relationship right now?"
 
 # Continue button should be disabled until option selected
 - tapOn: "Continue"
@@ -19,4 +19,4 @@ appId: com.pearprogramming.wingmanapp
 - tapOn: "Continue"
 
 # Should advance to focus step
-- assertVisible: "What would you like to focus on"
+- assertVisible: "What would you like to focus on?"

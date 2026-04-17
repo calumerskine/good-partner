@@ -1,3 +1,8 @@
 # .maestro/config.yaml
 ---
 appId: com.pearprogramming.wingmanapp
+env:
+  TEST_EMAIL: ${TEST_EMAIL}
+  TEST_PASSWORD: ${TEST_PASSWORD}
+  NEW_USER_EMAIL: ${NEW_USER_EMAIL}
+  NEW_USER_PASSWORD: ${NEW_USER_PASSWORD}

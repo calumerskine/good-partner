@@ -11,7 +11,9 @@ appId: com.pearprogramming.wingmanapp
 - tapOn: "Continue"
 - tapOn: "Mostly solid, but I sense some distance"
 - tapOn: "Continue"
-- tapOn: "Being more present & connected"
+- assertVisible: "What would you like to focus on?"
+- tapOn:
+    id: "focus-ATTENTION"
 - tapOn: "Continue"
 - tapOn: "Prefer not to say"
 - tapOn: "Continue"

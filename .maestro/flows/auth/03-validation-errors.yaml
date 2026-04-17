@@ -15,7 +15,7 @@ appId: com.pearprogramming.wingmanapp
 # --- Test 2: Invalid email format ---
 - tapOn:
     id: "email"
-- clearText
+- eraseText
 - inputText: "not-an-email"
 - tapOn: "Sign In"
 - assertVisible: "Invalid email address"
@@ -23,11 +23,11 @@ appId: com.pearprogramming.wingmanapp
 # --- Test 3: Password too short ---
 - tapOn:
     id: "email"
-- clearText
+- eraseText
 - inputText: ${TEST_EMAIL}
 - tapOn:
     id: "password"
-- clearText
+- eraseText
 - inputText: "abc"
 - tapOn: "Sign In"
 - assertVisible: "Password must be at least 6 characters"
@@ -35,7 +35,7 @@ appId: com.pearprogramming.wingmanapp
 # --- Test 4: Wrong password (Supabase error) ---
 - tapOn:
     id: "password"
-- clearText
+- eraseText
 - inputText: "wrongpassword"
 - tapOn: "Sign In"
 # Supabase v2 returns "Invalid login credentials"

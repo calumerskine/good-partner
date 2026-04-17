@@ -3,10 +3,13 @@ appId: com.pearprogramming.wingmanapp
 ---
 - runFlow: ../../utils/launch.yaml
 
-# Welcome screen
-- assertVisible: "Welcome to"
+# Welcome screen — two loading states fire before this renders, so extend timeout
+- extendedWaitUntil:
+    visible:
+      text: "Welcome to"
+    timeout: 15000
 - assertVisible: "The Good Partner"
 - tapOn: "Get Started"
 
 # Should advance to transition step
-- assertVisible: "Three quick questions"
+- assertVisible: "Three quick questions to make this yours."

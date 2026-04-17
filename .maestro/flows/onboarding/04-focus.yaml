@@ -8,17 +8,19 @@ appId: com.pearprogramming.wingmanapp
 - tapOn: "Continue"
 - tapOn: "Mostly solid, but I sense some distance"
 - tapOn: "Continue"
-- assertVisible: "What would you like to focus on"
+- assertVisible: "What would you like to focus on?"
 
 # Continue should be disabled with nothing selected
 - tapOn: "Continue"
 - assertVisible: "Please select at least one area to continue"
 
-# Select a focus area
-- tapOn: "Being more present & connected"
+# Select a focus area (tap by testID — Pressable inside animated layers)
+- tapOn:
+    id: "focus-ATTENTION"
 
 # Select a second focus area (multi-select)
-- tapOn: "Showing more affection & appreciation"
+- tapOn:
+    id: "focus-AFFECTION"
 
 # Continue should now work
 - tapOn: "Continue"

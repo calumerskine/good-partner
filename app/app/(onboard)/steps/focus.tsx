@@ -57,6 +57,7 @@ export function FocusStep({ selected, onToggle, onNext }: Props) {
                 category={key}
                 onPress={onToggle}
                 selected={selected.includes(key)}
+                testID={`focus-${key}`}
               />
             </View>
           ))}

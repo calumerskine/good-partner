@@ -20,7 +20,10 @@ export function WelcomeStep({ onNext }: Props) {
 
       <View style={tw`gap-6 flex-1 mt-12`}>
         <Text style={tw`text-4xl text-ink font-gabarito font-bold text-center`}>
-          Welcome to{"\n"}The Good Partner
+          Welcome to
+        </Text>
+        <Text style={tw`text-4xl text-ink font-gabarito font-bold text-center`}>
+          The Good Partner
         </Text>
         <Text
           style={tw`text-xl text-ink/80 font-gabarito text-center leading-relaxed px-6`}

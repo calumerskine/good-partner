@@ -141,11 +141,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signInWithGoogle = async (): Promise<User | null> => {
     if (process.env.EXPO_PUBLIC_E2E === "true") {
+      console.log("signInWithGoogle", {
+        email: process.env.EXPO_PUBLIC_E2E_EMAIL!,
+        password: process.env.EXPO_PUBLIC_E2E_PASSWORD!,
+      });
       const { data, error } = await supabase.auth.signInWithPassword({
         email: process.env.EXPO_PUBLIC_E2E_EMAIL!,
         password: process.env.EXPO_PUBLIC_E2E_PASSWORD!,
       });
-      if (error) throw Object.assign(new Error(error.message), { errorCode: error.code, errorStage: "supabase" as const, errorStatus: error.status });
+      if (error)
+        throw Object.assign(new Error(error.message), {
+          errorCode: error.code,
+          errorStage: "supabase" as const,
+          errorStatus: error.status,
+        });
       return data.user;
     }
     let idToken: string;
@@ -169,10 +178,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           new Error("Google Play Services are not available on this device."),
           { errorCode: err.code, errorStage: "sdk" as const },
         );
-      const base = err instanceof Error
-        ? err
-        : new Error(err.message ?? "Something went wrong with Google sign-in. Please try again.");
-      throw Object.assign(base, { errorCode: err.code, errorStage: "sdk" as const });
+      const base =
+        err instanceof Error
+          ? err
+          : new Error(
+              err.message ??
+                "Something went wrong with Google sign-in. Please try again.",
+            );
+      throw Object.assign(base, {
+        errorCode: err.code,
+        errorStage: "sdk" as const,
+      });
     }
 
     const { data, error } = await supabase.auth.signInWithIdToken({
@@ -180,22 +196,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       token: idToken,
     });
     if (error)
-      throw Object.assign(new Error(error.message ?? "Sign-in failed. Please try again."), {
-        errorCode: error.code,
-        errorStage: "supabase" as const,
-        errorStatus: error.status,
-      });
+      throw Object.assign(
+        new Error(error.message ?? "Sign-in failed. Please try again."),
+        {
+          errorCode: error.code,
+          errorStage: "supabase" as const,
+          errorStatus: error.status,
+        },
+      );
     if (!data.user) throw new Error("Sign-in failed. Please try again.");
     return data.user;
   };
 
   const signInWithApple = async (): Promise<User | null> => {
     if (process.env.EXPO_PUBLIC_E2E === "true") {
+      console.log("signInWithApple", {
+        email: process.env.EXPO_PUBLIC_E2E_EMAIL!,
+        password: process.env.EXPO_PUBLIC_E2E_PASSWORD!,
+      });
       const { data, error } = await supabase.auth.signInWithPassword({
         email: process.env.EXPO_PUBLIC_E2E_EMAIL!,
         password: process.env.EXPO_PUBLIC_E2E_PASSWORD!,
       });
-      if (error) throw Object.assign(new Error(error.message), { errorCode: error.code, errorStage: "supabase" as const, errorStatus: error.status });
+      if (error)
+        throw Object.assign(new Error(error.message), {
+          errorCode: error.code,
+          errorStage: "supabase" as const,
+          errorStatus: error.status,
+        });
       return data.user;
     }
     let identityToken: string;
@@ -212,10 +240,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } catch (error: unknown) {
       const err = error as Error & { code?: string };
       if (err.code === "ERR_REQUEST_CANCELED") return null;
-      const base = err instanceof Error
-        ? err
-        : new Error(err.message ?? "Something went wrong with Apple sign-in. Please try again.");
-      throw Object.assign(base, { errorCode: err.code, errorStage: "sdk" as const });
+      const base =
+        err instanceof Error
+          ? err
+          : new Error(
+              err.message ??
+                "Something went wrong with Apple sign-in. Please try again.",
+            );
+      throw Object.assign(base, {
+        errorCode: err.code,
+        errorStage: "sdk" as const,
+      });
     }
 
     const { data, error } = await supabase.auth.signInWithIdToken({
@@ -223,11 +258,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       token: identityToken,
     });
     if (error)
-      throw Object.assign(new Error(error.message ?? "Sign-in failed. Please try again."), {
-        errorCode: error.code,
-        errorStage: "supabase" as const,
-        errorStatus: error.status,
-      });
+      throw Object.assign(
+        new Error(error.message ?? "Sign-in failed. Please try again."),
+        {
+          errorCode: error.code,
+          errorStage: "supabase" as const,
+          errorStatus: error.status,
+        },
+      );
     if (!data.user) throw new Error("Sign-in failed. Please try again.");
     return data.user;
   };

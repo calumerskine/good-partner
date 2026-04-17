@@ -89,7 +89,7 @@ export function AuthStep({ onComplete }: Props) {
   };
 
   return (
-    <FormScrollView contentContainerStyle={tw`flex-grow px-6 pt-3`}>
+    <FormScrollView contentContainerStyle={tw`px-6 pt-3`}>
       <View style={tw`gap-4 mb-12`}>
         <Text style={tw`text-4xl text-ink font-gabarito font-bold text-center`}>
           You're all set.
