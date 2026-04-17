@@ -1,0 +1,105 @@
+name: E2E Tests
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  e2e-ios:
+    name: iOS E2E (Maestro)
+    runs-on: macos-15
+    timeout-minutes: 60
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+
+      - name: Install JS dependencies
+        working-directory: app
+        run: npm ci
+
+      - name: Install Maestro CLI
+        run: |
+          curl -Ls "https://get.maestro.mobile.dev" | bash
+          echo "$HOME/.maestro/bin" >> $GITHUB_PATH
+
+      - name: Cache CocoaPods
+        uses: actions/cache@v4
+        with:
+          path: app/ios/Pods
+          key: pods-${{ hashFiles('app/ios/Podfile.lock') }}
+          restore-keys: pods-
+
+      - name: Install CocoaPods
+        working-directory: app/ios
+        run: pod install --repo-update
+
+      - name: Select Xcode version
+        run: sudo xcode-select -s /Applications/Xcode_16.3.app
+
+      - name: Boot iOS Simulator
+        id: simulator
+        run: |
+          UDID=$(xcrun simctl create "E2E-iPhone16" "iPhone 16" "iOS-18-4" 2>/dev/null || \
+                 xcrun simctl list devices available | grep "iPhone 16" | grep -v "Plus\|Pro" | head -1 | awk -F'[()]' '{print $2}')
+          xcrun simctl boot "$UDID"
+          echo "udid=$UDID" >> $GITHUB_OUTPUT
+
+      - name: Build app for simulator (E2E mode)
+        working-directory: app
+        env:
+          EXPO_PUBLIC_E2E: "true"
+          EXPO_PUBLIC_E2E_EMAIL: ${{ secrets.E2E_TEST_EMAIL }}
+          EXPO_PUBLIC_E2E_PASSWORD: ${{ secrets.E2E_TEST_PASSWORD }}
+          EXPO_PUBLIC_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          EXPO_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID: ${{ secrets.GOOGLE_IOS_CLIENT_ID }}
+          EXPO_PUBLIC_AMPLITUDE_API_KEY: ${{ secrets.AMPLITUDE_API_KEY }}
+          EXPO_PUBLIC_ONESIGNAL_APP_ID: ${{ secrets.ONESIGNAL_APP_ID }}
+          EXPO_PUBLIC_ENV: development
+        run: |
+          xcodebuild \
+            -workspace ios/wingmanapp.xcworkspace \
+            -scheme wingmanapp \
+            -configuration Debug \
+            -destination "platform=iOS Simulator,id=${{ steps.simulator.outputs.udid }}" \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO \
+            build 2>&1 | xcpretty || xcodebuild \
+            -workspace ios/wingmanapp.xcworkspace \
+            -scheme wingmanapp \
+            -configuration Debug \
+            -destination "platform=iOS Simulator,id=${{ steps.simulator.outputs.udid }}" \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO \
+            build
+
+      - name: Install app on simulator
+        run: |
+          APP_PATH=$(find app/build -name "*.app" -path "*/Debug-iphonesimulator/*.app" ! -name "*.dSYM" | head -1)
+          xcrun simctl install ${{ steps.simulator.outputs.udid }} "$APP_PATH"
+
+      - name: Run Maestro flows
+        env:
+          TEST_EMAIL: ${{ secrets.E2E_TEST_EMAIL }}
+          TEST_PASSWORD: ${{ secrets.E2E_TEST_PASSWORD }}
+        run: |
+          maestro test \
+            --env TEST_EMAIL="$TEST_EMAIL" \
+            --env TEST_PASSWORD="$TEST_PASSWORD" \
+            .maestro/flows/
+
+      - name: Upload Maestro results on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: maestro-results
+          path: ~/.maestro/tests/
+          retention-days: 7
