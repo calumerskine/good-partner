@@ -1,0 +1,43 @@
+# .maestro/flows/onboarding/happy-path.yaml
+# Full end-to-end onboarding flow for a new user.
+# Requires: TEST_EMAIL and TEST_PASSWORD env vars (account must not already exist in Supabase).
+# For subsequent runs use auth/01-signin-email.yaml instead.
+appId: com.pearprogramming.wingmanapp
+---
+- runFlow: ../../utils/launch.yaml
+
+# Welcome
+- assertVisible: "Welcome to"
+- tapOn: "Get Started"
+
+# Transition
+- assertVisible: "Three quick questions"
+- tapOn: "Continue"
+
+# Relationship
+- assertVisible: "How would you describe your relationship"
+- tapOn: "Really good, I just want to keep growing"
+- tapOn: "Continue"
+
+# Focus
+- assertVisible: "What would you like to focus on"
+- tapOn: "Being more present & connected"
+- tapOn: "Continue"
+
+# Gender
+- assertVisible: "About you"
+- tapOn: "Man"
+- tapOn: "Continue"
+
+# Auth
+- assertVisible: "You're all set."
+- tapOn:
+    id: "email"
+- inputText: ${TEST_EMAIL}
+- tapOn:
+    id: "password"
+- inputText: ${TEST_PASSWORD}
+- tapOn: "Continue with email"
+
+# Home — header always shows "Day N"
+- assertVisible: "Day 1"

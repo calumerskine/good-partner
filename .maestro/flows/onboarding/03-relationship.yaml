@@ -1,0 +1,22 @@
+# .maestro/flows/onboarding/03-relationship.yaml
+appId: com.pearprogramming.wingmanapp
+---
+- runFlow: ../../utils/launch.yaml
+
+# Navigate through welcome and transition
+- tapOn: "Get Started"
+- tapOn: "Continue"
+- assertVisible: "How would you describe your relationship"
+
+# Continue button should be disabled until option selected
+- tapOn: "Continue"
+- assertVisible: "Please select an option to continue"
+
+# Select a relationship option
+- tapOn: "Mostly solid, but I sense some distance"
+
+# Continue button should now be enabled
+- tapOn: "Continue"
+
+# Should advance to focus step
+- assertVisible: "What would you like to focus on"

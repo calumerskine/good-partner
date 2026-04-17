@@ -1,0 +1,12 @@
+# .maestro/flows/onboarding/01-welcome.yaml
+appId: com.pearprogramming.wingmanapp
+---
+- runFlow: ../../utils/launch.yaml
+
+# Welcome screen
+- assertVisible: "Welcome to"
+- assertVisible: "The Good Partner"
+- tapOn: "Get Started"
+
+# Should advance to transition step
+- assertVisible: "Three quick questions"

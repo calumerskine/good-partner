@@ -1,0 +1,26 @@
+# .maestro/flows/onboarding/05-gender.yaml
+appId: com.pearprogramming.wingmanapp
+---
+- runFlow: ../../utils/launch.yaml
+
+# Navigate to gender step
+- tapOn: "Get Started"
+- tapOn: "Continue"
+- tapOn: "Mostly solid, but I sense some distance"
+- tapOn: "Continue"
+- tapOn: "Being more present & connected"
+- tapOn: "Continue"
+- assertVisible: "About you"
+
+# Continue should be disabled until option selected
+- tapOn: "Continue"
+- assertVisible: "Please select an option to continue"
+
+# Select gender
+- tapOn: "Prefer not to say"
+
+# Continue should now work
+- tapOn: "Continue"
+
+# Should advance to account creation step
+- assertVisible: "You're all set."

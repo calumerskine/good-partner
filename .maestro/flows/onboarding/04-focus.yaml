@@ -1,0 +1,27 @@
+# .maestro/flows/onboarding/04-focus.yaml
+appId: com.pearprogramming.wingmanapp
+---
+- runFlow: ../../utils/launch.yaml
+
+# Navigate to focus step
+- tapOn: "Get Started"
+- tapOn: "Continue"
+- tapOn: "Mostly solid, but I sense some distance"
+- tapOn: "Continue"
+- assertVisible: "What would you like to focus on"
+
+# Continue should be disabled with nothing selected
+- tapOn: "Continue"
+- assertVisible: "Please select at least one area to continue"
+
+# Select a focus area
+- tapOn: "Being more present & connected"
+
+# Select a second focus area (multi-select)
+- tapOn: "Showing more affection & appreciation"
+
+# Continue should now work
+- tapOn: "Continue"
+
+# Should advance to gender step
+- assertVisible: "About you"
