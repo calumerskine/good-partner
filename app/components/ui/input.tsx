@@ -49,6 +49,7 @@ export default function Input({
       <TextInput
         ref={inputRef}
         id={name}
+        testID={name}
         value={value}
         onChangeText={onChangeText}
         placeholder={placeholder}
@@ -71,6 +72,7 @@ export default function Input({
     <TextInput
       ref={inputRef}
       id={name}
+      testID={name}
       value={value}
       onChangeText={onChangeText}
       placeholder={placeholder}
