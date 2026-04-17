@@ -1,0 +1,42 @@
+# .maestro/flows/auth/03-validation-errors.yaml
+# Tests client-side and server-side validation errors on the login screen.
+# Requires: TEST_EMAIL env var (account must exist; only used in the wrong-password test)
+appId: com.pearprogramming.wingmanapp
+---
+- runFlow: ../../utils/launch.yaml
+- openLink: "wingmanapp://login"
+- assertVisible: "Welcome Back"
+
+# --- Test 1: Empty form submission ---
+- tapOn: "Sign In"
+- assertVisible: "Email is required"
+- assertVisible: "Password is required"
+
+# --- Test 2: Invalid email format ---
+- tapOn:
+    id: "email"
+- clearText
+- inputText: "not-an-email"
+- tapOn: "Sign In"
+- assertVisible: "Invalid email address"
+
+# --- Test 3: Password too short ---
+- tapOn:
+    id: "email"
+- clearText
+- inputText: ${TEST_EMAIL}
+- tapOn:
+    id: "password"
+- clearText
+- inputText: "abc"
+- tapOn: "Sign In"
+- assertVisible: "Password must be at least 6 characters"
+
+# --- Test 4: Wrong password (Supabase error) ---
+- tapOn:
+    id: "password"
+- clearText
+- inputText: "wrongpassword"
+- tapOn: "Sign In"
+# Supabase v2 returns "Invalid login credentials"
+- assertVisible: "Invalid login credentials"
