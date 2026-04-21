@@ -1,7 +1,8 @@
 import Button from "@/components/ui/button";
 import tw from "@/lib/tw";
 import { useAssets } from "expo-asset";
-import { Text, View } from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
+import { useRouter } from "expo-router";
 import { Image } from "expo-image";
 
 type Props = {
@@ -9,6 +10,7 @@ type Props = {
 };
 
 export function WelcomeStep({ onNext }: Props) {
+  const router = useRouter();
   const [starImage] = useAssets([require("@/assets/images/logo_min.png")]);
 
   return (
@@ -33,8 +35,18 @@ export function WelcomeStep({ onNext }: Props) {
         </Text>
       </View>
 
-      <View style={tw`w-full gap-4 pt-6 pb-2`}>
+      <View style={tw`w-full gap-4 pt-6 pb-8`}>
         <Button onPress={onNext}>Get Started</Button>
+        <View style={tw`flex-row items-center justify-center gap-2`}>
+          <Text style={tw`text-ink/80 font-gabarito text-base`}>
+            Already have an account?
+          </Text>
+          <TouchableOpacity onPress={() => router.push("/(auth)/login")}>
+            <Text style={tw`text-indigo-400 font-gabarito font-bold text-base`}>
+              Sign In
+            </Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   );
