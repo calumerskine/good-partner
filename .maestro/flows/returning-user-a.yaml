@@ -1,0 +1,24 @@
+appId: com.pearprogramming.wingmanapp
+---
+- runFlow: ../../utils/launch.yaml
+
+# Welcome — extend timeout to account for sequential loading states
+- extendedWaitUntil:
+    visible:
+      text: "Welcome to"
+    timeout: 15000
+- assertVisible: "The Good Partner"
+- assertVisible: "Already have an account?"
+- tapOn: "Sign In"
+
+# Auth
+- assertVisible: "Welcome Back"
+- tapOn:
+    id: "email"
+- inputText: "emptyuser@mail.com"
+- tapOn:
+    id: "password"
+- inputText: "password"
+- tapOn: "Continue with email"
+
+- assertVisible: "Day 1"

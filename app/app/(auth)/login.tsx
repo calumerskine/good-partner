@@ -89,7 +89,11 @@ export default function LoginScreen() {
       }
       trackEvent(`${eventPrefix}_succeeded`, { provider: "email" });
     } catch (error) {
-      const e = error as Error & { errorCode?: string; errorStage?: string; errorStatus?: number };
+      const e = error as Error & {
+        errorCode?: string;
+        errorStage?: string;
+        errorStatus?: number;
+      };
       trackEvent(`${eventPrefix}_failed`, {
         provider: "email",
         error: e instanceof Error ? e.message : "unknown",
@@ -122,7 +126,11 @@ export default function LoginScreen() {
       trackEvent(`${eventPrefix}_succeeded`, { provider });
       router.replace("/");
     } catch (err) {
-      const e = err as Error & { errorCode?: string; errorStage?: string; errorStatus?: number };
+      const e = err as Error & {
+        errorCode?: string;
+        errorStage?: string;
+        errorStatus?: number;
+      };
       trackEvent(`${eventPrefix}_failed`, {
         provider,
         error: e instanceof Error ? e.message : "unknown",
@@ -291,11 +299,7 @@ export default function LoginScreen() {
 
         <View style={tw`w-full gap-6 pt-0`}>
           <Button disabled={isLoading} onPress={handleSubmit(onSubmit)}>
-            {isLoading
-              ? "Loading..."
-              : mode === "login"
-                ? "Sign In"
-                : "Sign Up"}
+            {isLoading ? "Loading..." : "Continue with email"}
           </Button>
 
           <View style={tw`flex-row items-center justify-center gap-2`}>

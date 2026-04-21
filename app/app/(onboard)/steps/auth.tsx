@@ -23,7 +23,12 @@ type Props = {
 export function AuthStep({ onComplete, onExistingUser }: Props) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { signUpWithEmail, signInWithEmail, signInWithGoogle, signInWithApple } = useAuth();
+  const {
+    signUpWithEmail,
+    signInWithEmail,
+    signInWithGoogle,
+    signInWithApple,
+  } = useAuth();
 
   const {
     control,
@@ -47,7 +52,11 @@ export function AuthStep({ onComplete, onExistingUser }: Props) {
       trackEvent("auth_signup_succeeded", { provider });
       await onComplete(user.id);
     } catch (err) {
-      const e = err as Error & { errorCode?: string; errorStage?: string; errorStatus?: number };
+      const e = err as Error & {
+        errorCode?: string;
+        errorStage?: string;
+        errorStatus?: number;
+      };
       trackEvent("auth_signup_failed", {
         provider,
         error: e instanceof Error ? e.message : "unknown",
@@ -75,7 +84,11 @@ export function AuthStep({ onComplete, onExistingUser }: Props) {
       trackEvent("auth_signup_succeeded", { provider: "email" });
       await onComplete(user.id);
     } catch (err) {
-      const e = err as Error & { errorCode?: string; errorStage?: string; errorStatus?: number };
+      const e = err as Error & {
+        errorCode?: string;
+        errorStage?: string;
+        errorStatus?: number;
+      };
       if (e.errorCode === "user_already_exists") {
         try {
           const existingUser = await signInWithEmail(email, password);
@@ -83,7 +96,11 @@ export function AuthStep({ onComplete, onExistingUser }: Props) {
           await onExistingUser(existingUser.id);
           return;
         } catch (signInErr) {
-          const se = signInErr as Error & { errorCode?: string; errorStage?: string; errorStatus?: number };
+          const se = signInErr as Error & {
+            errorCode?: string;
+            errorStage?: string;
+            errorStatus?: number;
+          };
           trackEvent("auth_signup_failed", {
             provider: "email",
             error: se instanceof Error ? se.message : "unknown",
@@ -91,7 +108,9 @@ export function AuthStep({ onComplete, onExistingUser }: Props) {
             error_stage: se.errorStage,
             error_status: se.errorStatus,
           });
-          setError(se instanceof Error ? se.message : "An unknown error occurred");
+          setError(
+            se instanceof Error ? se.message : "An unknown error occurred",
+          );
           return;
         }
       }
@@ -131,8 +150,7 @@ export function AuthStep({ onComplete, onExistingUser }: Props) {
                 AppleAuthentication.AppleAuthenticationButtonType.SIGN_UP
               }
               buttonStyle={
-                AppleAuthentication.AppleAuthenticationButtonStyle
-                  .WHITE_OUTLINE
+                AppleAuthentication.AppleAuthenticationButtonStyle.WHITE_OUTLINE
               }
               cornerRadius={18}
               style={{ height: 56 }}
@@ -178,9 +196,7 @@ export function AuthStep({ onComplete, onExistingUser }: Props) {
                 keyboardType="email-address"
               />
               {errors.email && (
-                <Text
-                  style={tw`text-red-600 text-sm mt-2 ml-4 font-gabarito`}
-                >
+                <Text style={tw`text-red-600 text-sm mt-2 ml-4 font-gabarito`}>
                   {errors.email.message}
                 </Text>
               )}
@@ -209,9 +225,7 @@ export function AuthStep({ onComplete, onExistingUser }: Props) {
                 autoComplete="new-password"
               />
               {errors.password && (
-                <Text
-                  style={tw`text-red-600 text-sm mt-2 ml-4 font-gabarito`}
-                >
+                <Text style={tw`text-red-600 text-sm mt-2 ml-4 font-gabarito`}>
                   {errors.password.message}
                 </Text>
               )}
@@ -233,7 +247,7 @@ export function AuthStep({ onComplete, onExistingUser }: Props) {
       )}
       <View style={tw`w-full pt-6 pb-8`}>
         <Button disabled={isLoading} onPress={handleSubmit(onSubmit)}>
-          {isLoading ? "Creating account..." : "Continue with email"}
+          {isLoading ? "Loading..." : "Continue with email"}
         </Button>
       </View>
     </FormScrollView>

@@ -1,0 +1,26 @@
+appId: com.pearprogramming.wingmanapp
+---
+- runFlow: ../../utils/launch.yaml
+
+- openLink: "wingmanapp://login"
+
+- assertVisible: "Welcome Back"
+- assertVisible: "Sign in to continue your journey"
+- assertVisible: "Don't have an account?"
+- tapOn: "Sign Up"
+- assertVisible: "Create Account"
+- assertVisible: "Start building meaningful connections"
+
+# Enter credentials
+- tapOn:
+    id: "email"
+- inputText: "newuser-b@mail.com"
+- tapOn:
+    id: "password"
+- inputText: "password"
+
+# Sign in
+- tapOn: "Continue with email"
+
+# Goes to onboarding
+- assertVisible: "How would you describe your relationship right now?"

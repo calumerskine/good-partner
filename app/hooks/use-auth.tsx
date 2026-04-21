@@ -10,7 +10,6 @@ import * as AppleAuthentication from "expo-apple-authentication";
 import React, { createContext, useContext, useEffect, useState } from "react";
 
 GoogleSignin.configure({
-  // webClientId: env.google.webClientId,
   iosClientId: env.google.iosClientId,
 });
 

@@ -1,6 +1,3 @@
-# .maestro/flows/auth/04-google-signin.yaml
-# Requires app built with EXPO_PUBLIC_E2E=true — bypasses the Google SDK.
-# The "Sign up with Google" button calls email/password auth under the hood in E2E mode.
 appId: com.pearprogramming.wingmanapp
 ---
 - runFlow: ../../utils/launch.yaml

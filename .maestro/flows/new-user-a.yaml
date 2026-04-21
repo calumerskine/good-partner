@@ -1,7 +1,3 @@
-# .maestro/flows/onboarding/happy-path.yaml
-# Full end-to-end onboarding flow for a new user.
-# Requires: NEW_USER_EMAIL and NEW_USER_PASSWORD env vars.
-# seed-e2e-db.sh deletes NEW_USER_EMAIL before each run so this flow can sign up fresh.
 appId: com.pearprogramming.wingmanapp
 ---
 - runFlow: ../../utils/launch.yaml
@@ -12,6 +8,8 @@ appId: com.pearprogramming.wingmanapp
       text: "Welcome to"
     timeout: 15000
 - assertVisible: "The Good Partner"
+- assertVisible: "Already have an account?"
+- assertVisible: "Sign In"
 - tapOn: "Get Started"
 
 # Transition
@@ -38,11 +36,10 @@ appId: com.pearprogramming.wingmanapp
 - assertVisible: "You're all set."
 - tapOn:
     id: "email"
-- inputText: ${NEW_USER_EMAIL}
+- inputText: "newuser-a@mail.com"
 - tapOn:
     id: "password"
-- inputText: ${NEW_USER_PASSWORD}
+- inputText: "password"
 - tapOn: "Continue with email"
 
-# Home — header always shows "Day N"
 - assertVisible: "Day 1"

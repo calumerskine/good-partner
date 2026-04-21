@@ -1,0 +1,16 @@
+appId: com.pearprogramming.wingmanapp
+---
+- runFlow: ../../utils/launch.yaml
+
+- openLink: "wingmanapp://(onboard)/auth"
+
+- assertVisible: "You're all set."
+- tapOn:
+    id: "email"
+- inputText: "existinguser@mail.com"
+- tapOn:
+    id: "password"
+- inputText: "password"
+- tapOn: "Continue with email"
+
+- assertVisible: "Day 1"
