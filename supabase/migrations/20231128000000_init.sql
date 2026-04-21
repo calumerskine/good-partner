@@ -241,10 +241,12 @@ BEGIN
         WHERE NOT EXISTS (
           SELECT 1 FROM completions c
           WHERE c.user_action_id = ua.id
-          AND c.completed_at::DATE = CURRENT_DATE
+          AND (c.completed_at AT TIME ZONE COALESCE(up2.timezone, 'UTC'))::DATE
+              = (NOW() AT TIME ZONE COALESCE(up2.timezone, 'UTC'))::DATE
         )
       ) AS outstanding_count
     FROM user_actions ua
+    JOIN user_profiles up2 ON up2.user_id = ua.user_id
     WHERE ua.is_active = true
     GROUP BY ua.user_id
   ),

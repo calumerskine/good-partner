@@ -2,6 +2,16 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "./supabase";
 import { XP_PER_COMPLETION } from "./xp";
 
+// Returns YYYY-MM-DD in the device's local timezone, not UTC.
+function localDateString(): string {
+  const d = new Date();
+  return [
+    d.getFullYear(),
+    String(d.getMonth() + 1).padStart(2, "0"),
+    String(d.getDate()).padStart(2, "0"),
+  ].join("-");
+}
+
 // Query key factory for better type safety and management
 const queryKeys = {
   hasOnboarded: (userId: string) => ["hasOnboarded", userId] as const,
@@ -542,7 +552,7 @@ async function getSuggestedActions(
     .from("user_skips")
     .select("action_id")
     .eq("user_id", userId)
-    .eq("skipped_at", new Date().toISOString().split("T")[0]);
+    .eq("skipped_at", localDateString());
 
   // If skips query fails, fall back to empty — skipped cards may re-appear but won't break the flow
   if (skipsError) {
@@ -1383,7 +1393,7 @@ export function useSkipAction() {
 }
 
 async function skipAction(userId: string, actionId: string): Promise<void> {
-  const today = new Date().toISOString().split("T")[0];
+  const today = localDateString();
   const { error } = await supabase
     .from("user_skips")
     .upsert(
