@@ -1,9 +1,10 @@
 import BackButton from "@/components/ui/back-button";
 import PressableCard from "@/components/ui/pressable-card";
 import { trackEvent } from "@/lib/analytics";
-import { CatalogAction, useGetActionsByCategory } from "@/lib/api";
+import { CatalogAction, getActionDetail, useGetActionsByCategory } from "@/lib/api";
 import { ActionTypes } from "@/lib/state/actions.model";
 import tw from "@/lib/tw";
+import { useQueryClient } from "@tanstack/react-query";
 import { useLocalSearchParams } from "expo-router";
 import { useEffect } from "react";
 import { FlatList, Text, View } from "react-native";
@@ -13,11 +14,23 @@ export default function ActionTypeScreen() {
   const { type } = useLocalSearchParams<{ type: keyof typeof ActionTypes }>();
   const { data: actions = [], isLoading } = useGetActionsByCategory(type);
   const category = ActionTypes[type];
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     trackEvent("screen_viewed", { screen_name: "Category", category: type });
     trackEvent("category_viewed", { category: type });
   }, [type]);
+
+  useEffect(() => {
+    if (actions.length === 0) return;
+    actions.forEach((action) => {
+      queryClient.prefetchQuery({
+        queryKey: ["actionDetail", action.id],
+        queryFn: () => getActionDetail(action.id),
+        staleTime: Infinity,
+      });
+    });
+  }, [actions, queryClient]);
 
   return (
     <SafeAreaView edges={["top"]} style={tw`flex-1 bg-white`}>
