@@ -7,7 +7,9 @@
     "android": "expo run:android",
     "ios": "expo run:ios",
     "web": "expo start --web",
-    "test": "bash ../.maestro/scripts/run-tests.sh"
+    "seed": "tsx ../.maestro/scripts/seed.ts",
+    "pretest": "tsx ../.maestro/scripts/seed.ts",
+    "test": "maestro test ../.maestro/flows"
   },
   "dependencies": {
     "@amplitude/analytics-react-native": "^1.5.35",
@@ -62,6 +64,7 @@
   "devDependencies": {
     "@types/react": "~19.1.0",
     "react-test-renderer": "19.1.0",
+    "tsx": "^4.21.0",
     "typescript": "~5.9.2"
   },
   "private": true,

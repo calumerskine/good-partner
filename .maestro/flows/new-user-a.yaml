@@ -1,6 +1,6 @@
 appId: com.pearprogramming.wingmanapp
 ---
-- runFlow: ../../utils/launch.yaml
+- runFlow: ../utils/launch.yaml
 
 # Welcome — extend timeout to account for sequential loading states
 - extendedWaitUntil:
@@ -36,7 +36,7 @@ appId: com.pearprogramming.wingmanapp
 - assertVisible: "You're all set."
 - tapOn:
     id: "email"
-- inputText: "newuser-a@mail.com"
+- inputText: "new-user-a@mail.com"
 - tapOn:
     id: "password"
 - inputText: "password"

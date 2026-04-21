@@ -1,6 +1,6 @@
 appId: com.pearprogramming.wingmanapp
 ---
-- runFlow: ../../utils/launch.yaml
+- runFlow: ../utils/launch.yaml
 - openLink: "wingmanapp://login"
 - assertVisible: "Welcome Back"
 

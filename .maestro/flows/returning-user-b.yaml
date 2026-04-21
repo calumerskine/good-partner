@@ -1,13 +1,13 @@
 appId: com.pearprogramming.wingmanapp
 ---
-- runFlow: ../../utils/launch.yaml
+- runFlow: ../utils/launch.yaml
 
 - openLink: "wingmanapp://(onboard)/auth"
 
 - assertVisible: "You're all set."
 - tapOn:
     id: "email"
-- inputText: "existinguser@mail.com"
+- inputText: "empty-user@mail.com"
 - tapOn:
     id: "password"
 - inputText: "password"

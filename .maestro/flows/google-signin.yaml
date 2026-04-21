@@ -1,6 +1,6 @@
 appId: com.pearprogramming.wingmanapp
 ---
-- runFlow: ../../utils/launch.yaml
+- runFlow: ../utils/launch.yaml
 
 # Navigate to login screen
 - openLink: "wingmanapp://login"
