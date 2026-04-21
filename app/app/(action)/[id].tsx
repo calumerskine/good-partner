@@ -83,10 +83,18 @@ export default function ActionDetailScreen() {
     actionData = userAction.action;
   }
 
-  const categoryInfo =
-    ActionTypes[actionData?.category as keyof typeof ActionTypes];
-  const isActive = !isCatalogView && userAction?.isActive;
-  const completionCount = !isCatalogView ? userAction?.completionCount || 0 : 0;
+  if (isLoading) {
+    return (
+      <SafeAreaView style={tw`flex-1 bg-white`}>
+        <View style={tw`w-full px-6 py-4 flex-row items-center justify-between`}>
+          <BackButton />
+        </View>
+        <View style={tw`flex-1 items-center justify-center`}>
+          <ActivityIndicator size="large" color="#2E3130" />
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   if (!actionData) {
     return (
@@ -104,6 +112,11 @@ export default function ActionDetailScreen() {
       </SafeAreaView>
     );
   }
+
+  const categoryInfo =
+    ActionTypes[actionData.category as keyof typeof ActionTypes];
+  const isActive = !isCatalogView && userAction?.isActive;
+  const completionCount = !isCatalogView ? userAction?.completionCount || 0 : 0;
 
   const handleActivate = async () => {
     if (!user || !actionData.id) return;
@@ -173,143 +186,135 @@ export default function ActionDetailScreen() {
         </View>
       </View>
 
-      {isLoading ? (
-        <View style={tw`flex-1 items-center justify-center bg-white`}>
-          <ActivityIndicator size="large" color="#2E3130" />
-        </View>
-      ) : (
-        <>
-          <ScrollView
-            style={tw`flex-1 w-full`}
-            contentContainerStyle={tw`px-8 pb-8`}
-            showsVerticalScrollIndicator={false}
+      <ScrollView
+        style={tw`flex-1 w-full`}
+        contentContainerStyle={tw`px-8 pb-8`}
+        showsVerticalScrollIndicator={false}
+      >
+        {isActive ? (
+          <View
+            style={tw`flex w-24 flex-row items-center justify-between pb-6 gap-2`}
           >
-            {isActive ? (
-              <View
-                style={tw`flex w-24 flex-row items-center justify-between pb-6 gap-2`}
-              >
-                <Text style={tw`font-bold`}>In Progress</Text>
-                <View
-                  style={tw`bg-green-400 border-green-500 border w-4 h-4 rounded-full animate-ping`}
-                ></View>
-              </View>
-            ) : null}
-            <Text
-              style={tw`text-black font-gabarito font-black text-3xl leading-tight mb-6`}
-            >
-              {actionData.title}
-            </Text>
-
-            <Text style={tw`text-ink font-gabarito text-xl  mb-8`}>
-              {actionData.description}
-            </Text>
-
-            {!isCatalogView && completionCount > 0 && (
-              <View style={tw`rounded-2xl px-6 py-3 bg-grape/20 mb-6 self-end`}>
-                <Text
-                  style={tw`text-ink/70 font-gabarito text-base font-bold self-end`}
-                >
-                  {completionCount} {completionCount === 1 ? "time" : "times"}{" "}
-                  completed
-                </Text>
-              </View>
-            )}
-
-            <PressableCard
-              style={tw`mb-6`}
-              color={categoryInfo.color}
-              shade={200}
-            >
-              <View style={tw`p-6`}>
-                <View style={tw`absolute right-4 top-4`}>
-                  <Lightbulb />
-                </View>
-
-                <Text
-                  style={tw`text-ink font-gabarito text-2xl font-bold mb-3 mr-6`}
-                >
-                  Why it matters
-                </Text>
-                <Text
-                  style={tw`text-ink font-gabarito text-lg leading-relaxed`}
-                >
-                  {actionData.reasoning}
-                </Text>
-              </View>
-            </PressableCard>
-          </ScrollView>
-          <View style={tw`w-full px-6 pb-0 pt-4`}>
-            {isCatalogView ? (
-              hasOtherActiveAction ? (
-                <View style={tw`gap-3`}>
-                  <Button color="gray" disabled>
-                    Finish todays action first
-                  </Button>
-                  <Button
-                    color="ghost"
-                    size="sm"
-                    onPress={() => router.replace("/(tabs)/(home)")}
-                  >
-                    View active action →
-                  </Button>
-                </View>
-              ) : (
-                <Button
-                  onPress={handleActivate}
-                  disabled={activateAction.isPending}
-                  color={categoryInfo.color}
-                >
-                  {activateAction.isPending ? "Activating..." : "I'm on it"}
-                </Button>
-              )
-            ) : isActive ? (
-              <View style={tw`gap-3`}>
-                <Button
-                  onPress={handleComplete}
-                  disabled={completeAction.isPending}
-                  color="green"
-                >
-                  {completeAction.isPending
-                    ? "Completing..."
-                    : "✓ I've done it!"}
-                </Button>
-                <Button
-                  color="ghost"
-                  size="sm"
-                  onPress={handleDeactivate}
-                  disabled={deactivateAction.isPending}
-                >
-                  <Text style={tw`text-ink`}>
-                    {deactivateAction.isPending
-                      ? "Pausing..."
-                      : "Pause for now"}
-                  </Text>
-                </Button>
-              </View>
-            ) : hasOtherActiveAction ? (
-              <View style={tw`gap-3`}>
-                <Button disabled>Finish todays action first</Button>
-                <Button
-                  color="ghost"
-                  size="sm"
-                  onPress={() => router.replace("/(tabs)/(home)")}
-                >
-                  <Text style={tw`text-ink`}>View active action</Text>
-                </Button>
-              </View>
-            ) : (
-              <Button
-                onPress={handleActivate}
-                disabled={activateAction.isPending}
-              >
-                <Text>
-                  {activateAction.isPending ? "Activating..." : "I'm on it"}
-                </Text>
-              </Button>
-            )}
+            <Text style={tw`font-bold`}>In Progress</Text>
+            <View
+              style={tw`bg-green-400 border-green-500 border w-4 h-4 rounded-full animate-ping`}
+            ></View>
           </View>
-        </>
-      )}
+        ) : null}
+        <Text
+          style={tw`text-black font-gabarito font-black text-3xl leading-tight mb-6`}
+        >
+          {actionData.title}
+        </Text>
+
+        <Text style={tw`text-ink font-gabarito text-xl  mb-8`}>
+          {actionData.description}
+        </Text>
+
+        {!isCatalogView && completionCount > 0 && (
+          <View style={tw`rounded-2xl px-6 py-3 bg-grape/20 mb-6 self-end`}>
+            <Text
+              style={tw`text-ink/70 font-gabarito text-base font-bold self-end`}
+            >
+              {completionCount} {completionCount === 1 ? "time" : "times"}{" "}
+              completed
+            </Text>
+          </View>
+        )}
+
+        <PressableCard
+          style={tw`mb-6`}
+          color={categoryInfo.color}
+          shade={200}
+        >
+          <View style={tw`p-6`}>
+            <View style={tw`absolute right-4 top-4`}>
+              <Lightbulb />
+            </View>
+
+            <Text
+              style={tw`text-ink font-gabarito text-2xl font-bold mb-3 mr-6`}
+            >
+              Why it matters
+            </Text>
+            <Text
+              style={tw`text-ink font-gabarito text-lg leading-relaxed`}
+            >
+              {actionData.reasoning}
+            </Text>
+          </View>
+        </PressableCard>
+      </ScrollView>
+      <View style={tw`w-full px-6 pb-0 pt-4`}>
+        {isCatalogView ? (
+          hasOtherActiveAction ? (
+            <View style={tw`gap-3`}>
+              <Button color="gray" disabled>
+                Finish todays action first
+              </Button>
+              <Button
+                color="ghost"
+                size="sm"
+                onPress={() => router.replace("/(tabs)/(home)")}
+              >
+                View active action →
+              </Button>
+            </View>
+          ) : (
+            <Button
+              onPress={handleActivate}
+              disabled={activateAction.isPending}
+              color={categoryInfo.color}
+            >
+              {activateAction.isPending ? "Activating..." : "I'm on it"}
+            </Button>
+          )
+        ) : isActive ? (
+          <View style={tw`gap-3`}>
+            <Button
+              onPress={handleComplete}
+              disabled={completeAction.isPending}
+              color="green"
+            >
+              {completeAction.isPending
+                ? "Completing..."
+                : "✓ I've done it!"}
+            </Button>
+            <Button
+              color="ghost"
+              size="sm"
+              onPress={handleDeactivate}
+              disabled={deactivateAction.isPending}
+            >
+              <Text style={tw`text-ink`}>
+                {deactivateAction.isPending
+                  ? "Pausing..."
+                  : "Pause for now"}
+              </Text>
+            </Button>
+          </View>
+        ) : hasOtherActiveAction ? (
+          <View style={tw`gap-3`}>
+            <Button disabled>Finish todays action first</Button>
+            <Button
+              color="ghost"
+              size="sm"
+              onPress={() => router.replace("/(tabs)/(home)")}
+            >
+              <Text style={tw`text-ink`}>View active action</Text>
+            </Button>
+          </View>
+        ) : (
+          <Button
+            onPress={handleActivate}
+            disabled={activateAction.isPending}
+          >
+            <Text>
+              {activateAction.isPending ? "Activating..." : "I'm on it"}
+            </Text>
+          </Button>
+        )}
+      </View>
     </SafeAreaView>
   );
 }
