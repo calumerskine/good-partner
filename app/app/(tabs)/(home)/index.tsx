@@ -32,7 +32,7 @@ export default function HomeScreen() {
     useGetTodayCompletedAction(user?.id);
   const [showSuggestedFlow, setShowSuggestedFlow] = useState(false);
 
-  const dayNumber = profile ? Math.max(profile.totalDaysActive, 1) : undefined;
+  const dayNumber = profile ? profile.totalDaysActive + 1 : undefined;
   const { data: dailyContent } = useGetDailyContent(dayNumber);
 
   const headerAnim = useMountAnimation({ fromOpacity: 0, fromTranslateY: 8, duration: 250, delay: 0 });
