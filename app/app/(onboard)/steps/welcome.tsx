@@ -18,7 +18,6 @@ export function WelcomeStep({ onNext }: Props) {
       {starImage?.[0]?.localUri ? (
         <Image source={{ uri: starImage[0].localUri }} style={tw`w-42 h-42`} />
       ) : null}
-      {/* </View> */}
 
       <View style={tw`gap-6 flex-1 mt-12`}>
         <Text style={tw`text-4xl text-ink font-gabarito font-bold text-center`}>
@@ -41,7 +40,7 @@ export function WelcomeStep({ onNext }: Props) {
           <Text style={tw`text-ink/80 font-gabarito text-base`}>
             Already have an account?
           </Text>
-          <TouchableOpacity onPress={() => router.push("/(auth)/login")}>
+          <TouchableOpacity onPress={() => router.replace("/(auth)/login")}>
             <Text style={tw`text-indigo-400 font-gabarito font-bold text-base`}>
               Sign In
             </Text>
