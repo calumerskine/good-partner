@@ -714,7 +714,7 @@ export function useGetActionDetail(actionId?: string) {
   });
 }
 
-async function getActionDetail(actionId: string): Promise<CatalogAction> {
+export async function getActionDetail(actionId: string): Promise<CatalogAction> {
   const { data, error } = await supabase
     .from("actions")
     .select(
@@ -792,10 +792,6 @@ export function useGetActiveActions(userId?: string) {
 }
 
 async function getActiveActions(userId: string): Promise<UserAction[]> {
-  // Only return actions activated today — active state should not persist across days
-  const todayStart = new Date();
-  todayStart.setHours(0, 0, 0, 0);
-
   // Get active user actions with their action details
   const { data: userActions, error } = await supabase
     .from("user_actions")
@@ -819,8 +815,7 @@ async function getActiveActions(userId: string): Promise<UserAction[]> {
     `,
     )
     .eq("user_id", userId)
-    .eq("is_active", true)
-    .gte("activated_at", todayStart.toISOString());
+    .eq("is_active", true);
 
   if (error) {
     throw error;
@@ -1249,7 +1244,19 @@ export function useActivateAction() {
 }
 
 async function activateAction(userId: string, actionId: string) {
-  // First, check if there's already a user_action for this user and action
+  // Deactivate any currently active actions before activating a new one.
+  // Enforces the single-active-action invariant that the UI assumes.
+  const { error: deactivateError } = await supabase
+    .from("user_actions")
+    .update({ is_active: false })
+    .eq("user_id", userId)
+    .eq("is_active", true);
+
+  if (deactivateError) {
+    throw deactivateError;
+  }
+
+  // Check if there's already a user_action for this user and action
   const { data: existingAction, error: fetchError } = await supabase
     .from("user_actions")
     .select("id, is_active")
