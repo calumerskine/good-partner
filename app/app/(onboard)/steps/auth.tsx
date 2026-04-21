@@ -22,7 +22,7 @@ type Props = {
 export function AuthStep({ onComplete }: Props) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { signUpWithEmail, signInWithGoogle, signInWithApple } = useAuth();
+  const { signUpWithEmail, signInWithEmail, signInWithGoogle, signInWithApple } = useAuth();
 
   const {
     control,
@@ -75,6 +75,25 @@ export function AuthStep({ onComplete }: Props) {
       await onComplete(user.id);
     } catch (err) {
       const e = err as Error & { errorCode?: string; errorStage?: string; errorStatus?: number };
+      if (e.errorCode === "user_already_exists") {
+        try {
+          const existingUser = await signInWithEmail(email, password);
+          trackEvent("auth_signup_succeeded", { provider: "email" });
+          await onComplete(existingUser.id);
+          return;
+        } catch (signInErr) {
+          const se = signInErr as Error & { errorCode?: string; errorStage?: string; errorStatus?: number };
+          trackEvent("auth_signup_failed", {
+            provider: "email",
+            error: se instanceof Error ? se.message : "unknown",
+            error_code: se.errorCode,
+            error_stage: se.errorStage,
+            error_status: se.errorStatus,
+          });
+          setError(se instanceof Error ? se.message : "An unknown error occurred");
+          return;
+        }
+      }
       trackEvent("auth_signup_failed", {
         provider: "email",
         error: e instanceof Error ? e.message : "unknown",
