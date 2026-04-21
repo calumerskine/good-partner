@@ -26,8 +26,11 @@ export default function HomeScreen() {
   const { isLoading: isProfileLoading, data: profile } = useGetUserProfile(
     user?.id,
   );
-  const [reminderSheetActionId, setReminderSheetActionId] = useState<string | null>(null);
-  const reminderSheetAction = userActions.find((a) => a.id === reminderSheetActionId) ?? null;
+  const [reminderSheetActionId, setReminderSheetActionId] = useState<
+    string | null
+  >(null);
+  const reminderSheetAction =
+    userActions.find((a) => a.id === reminderSheetActionId) ?? null;
   const { data: todayCompletedAction = null, isLoading: isTodayLoading } =
     useGetTodayCompletedAction(user?.id);
   const [showSuggestedFlow, setShowSuggestedFlow] = useState(false);
@@ -35,8 +38,18 @@ export default function HomeScreen() {
   const dayNumber = profile ? profile.totalDaysActive + 1 : undefined;
   const { data: dailyContent } = useGetDailyContent(dayNumber);
 
-  const headerAnim = useMountAnimation({ fromOpacity: 0, fromTranslateY: 8, duration: 250, delay: 0 });
-  const headlineAnim = useMountAnimation({ fromOpacity: 0, fromTranslateY: 8, duration: 250, delay: 0 });
+  const headerAnim = useMountAnimation({
+    fromOpacity: 0,
+    fromTranslateY: 8,
+    duration: 250,
+    delay: 0,
+  });
+  const headlineAnim = useMountAnimation({
+    fromOpacity: 0,
+    fromTranslateY: 8,
+    duration: 250,
+    delay: 0,
+  });
 
   useFocusEffect(
     useCallback(() => {
@@ -49,7 +62,11 @@ export default function HomeScreen() {
     }, [queryClient, user?.id]),
   );
 
-  if (isLoading || isProfileLoading || (isTodayLoading && userActions.length === 0)) {
+  if (
+    isLoading ||
+    isProfileLoading ||
+    (isTodayLoading && userActions.length === 0)
+  ) {
     return (
       <View style={tw`flex-1 items-center justify-center bg-white`}>
         <ActivityIndicator size="large" color="#2E3130" />
@@ -67,6 +84,8 @@ export default function HomeScreen() {
         <Text
           style={tw`text-xl font-gabarito text-charcoal mt-3 mb-5`}
           numberOfLines={1}
+          adjustsFontSizeToFit
+          minimumFontScale={0.5}
         >
           {dailyContent?.headlineMessage ?? "Everyone starts here"}
         </Text>
@@ -78,11 +97,7 @@ export default function HomeScreen() {
           onRemind={setReminderSheetActionId}
         />
       ) : showSuggestedFlow || !todayCompletedAction ? (
-        <SuggestedActions
-          user={user}
-          profile={profile}
-          isLoading={isLoading}
-        />
+        <SuggestedActions user={user} profile={profile} isLoading={isLoading} />
       ) : (
         <CompletedAction
           action={todayCompletedAction}
