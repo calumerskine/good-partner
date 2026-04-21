@@ -17,9 +17,10 @@ type FormValues = {
 
 type Props = {
   onComplete: (userId: string) => Promise<void>;
+  onExistingUser: (userId: string) => Promise<void>;
 };
 
-export function AuthStep({ onComplete }: Props) {
+export function AuthStep({ onComplete, onExistingUser }: Props) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { signUpWithEmail, signInWithEmail, signInWithGoogle, signInWithApple } = useAuth();
@@ -79,7 +80,7 @@ export function AuthStep({ onComplete }: Props) {
         try {
           const existingUser = await signInWithEmail(email, password);
           trackEvent("auth_signup_succeeded", { provider: "email" });
-          await onComplete(existingUser.id);
+          await onExistingUser(existingUser.id);
           return;
         } catch (signInErr) {
           const se = signInErr as Error & { errorCode?: string; errorStage?: string; errorStatus?: number };

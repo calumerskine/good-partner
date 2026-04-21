@@ -124,6 +124,11 @@ export default function OnboardWizard() {
     await submitProfile(userId);
   };
 
+  const handleExistingUser = async (_userId: string) => {
+    trackEvent("onboarding_completed");
+    router.replace("/(tabs)/(home)");
+  };
+
   if (authLoading || displayStep === null) {
     return (
       <View style={tw`flex-1 items-center justify-center bg-white`}>
@@ -132,7 +137,7 @@ export default function OnboardWizard() {
     );
   }
 
-  const showBack = displayStep >= 2 && displayStep <= 4;
+  const showBack = displayStep >= 1 && displayStep <= 4;
   const showProgress = displayStep >= 2 && displayStep <= 4;
   const progressStep = displayStep - 1; // step 2 → 1, step 3 → 2, step 4 → 3
 
@@ -213,7 +218,7 @@ export default function OnboardWizard() {
             isSubmitting={createProfileMutation.isPending}
           />
         )}
-        {displayStep === 5 && <AuthStep onComplete={handleComplete} />}
+        {displayStep === 5 && <AuthStep onComplete={handleComplete} onExistingUser={handleExistingUser} />}
       </Animated.View>
     </SafeAreaView>
   );
