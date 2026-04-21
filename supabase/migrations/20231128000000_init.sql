@@ -126,18 +126,22 @@ RETURNS TRIGGER AS $$
 DECLARE
     last_date DATE;
     current_streak INTEGER;
+    user_timezone TEXT;
+    today DATE;
 BEGIN
-    SELECT last_completion_date, current_streak_days
-    INTO last_date, current_streak
-    FROM user_profiles
-    JOIN user_actions ON user_actions.user_id = user_profiles.user_id
-    WHERE user_actions.id = NEW.user_action_id;
+    SELECT last_completion_date, current_streak_days, up.timezone
+    INTO last_date, current_streak, user_timezone
+    FROM user_profiles up
+    JOIN user_actions ua ON ua.user_id = up.user_id
+    WHERE ua.id = NEW.user_action_id;
+
+    today := (NOW() AT TIME ZONE COALESCE(user_timezone, 'UTC'))::DATE;
 
     IF last_date IS NULL THEN
         current_streak := 1;
-    ELSIF last_date = CURRENT_DATE THEN
+    ELSIF last_date = today THEN
         current_streak := current_streak;
-    ELSIF last_date = CURRENT_DATE - INTERVAL '1 day' THEN
+    ELSIF last_date = today - INTERVAL '1 day' THEN
         current_streak := current_streak + 1;
     ELSE
         current_streak := 1;
@@ -146,8 +150,8 @@ BEGIN
     UPDATE user_profiles
     SET
         current_streak_days = current_streak,
-        last_completion_date = CURRENT_DATE,
-        total_days_active = total_days_active + (CASE WHEN last_date = CURRENT_DATE THEN 0 ELSE 1 END)
+        last_completion_date = today,
+        total_days_active = total_days_active + (CASE WHEN last_date = today THEN 0 ELSE 1 END)
     FROM user_actions
     WHERE user_profiles.user_id = user_actions.user_id
     AND user_actions.id = NEW.user_action_id;
