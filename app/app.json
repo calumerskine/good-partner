@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "wingman-app",
+    "name": "Good Partner",
     "slug": "wingman-app",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/logo_full.png",
-    "scheme": "wingmanapp",
+    "scheme": "Good Partner",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {
@@ -17,11 +17,14 @@
       "deploymentTarget": "16.0",
       "supportsTablet": true,
       "bundleIdentifier": "com.pearprogramming.wingmanapp",
+      "name": "Good Partner",
       "usesAppleSignIn": true,
       "infoPlist": {
         "UIBackgroundModes": [
           "remote-notification"
-        ]
+        ],
+        "CFBundleDisplayName": "Good Partner",
+        "CFBundleName": "Good Partner"
       },
       "entitlements": {
         "aps-environment": "development"
