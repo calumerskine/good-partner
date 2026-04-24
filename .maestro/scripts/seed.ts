@@ -1,6 +1,7 @@
-#!/usr/bin/env tsx
+// @ts-nocheck
+// #!/usr/bin/env tsx
 /**
- * E2E seed script — nukes and recreates empty-user@mail.com as an onboarded user.
+ * E2E seed script — nukes and recreates users.
  * Reads env from app/.env (EXPO_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY).
  */
 
@@ -91,22 +92,22 @@ async function restPost(table: string, body: unknown) {
 // ── Core operations ───────────────────────────────────────────────────────────
 
 async function nukeUser(email: string): Promise<void> {
-  console.log(`  Nuking ${email} if exists...`);
+  // console.log(`  Nuking ${email} if exists...`);
   const data = await adminGet(
     `/admin/users?filter=${encodeURIComponent(email)}`
   );
   const userId: string | undefined = data?.users?.[0]?.id;
   if (!userId) {
-    console.log("  No existing user found");
+    // console.log("  No existing user found");
     return;
   }
-  console.log(`  Deleting ${userId}...`);
+  // console.log(`  Deleting ${userId}...`);
   await adminDelete(`/admin/users/${userId}`);
-  console.log("  Deleted");
+  // console.log("  Deleted");
 }
 
 async function createOnboardedUser(email: string, password: string) {
-  console.log(`  Creating auth user ${email}...`);
+  // console.log(`  Creating auth user ${email}...`);
   const user = await adminPost("/admin/users", {
     email,
     password,
@@ -119,9 +120,9 @@ async function createOnboardedUser(email: string, password: string) {
     console.error(`❌  Failed to create user. Response: ${JSON.stringify(user)}`);
     process.exit(1);
   }
-  console.log(`  ✓  Auth user: ${userId}`);
+  // console.log(`  ✓  Auth user: ${userId}`);
 
-  console.log("  Creating user_profile...");
+  // console.log("  Creating user_profile...");
   const profiles = await restPost("user_profiles", {
     user_id: userId,
     has_completed_onboarding: true,
@@ -141,9 +142,9 @@ async function createOnboardedUser(email: string, password: string) {
     console.error(`❌  Failed to create profile. Response: ${JSON.stringify(profiles)}`);
     process.exit(1);
   }
-  console.log(`  ✓  Profile: ${profileId}`);
+  // console.log(`  ✓  Profile: ${profileId}`);
 
-  console.log("  Upserting user_categories...");
+  // console.log("  Upserting user_categories...");
   await fetch(`${REST_URL}/user_categories`, {
     method: "POST",
     headers: { ...HEADERS, Prefer: "return=minimal,resolution=ignore-duplicates" },
@@ -152,7 +153,7 @@ async function createOnboardedUser(email: string, password: string) {
       { profile_id: profileId, category_id: "00000000-0000-0000-0000-000000000002" },
     ]),
   });
-  console.log("  ✓  Categories seeded");
+  // console.log("  ✓  Categories seeded");
 
   return { userId, profileId };
 }
@@ -164,16 +165,17 @@ const PASSWORD = "password";
 
 (async () => {
   console.log("");
-  console.log(`── Seeding E2E: ${EMAIL} ${"─".repeat(50)}`);
+  console.log("🌱  Seeding db...");
 
-  await nukeUser(EMAIL);
-  const result = await createOnboardedUser(EMAIL, PASSWORD);
+  await nukeUser(env.EXPO_PUBLIC_E2E_GOOGLE_EMAIL);
+  await nukeUser(env.EXPO_PUBLIC_E2E_APPLE_EMAIL);
+  await nukeUser(env.ONBOARDED_USER_EMAIL);
+  await nukeUser(env.EMPTY_USER_EMAIL);
+  await createOnboardedUser(env.EXPO_PUBLIC_E2E_GOOGLE_EMAIL, env.EXPO_PUBLIC_TEST_PASSWORD);
+  await createOnboardedUser(env.EXPO_PUBLIC_E2E_APPLE_EMAIL, env.EXPO_PUBLIC_TEST_PASSWORD);
+  await createOnboardedUser(env.ONBOARDED_USER_EMAIL, env.EXPO_PUBLIC_TEST_PASSWORD);
 
   console.log("");
   console.log("✅  Seed complete");
-  console.log(`    Email:    ${EMAIL}`);
-  console.log(`    Password: ${PASSWORD}`);
-  console.log(`    User ID:  ${result?.userId}`);
-  console.log(`    Profile:  ${result?.profileId}`);
   console.log("");
 })();

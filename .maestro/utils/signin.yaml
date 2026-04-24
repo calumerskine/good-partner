@@ -1,0 +1,11 @@
+# .maestro/utils/signin.yaml
+# Inputs specified auth credentials and taps Continue.
+appId: com.pearprogramming.wingmanapp
+---
+- tapOn:
+    id: "email"
+- inputText: ${EMAIL}
+- tapOn:
+    id: "password"
+- inputText: ${PASSWORD}
+- tapOn: "Continue with email"

@@ -9,7 +9,7 @@
     "web": "expo start --web",
     "seed": "tsx ../.maestro/scripts/seed.ts",
     "pretest": "tsx ../.maestro/scripts/seed.ts",
-    "test": "maestro test ../.maestro/flows"
+    "test": "sh ../.maestro/scripts/run.sh"
   },
   "dependencies": {
     "@amplitude/analytics-react-native": "^1.5.35",

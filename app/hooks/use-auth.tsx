@@ -140,13 +140,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signInWithGoogle = async (): Promise<User | null> => {
     if (process.env.EXPO_PUBLIC_E2E === "true") {
-      console.log("signInWithGoogle", {
-        email: process.env.EXPO_PUBLIC_E2E_EMAIL!,
-        password: process.env.EXPO_PUBLIC_E2E_PASSWORD!,
-      });
       const { data, error } = await supabase.auth.signInWithPassword({
-        email: process.env.EXPO_PUBLIC_E2E_EMAIL!,
-        password: process.env.EXPO_PUBLIC_E2E_PASSWORD!,
+        email: process.env.EXPO_PUBLIC_E2E_GOOGLE_EMAIL!,
+        password: process.env.EXPO_PUBLIC_TEST_PASSWORD!,
       });
       if (error)
         throw Object.assign(new Error(error.message), {
@@ -209,13 +205,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signInWithApple = async (): Promise<User | null> => {
     if (process.env.EXPO_PUBLIC_E2E === "true") {
-      console.log("signInWithApple", {
-        email: process.env.EXPO_PUBLIC_E2E_EMAIL!,
-        password: process.env.EXPO_PUBLIC_E2E_PASSWORD!,
-      });
       const { data, error } = await supabase.auth.signInWithPassword({
-        email: process.env.EXPO_PUBLIC_E2E_EMAIL!,
-        password: process.env.EXPO_PUBLIC_E2E_PASSWORD!,
+        email: process.env.EXPO_PUBLIC_E2E_APPLE_EMAIL!,
+        password: process.env.EXPO_PUBLIC_TEST_PASSWORD!,
       });
       if (error)
         throw Object.assign(new Error(error.message), {

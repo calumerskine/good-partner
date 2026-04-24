@@ -12,13 +12,10 @@ appId: com.pearprogramming.wingmanapp
 - tapOn: "Sign In"
 
 # Auth
-- assertVisible: "Welcome Back"
-- tapOn:
-    id: "email"
-- inputText: "empty-user@mail.com"
-- tapOn:
-    id: "password"
-- inputText: "password"
-- tapOn: "Continue with email"
+- runFlow:
+    file: ../utils/signin.yaml
+    env:
+      EMAIL: ${ONBOARDED_USER_EMAIL}
+      PASSWORD: ${TEST_PASSWORD}
 
 - assertVisible: "Day 1"

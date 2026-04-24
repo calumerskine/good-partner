@@ -4,7 +4,7 @@ appId: com.pearprogramming.wingmanapp
 - openLink: "wingmanapp://login"
 - assertVisible: "Welcome Back"
 
-- tapOn: "Sign In"
+- tapOn: "Continue with email"
 - assertVisible: "Email is required"
 - assertVisible: "Password is required"
 
@@ -12,23 +12,23 @@ appId: com.pearprogramming.wingmanapp
     id: "email"
 - eraseText
 - inputText: "not-an-email"
-- tapOn: "Sign In"
+- tapOn: "Continue with email"
 - assertVisible: "Invalid email address"
 
 - tapOn:
     id: "email"
 - eraseText
-- inputText: ${TEST_EMAIL}
+- inputText: ${EMPTY_USER_EMAIL}
 - tapOn:
     id: "password"
 - eraseText
 - inputText: "abc"
-- tapOn: "Sign In"
+- tapOn: "Continue with email"
 - assertVisible: "Password must be at least 6 characters"
 
 - tapOn:
     id: "password"
 - eraseText
 - inputText: "wrongpassword"
-- tapOn: "Sign In"
+- tapOn: "Continue with email"
 - assertVisible: "Invalid login credentials"

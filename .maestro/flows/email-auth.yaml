@@ -12,34 +12,27 @@ appId: com.pearprogramming.wingmanapp
 - assertVisible: "Sign In"
 - tapOn: "Get Started"
 
-# Transition
 - assertVisible: "Three quick questions to make this yours."
 - tapOn: "Continue"
 
-# Relationship
 - assertVisible: "How would you describe your relationship right now?"
 - tapOn: "Really good, I just want to keep growing"
 - tapOn: "Continue"
 
-# Focus
 - assertVisible: "What would you like to focus on?"
 - tapOn:
     id: "focus-ATTENTION"
 - tapOn: "Continue"
 
-# Gender
 - assertVisible: "About you"
 - tapOn: "Man"
 - tapOn: "Continue"
 
-# Auth
 - assertVisible: "You're all set."
-- tapOn:
-    id: "email"
-- inputText: "new-user-a@mail.com"
-- tapOn:
-    id: "password"
-- inputText: "password"
-- tapOn: "Continue with email"
+- runFlow:
+    file: ../utils/signin.yaml
+    env:
+      EMAIL: ${NEW_USER_PREFIX + Math.floor(Math.random() * 1000) + '@mail.com'}
+      PASSWORD: ${TEST_PASSWORD}
 
 - assertVisible: "Day 1"

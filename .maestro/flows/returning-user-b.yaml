@@ -2,15 +2,30 @@ appId: com.pearprogramming.wingmanapp
 ---
 - runFlow: ../utils/launch.yaml
 
-- openLink: "wingmanapp://(onboard)/auth"
+- tapOn: "Get Started"
+
+- assertVisible: "Three quick questions to make this yours."
+- tapOn: "Continue"
+
+- assertVisible: "How would you describe your relationship right now?"
+- tapOn: "Really good, I just want to keep growing"
+- tapOn: "Continue"
+
+- assertVisible: "What would you like to focus on?"
+- tapOn:
+    id: "focus-ATTENTION"
+- tapOn: "Continue"
+
+- assertVisible: "About you"
+- tapOn: "Man"
+- tapOn: "Continue"
 
 - assertVisible: "You're all set."
-- tapOn:
-    id: "email"
-- inputText: "empty-user@mail.com"
-- tapOn:
-    id: "password"
-- inputText: "password"
-- tapOn: "Continue with email"
+
+- runFlow:
+    file: ../utils/signin.yaml
+    env:
+      EMAIL: ${ONBOARDED_USER_EMAIL}
+      PASSWORD: ${TEST_PASSWORD}
 
 - assertVisible: "Day 1"

@@ -2,12 +2,10 @@ appId: com.pearprogramming.wingmanapp
 ---
 - runFlow: ../utils/launch.yaml
 
-# Navigate to login screen
 - openLink: "wingmanapp://login"
 - assertVisible: "Welcome Back"
 
 # Tap Apple button (iOS only — will fail on Android simulator)
 - tapOn: "Sign up with Apple"
 
-# E2E bypass: resolves immediately using test account credentials
 - assertVisible: "Day 1"

@@ -11,16 +11,11 @@ appId: com.pearprogramming.wingmanapp
 - assertVisible: "Create Account"
 - assertVisible: "Start building meaningful connections"
 
-# Enter credentials
-- tapOn:
-    id: "email"
-- inputText: "new-user-b@mail.com"
-- tapOn:
-    id: "password"
-- inputText: "password"
-
-# Sign in
-- tapOn: "Continue with email"
+- runFlow:
+    file: ../utils/signin.yaml
+    env:
+      EMAIL: ${NEW_USER_PREFIX + Math.floor(Math.random() * 1000) + '@mail.com'}
+      PASSWORD: ${TEST_PASSWORD}
 
 # Goes to onboarding
 - assertVisible: "How would you describe your relationship right now?"
