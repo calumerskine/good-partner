@@ -17,5 +17,7 @@ appId: com.pearprogramming.wingmanapp
       EMAIL: ${NEW_USER_PREFIX + Math.floor(Math.random() * 1000) + '@mail.com'}
       PASSWORD: ${TEST_PASSWORD}
 
-# Goes to onboarding
+# Intentionally stops here — this flow only validates that the deep link
+# lands on the sign-in screen and that signing up from there routes to
+# onboarding. Full onboarding coverage is in email-auth.yaml.
 - assertVisible: "How would you describe your relationship right now?"

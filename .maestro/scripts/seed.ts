@@ -160,20 +160,17 @@ async function createOnboardedUser(email: string, password: string) {
 
 // ── Main ──────────────────────────────────────────────────────────────────────
 
-const EMAIL = "empty-user@mail.com";
-const PASSWORD = "password";
-
 (async () => {
   console.log("");
   console.log("🌱  Seeding db...");
 
-  await nukeUser(env.EXPO_PUBLIC_E2E_GOOGLE_EMAIL);
-  await nukeUser(env.EXPO_PUBLIC_E2E_APPLE_EMAIL);
-  await nukeUser(env.ONBOARDED_USER_EMAIL);
-  await nukeUser(env.EMPTY_USER_EMAIL);
-  await createOnboardedUser(env.EXPO_PUBLIC_E2E_GOOGLE_EMAIL, env.EXPO_PUBLIC_TEST_PASSWORD);
-  await createOnboardedUser(env.EXPO_PUBLIC_E2E_APPLE_EMAIL, env.EXPO_PUBLIC_TEST_PASSWORD);
-  await createOnboardedUser(env.ONBOARDED_USER_EMAIL, env.EXPO_PUBLIC_TEST_PASSWORD);
+  await nukeUser((process.env.EXPO_PUBLIC_E2E_GOOGLE_EMAIL ?? env.EXPO_PUBLIC_E2E_GOOGLE_EMAIL));
+  await nukeUser((process.env.EXPO_PUBLIC_E2E_APPLE_EMAIL ?? env.EXPO_PUBLIC_E2E_APPLE_EMAIL));
+  await nukeUser((process.env.ONBOARDED_USER_EMAIL ?? env.ONBOARDED_USER_EMAIL));
+  await nukeUser((process.env.EMPTY_USER_EMAIL ?? env.EMPTY_USER_EMAIL));
+  await createOnboardedUser((process.env.EXPO_PUBLIC_E2E_GOOGLE_EMAIL ?? env.EXPO_PUBLIC_E2E_GOOGLE_EMAIL), (process.env.EXPO_PUBLIC_TEST_PASSWORD ?? env.EXPO_PUBLIC_TEST_PASSWORD));
+  await createOnboardedUser((process.env.EXPO_PUBLIC_E2E_APPLE_EMAIL ?? env.EXPO_PUBLIC_E2E_APPLE_EMAIL), (process.env.EXPO_PUBLIC_TEST_PASSWORD ?? env.EXPO_PUBLIC_TEST_PASSWORD));
+  await createOnboardedUser((process.env.ONBOARDED_USER_EMAIL ?? env.ONBOARDED_USER_EMAIL), (process.env.EXPO_PUBLIC_TEST_PASSWORD ?? env.EXPO_PUBLIC_TEST_PASSWORD));
 
   console.log("");
   console.log("✅  Seed complete");

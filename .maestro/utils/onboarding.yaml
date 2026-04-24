@@ -1,7 +1,8 @@
+# .maestro/utils/onboarding.yaml
+# Drives through the 3-step onboarding wizard from the welcome screen.
+# Caller must have the welcome screen visible before running this flow.
 appId: com.pearprogramming.wingmanapp
 ---
-- runFlow: ../utils/launch.yaml
-
 - tapOn: "Get Started"
 
 - assertVisible: "Three quick questions to make this yours."
@@ -21,11 +22,3 @@ appId: com.pearprogramming.wingmanapp
 - tapOn: "Continue"
 
 - assertVisible: "You're all set."
-
-- runFlow:
-    file: ../utils/signin.yaml
-    env:
-      EMAIL: ${ONBOARDED_USER_EMAIL}
-      PASSWORD: ${TEST_PASSWORD}
-
-- assertVisible: "Day 1"

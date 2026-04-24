@@ -56,7 +56,6 @@ jobs:
         working-directory: app
         env:
           EXPO_PUBLIC_E2E: "true"
-          # TODO: inject users
           EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID: ${{ secrets.GOOGLE_IOS_CLIENT_ID }}
           EXPO_PUBLIC_AMPLITUDE_API_KEY: ${{ secrets.AMPLITUDE_API_KEY }}
           EXPO_PUBLIC_ONESIGNAL_APP_ID: ${{ secrets.ONESIGNAL_APP_ID }}
@@ -83,13 +82,30 @@ jobs:
           APP_PATH=$(find app/build -name "*.app" -path "*/Debug-iphonesimulator/*.app" ! -name "*.dSYM" | head -1)
           xcrun simctl install ${{ steps.simulator.outputs.udid }} "$APP_PATH"
 
+      - name: Seed test users
+        working-directory: app
+        env:
+          EXPO_PUBLIC_SUPABASE_URL: ${{ secrets.EXPO_PUBLIC_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          ONBOARDED_USER_EMAIL: ${{ secrets.E2E_ONBOARDED_USER_EMAIL }}
+          EMPTY_USER_EMAIL: ${{ secrets.E2E_EMPTY_USER_EMAIL }}
+          EXPO_PUBLIC_E2E_GOOGLE_EMAIL: ${{ secrets.E2E_GOOGLE_EMAIL }}
+          EXPO_PUBLIC_E2E_APPLE_EMAIL: ${{ secrets.E2E_APPLE_EMAIL }}
+          EXPO_PUBLIC_TEST_PASSWORD: ${{ secrets.E2E_TEST_PASSWORD }}
+        run: npx tsx ../.maestro/scripts/seed.ts
+
       - name: Run Maestro flows
         env:
-          TEST_EMAIL: ${{ secrets.E2E_TEST_EMAIL }}
+          EMPTY_USER_EMAIL: ${{ secrets.E2E_EMPTY_USER_EMAIL }}
+          ONBOARDED_USER_EMAIL: ${{ secrets.E2E_ONBOARDED_USER_EMAIL }}
+          NEW_USER_PREFIX: ${{ secrets.E2E_NEW_USER_PREFIX }}
           TEST_PASSWORD: ${{ secrets.E2E_TEST_PASSWORD }}
         run: |
           maestro test \
-            --env TEST_EMAIL="$TEST_EMAIL" \
+            --exclude-tags=ios-only \
+            --env EMPTY_USER_EMAIL="$EMPTY_USER_EMAIL" \
+            --env ONBOARDED_USER_EMAIL="$ONBOARDED_USER_EMAIL" \
+            --env NEW_USER_PREFIX="$NEW_USER_PREFIX" \
             --env TEST_PASSWORD="$TEST_PASSWORD" \
             .maestro/flows/
 

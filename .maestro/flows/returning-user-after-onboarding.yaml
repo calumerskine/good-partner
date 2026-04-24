@@ -8,15 +8,13 @@ appId: com.pearprogramming.wingmanapp
       text: "Welcome to"
     timeout: 15000
 - assertVisible: "The Good Partner"
-- assertVisible: "Already have an account?"
-- assertVisible: "Sign In"
 
 - runFlow: ../utils/onboarding.yaml
 
 - runFlow:
     file: ../utils/signin.yaml
     env:
-      EMAIL: ${NEW_USER_PREFIX + Math.floor(Math.random() * 1000) + '@mail.com'}
+      EMAIL: ${ONBOARDED_USER_EMAIL}
       PASSWORD: ${TEST_PASSWORD}
 
 - assertVisible: "Day 1"

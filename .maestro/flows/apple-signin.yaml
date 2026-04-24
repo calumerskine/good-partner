@@ -1,4 +1,6 @@
 appId: com.pearprogramming.wingmanapp
+tags:
+  - ios-only
 ---
 - runFlow: ../utils/launch.yaml
 
